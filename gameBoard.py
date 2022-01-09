@@ -35,10 +35,6 @@ class GameBoard:
         return False
 
     def check_game_over(self):
-        #1. 보드를 정방행렬로 자르기
-        #2. 대각성분 추출하기
-        #3. 보드를 대칭변환 flip 하기
-
         #함수 선언================================
         def crop_board(board, stone_location, cut_size):
             #board를 stone_locate 기준으로 cut_size만큼 크롭하여 반환
@@ -105,7 +101,6 @@ class GameBoard:
                     return True
 
             cropped_board = np.rot90(cropped_board)   #90도 회전
-
         return False
 
 
