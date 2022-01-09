@@ -3,6 +3,7 @@ import numpy as np
 class GameBoard:
     def __init__(self, board_size):
         self.board_size = board_size
+        self.sequence_num = 5
 
         # self.__board = [(5, 2), (7, 5), (5, 3), (2, 0), (5, 5), (7, 4), (5, 6), (8, 3)]   #세로
         # self.__board = [(2, 5), (7, 5), (3, 5), (2, 0), (5, 5), (7, 4), (6, 5), (8, 3)]   #가로
@@ -38,10 +39,7 @@ class GameBoard:
         #2. 대각성분 추출하기
         #3. 보드를 대칭변환 flip 하기
 
-        last_x, last_y = self.__board[-1]
-        last_turn = not self.next_turn()
-        stone_color = -1 if last_turn else 1
-
+        #함수 선언================================
         def crop_board(board, stone_location, cut_size):
             #board를 stone_locate 기준으로 cut_size만큼 크롭하여 반환
 
@@ -74,25 +72,41 @@ class GameBoard:
 
             return tensor_board
 
-        cropped_board = crop_board(self.get_square_board(), (last_x, last_y), 4)
-        print(cropped_board)
+        def count_squential_stone(list):
+            #연결된 돌의 개수를 반환
+            for num, stone in enumerate(list):
+                if not stone: break;
+            return num
+        #End======================================
 
+        #변수 선언================================
+        last_x, last_y = self.__board[-1]
+        cut_size = self.sequence_num - 1
 
+        last_turn = not self.next_turn()
+        stone_color = -1 if last_turn else 1
+        #End======================================
 
-        # row = self.get_square_board()[last_y] == stone_color
-        #
-        # left_side = row[:last_x][::-1]   #마지막 돌 기준 좌측
-        # right_side = row[last_x+1:]   #마지막 돌 기준 우측
-        #
-        # def count_squential_stone(list):
-        #     #연결된 돌의 개수를 반환
-        #     for num, stone in enumerate(list):
-        #         if not stone: break;
-        #     return num
-        #
-        # seq_num = count_squential_stone(left_side)
-        # seq_num += count_squential_stone(right_side)
-        # print(seq_num)
+        cropped_board = crop_board(self.get_square_board(), (last_x, last_y), cut_size)
+
+        for angle in range(2):   #90도
+            row = cropped_board[cut_size] == stone_color   #수평축
+
+            for hor in range(2):   #수평, 대각
+                left_side = row[:cut_size][::-1]
+                right_side = row[cut_size+1:]
+
+                seq_num = count_squential_stone(left_side)
+                seq_num += count_squential_stone(right_side)
+
+                row = np.diag(cropped_board) == stone_color   #대각축
+
+                if seq_num >= cut_size:
+                    return True
+
+            cropped_board = np.rot90(cropped_board)   #90도 회전
+
+        return False
 
 
 
@@ -102,4 +116,4 @@ print(board.get_square_board(), end="\n\n")
 board.put_stone(3, 5)
 print(board.get_square_board(), end="\n\n")
 
-board.check_game_over()
+print(board.check_game_over())
