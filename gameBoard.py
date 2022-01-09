@@ -42,18 +42,40 @@ class GameBoard:
         last_turn = not self.next_turn()
         stone_color = -1 if last_turn else 1
 
-        def cut_board(board, stone_location, cut_size):
+        def crop_board(board, stone_location, cut_size):
             #board를 stone_locate 기준으로 cut_size만큼 크롭하여 반환
+
+            def get_crop_index(location, cut_size, board_size):
+                #크롭을 위한 위치(Index)를 반환
+                #board cut idx: cut_min_idx, cut_max_idx
+                #board shift idx: shift_min_idx, shift_max_idx
+                cut_min_idx = np.clip(location - cut_size, 0, None)
+                cut_max_idx = np.clip(location + cut_size, 0, board_size - 1) + 1
+
+                shift_min_idx = cut_size - location + cut_min_idx
+                shift_max_idx = shift_min_idx + cut_max_idx - cut_min_idx
+                return (cut_min_idx, cut_max_idx), (shift_min_idx, shift_max_idx)
+
             x, y = stone_location
+            tensor_board = np.zeros((cut_size*2+1, cut_size*2+1))
 
-            a = np.zeros((cut_size*2+1, cut_size*2+1))
+            cut_x, shift_x = get_crop_index(x, cut_size, self.board_size)
+            cut_y, shift_y = get_crop_index(y, cut_size, self.board_size)
 
-            print(x, y)
-            print(a)
+            cropped_board = board[   #cropping board
+                cut_y[0]:cut_y[1],
+                cut_x[0]:cut_x[1]
+            ]
 
+            tensor_board[   #마지막 착수를 중심으로 정방 행렬 생성
+                shift_y[0]:shift_y[1],
+                shift_x[0]:shift_x[1]
+            ] = cropped_board
 
-        cut_board(self.get_square_board(), (last_x, last_y), 4)
+            return tensor_board
 
+        cropped_board = crop_board(self.get_square_board(), (last_x, last_y), 4)
+        print(cropped_board)
 
 
 
