@@ -7,7 +7,7 @@ class GameBoard:
         self.__board = []
         # self.__board = [(0, 0), (1, 2), (1, 0), (1, 3), (2, 0), (6, 7), (3, 0), (5, 6), (4, 0)]
 
-    def next_turn(self):
+    def now_turn(self):
         return len(self.__board) % 2 == 0   #True: 흑, False: 백
 
     def get_list_board(self):
@@ -74,7 +74,7 @@ class GameBoard:
         last_x, last_y = self.__board[-1]
         cut_size = self.sequence_num - 1
 
-        last_turn = not self.next_turn()
+        last_turn = not self.now_turn()
         stone_color = -1 if last_turn else 1
         #End======================================
 
@@ -84,7 +84,7 @@ class GameBoard:
             row = (cropped_board[cut_size] == stone_color)   #수평축
             for hor in range(2):   #수평, 대각
                 row = row.tolist()
-                
+
                 left_side = row[:cut_size][::-1]
                 right_side = row[cut_size+1:]
 
