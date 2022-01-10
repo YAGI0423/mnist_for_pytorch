@@ -25,5 +25,5 @@ while game_done := not board.check_game_over():
         if success: break;
 
     print("=" * 100, end="\n\n")
-    
+
 print(board.check_game_over())
