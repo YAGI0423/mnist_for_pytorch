@@ -26,4 +26,7 @@ while game_done := not board.check_game_over():
 
     print("=" * 100, end="\n\n")
 
-print(board.check_game_over())
+if win_stone := board.now_turn():   #True: 백 승, False: 흑 승
+    print("White Win")
+else:
+    print("Black Win")
