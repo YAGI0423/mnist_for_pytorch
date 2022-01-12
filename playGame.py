@@ -16,11 +16,15 @@ def check_input(message):
             continue
 
 
+player_info = {
+    'playerA': True,
+    'playerB': model.AlphaO(9)
+}
+# if type(player_info['playerB']) == bool():
+print(type(player_info['playerB']) == 'class')
+exit()
 
-player1, player2 = True, False   #True: User, False: Model
-model = model.AlphaO(9)
-
-player1_stone = bool(np.random.randint(2))   #True: Black, Flase: White
+playerA_color = bool(np.random.randint(2))   #True: Black, Flase: White
 
 
 board = gameBoard.GameBoard(9)
@@ -32,24 +36,28 @@ while game_done := not board.check_game_over():
     now_turn = board.now_turn()
     print("Black" if now_turn else "White")
 
-    if player1_stone == now_turn:
-        if player1:
-            while True:
-                input_x, input_y = check_input("x"), check_input("y")
-                success = board.put_stone(input_x, input_y)
-                if success: break;
-        else:
-            loc = model.act(board.get_list_board)
-            success = board.put_stone(loc)
-    else:
-        if player2:
-            while True:
-                input_x, input_y = check_input("x"), check_input("y")
-                success = board.put_stone(input_x, input_y)
-                if success: break;
-        else:
-            loc = model.act(board.get_list_board())
-            success = board.put_stone(*loc)
+    now_player_key = "playerA" if playerA_color == now_turn else "playerB"
+
+    # if player_info[now_player_key]:
+
+    # if black_player == now_turn:
+    #     if player1:
+    #         while True:
+    #             input_x, input_y = check_input("x"), check_input("y")
+    #             success = board.put_stone(input_x, input_y)
+    #             if success: break;
+    #     else:
+    #         loc = model.act(board.get_list_board)
+    #         success = board.put_stone(loc)
+    # else:
+    #     if player2:
+    #         while True:
+    #             input_x, input_y = check_input("x"), check_input("y")
+    #             success = board.put_stone(input_x, input_y)
+    #             if success: break;
+    #     else:
+    #         loc = model.act(board.get_list_board())
+    #         success = board.put_stone(*loc)
 
 
 
