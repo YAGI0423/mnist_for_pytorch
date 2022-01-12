@@ -20,7 +20,7 @@ class AlphaO:
         return able_loc[rand_idx]
 
 
-board = [(0, 0), (1, 2), (1, 0), (1, 3), (2, 0), (6, 7), (3, 0), (5, 6), (4, 0)]
-
-model = AlphaO(9)
-print(model.act(board))
+# board = [(0, 0), (1, 2), (1, 0), (1, 3), (2, 0), (6, 7), (3, 0), (5, 6), (4, 0)]
+#
+# model = AlphaO(9)
+# print(model.act(board))

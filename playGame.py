@@ -1,4 +1,8 @@
 import gameBoard
+import model
+
+import numpy as np
+
 
 def check_input(message):
     #check user input value
@@ -12,17 +16,42 @@ def check_input(message):
             continue
 
 
+
+player1, player2 = True, False   #True: User, False: Model
+model = model.AlphaO(9)
+
+player1_stone = bool(np.random.randint(2))   #True: Black, Flase: White
+
+
 board = gameBoard.GameBoard(9)
 
 while game_done := not board.check_game_over():
     print("=" * 100)
     print(board.get_square_board())
-    print("Black" if board.now_turn() else "White")
 
-    while True:
-        input_x, input_y = check_input("x"), check_input("y")
-        success = board.put_stone(input_x, input_y)
-        if success: break;
+    now_turn = board.now_turn()
+    print("Black" if now_turn else "White")
+
+    if player1_stone == now_turn:
+        if player1:
+            while True:
+                input_x, input_y = check_input("x"), check_input("y")
+                success = board.put_stone(input_x, input_y)
+                if success: break;
+        else:
+            loc = model.act(board.get_list_board)
+            success = board.put_stone(loc)
+    else:
+        if player2:
+            while True:
+                input_x, input_y = check_input("x"), check_input("y")
+                success = board.put_stone(input_x, input_y)
+                if success: break;
+        else:
+            loc = model.act(board.get_list_board())
+            success = board.put_stone(*loc)
+
+
 
     print("=" * 100, end="\n\n")
 
