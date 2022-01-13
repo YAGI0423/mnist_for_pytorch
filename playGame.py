@@ -1,17 +1,18 @@
-import gameBoard
-import model
 import user
+import model
+import gameBoard
 
 import numpy as np
 
 
+board_size = 9
 player_info = {
-    'playerA': user.User(9),
-    'playerB': model.AlphaO(9)
+    'playerA': user.User(board_size),
+    'playerB': model.RandomChoice(board_size)
 }
 playerA_color = bool(np.random.randint(2))   #True: Black, Flase: White
+board = gameBoard.GameBoard(board_size)
 
-board = gameBoard.GameBoard(9)
 
 while game_done := not board.check_game_over():
     print("=" * 100)
@@ -28,7 +29,7 @@ while game_done := not board.check_game_over():
 
     print("=" * 100, end="\n\n")
 
-if now_turn:   #True: 백 승, False: 흑 승
+if not now_turn:   #True: 백 승, False: 흑 승
     print("White Win")
 else:
     print("Black Win")
