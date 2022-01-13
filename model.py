@@ -1,6 +1,6 @@
 import numpy as np
-import tensorflow as tf
-from tensorflow import keras as K
+# import tensorflow as tf
+# from tensorflow import keras as K
 
 
 class RandomChoice:
@@ -45,7 +45,7 @@ class AlphaO:
         return model
 
 
-model = AlphaO(9)
-
-test_input = np.zeros((1, 9, 9))
-print(model.model(test_input))
+# model = AlphaO(9)
+#
+# test_input = np.zeros((1, 9, 9))
+# print(model.model(test_input))

@@ -65,6 +65,12 @@ class GameBoard:
             ] = cropped_board
 
             return tensor_board
+
+        def count_seq_stone(seq_list):
+            #Count sequence Stone Num
+            try: seq_num = seq_list.index(False);
+            except: return len(seq_list);
+            return seq_num
         #End======================================
 
         #아홉 수 이전까지는 승패 결정 불가
@@ -88,7 +94,8 @@ class GameBoard:
                 left_side = row[:cut_size][::-1]
                 right_side = row[cut_size+1:]
 
-                seq_num = left_side.count(True) + right_side.count(True)
+                seq_num = count_seq_stone(left_side)
+                seq_num += count_seq_stone(right_side)
 
                 row = np.diag(cropped_board) == stone_color   #대각축
 

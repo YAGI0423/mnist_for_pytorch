@@ -33,6 +33,6 @@ if not now_turn:   #True: 백 승, False: 흑 승
     print("White Win")
 else:
     print("Black Win")
+    
 print(board.get_square_board())
 print(stone_location)
-#오목이 완성 되지 않아도 게임이 종료되는 이슈
