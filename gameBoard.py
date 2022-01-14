@@ -32,7 +32,9 @@ class GameBoard:
             return True
         return False
 
-    def check_game_over(self):
+    def game_status(self):
+        #0: during, 1: win, 2: draw
+
         #함수 선언================================
         def crop_board(board, stone_location, cut_size):
             #board를 stone_locate 기준으로 cut_size만큼 크롭하여 반환
@@ -73,8 +75,8 @@ class GameBoard:
             return seq_num
         #End======================================
 
-        #아홉 수 이전까지는 승패 결정 불가
-        if len(self.__board) < 9: return False;
+        #이전까지는 승패 결정 불가
+        if len(self.__board) < self.sequence_num * 2 - 1: return 0;   #during
 
         #변수 선언================================
         last_x, last_y = self.__board[-1]
@@ -99,7 +101,16 @@ class GameBoard:
 
                 row = np.diag(cropped_board) == stone_color   #대각축
 
-                if seq_num >= cut_size: return True;
+                if seq_num >= cut_size: return 1;   #win
 
             cropped_board = np.rot90(cropped_board)   #90도 회전
-        return False
+
+        if len(self.__board) == self.board_size ** 2:
+            return 2   #draw
+        return 0   #during
+
+
+if __name__ == "__main__":
+    board = GameBoard(3)
+    print(board.get_square_board())
+    print(board.game_status())

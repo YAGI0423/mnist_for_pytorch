@@ -4,6 +4,10 @@ import gameBoard
 
 import numpy as np
 
+#해결 필요 문제======
+#1. 무승부 처리
+#2. 기권 처리
+#End=================
 
 board_size = 9
 player_info = {
@@ -14,7 +18,7 @@ playerA_color = bool(np.random.randint(2))   #True: Black, Flase: White
 board = gameBoard.GameBoard(board_size)
 
 
-while game_done := not board.check_game_over():
+while (game_done := board.game_status()) == 0:
     print("=" * 100)
     print(board.get_square_board())
 
@@ -33,6 +37,6 @@ if not now_turn:   #True: 백 승, False: 흑 승
     print("White Win")
 else:
     print("Black Win")
-    
+
 print(board.get_square_board())
 print(stone_location)
