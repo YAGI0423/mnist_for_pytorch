@@ -5,13 +5,12 @@ import gameBoard
 import numpy as np
 
 #해결 필요 문제======
-#1. 무승부 처리
 #2. 기권 처리
 #End=================
 
 board_size = 9
 player_info = {
-    'playerA': model.RandomChoice(board_size),
+    'playerA': user.User(board_size),
     'playerB': model.RandomChoice(board_size)
 }
 playerA_color = bool(np.random.randint(2))   #True: Black, Flase: White
@@ -28,12 +27,14 @@ while (game_done := board.game_status()) == 0:
 
     now_player_key = "playerA" if playerA_color == now_turn else "playerB"
     stone_location = player_info[now_player_key].act(board.get_list_board())
-    success = board.put_stone(*stone_location)
+
+    if stone_location == (None, None): break;   #기권
+    sucess = board.put_stone(*stone_location)
     #End=============================
 
     print("=" * 100, end="\n\n")
 
-if not now_turn:   #True: 백 승, False: 흑 승
+if board.now_turn():   #True: 흑 승, False: 백 승
     print("White Win")
 else:
     print("Black Win")

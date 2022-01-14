@@ -11,14 +11,14 @@ class GameBoard:
         return len(self.__board) % 2 == 0   #True: 흑, False: 백
 
     def get_list_board(self):
-        return tuple(self.__board)
+        return tuple(self.__board.copy())
 
     def get_square_board(self):
-        board = np.zeros((self.board_size, self.board_size))
+        square_board = np.zeros((self.board_size, self.board_size))
         for turn, (x, y) in enumerate(self.__board):
             stone_color = -1 if turn % 2 == 0 else 1
-            board[y][x] = stone_color
-        return board
+            square_board[y][x] = stone_color
+        return square_board
 
     def check_location(self, x, y):
         if x >= self.board_size: return False;
@@ -108,9 +108,3 @@ class GameBoard:
         if len(self.__board) == self.board_size ** 2:
             return 2   #draw
         return 0   #during
-
-
-if __name__ == "__main__":
-    board = GameBoard(3)
-    print(board.get_square_board())
-    print(board.game_status())
