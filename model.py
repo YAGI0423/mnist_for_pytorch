@@ -10,9 +10,9 @@ class RandomChoice(rule.Rule):
         self.board_size = board_size
 
     def act(self, board):
-        able_loc = super().get_able_location(board)
-        rand_idx = np.random.choice(len(able_loc))
-        return able_loc[rand_idx]
+        able_loc_tup = super().get_able_location(board)
+        rand_idx = np.random.choice(len(able_loc_tup))
+        return able_loc_tup[rand_idx]
 
 
 class AlphaO(rule.Rule):

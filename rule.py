@@ -17,7 +17,7 @@ class Rule:
         )
         able_loc -= set(list_board)
 
-        able_loc = (
+        able_loc = tuple(
             loc for loc in able_loc \
             if self.check_able_location(list_board, *loc)
         )
