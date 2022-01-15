@@ -1,18 +1,11 @@
-class User:
+import rule
+
+class User(rule.Rule):
     def __init__(self, board_size):
+        super().__init__(board_size)
         self.board_size = board_size
 
     def act(self, board):
-        def get_able_location(board):
-            #return able location
-            able_loc = set(
-                (x, y) \
-                for x in range(self.board_size) \
-                for y in range(self.board_size)
-            )
-            able_loc -= set(board)
-            return tuple(able_loc)
-
         def check_input(message):
             #check user input value
             while True:
@@ -25,9 +18,9 @@ class User:
                 except:
                     continue
 
-        able_loc = get_able_location(board)
+        able_loc_tup = super().get_able_location(board)
         while True:
             input_x, input_y = check_input("x"), check_input("y")
-            if (input_x, input_y) in able_loc: break;
+            if (input_x, input_y) in able_loc_tup: break;
             if (input_x, input_y) == (None, None): break;   #기권
         return (input_x, input_y)
