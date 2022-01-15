@@ -11,7 +11,7 @@ import numpy as np
 board_size = 9
 player_info = {
     'playerA': user.User(board_size),
-    'playerB': model.RandomChoice(board_size)
+    'playerB': model.AlphaO(board_size)
 }
 playerA_color = bool(np.random.randint(2))   #True: Black, Flase: White
 board = gameBoard.GameBoard(board_size)

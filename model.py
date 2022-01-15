@@ -1,7 +1,8 @@
-import numpy as np
 import rule
-# import tensorflow as tf
-# from tensorflow import keras as K
+
+import numpy as np
+import tensorflow as tf
+from tensorflow import keras as K
 
 
 class RandomChoice(rule.Rule):
@@ -37,8 +38,18 @@ class AlphaO(rule.Rule):
         model = K.models.Model(inputs=input, outputs=[policy_output, value_output])
         return model
 
-    def act(self):
-        pass
+    def act(self, list_board):
+        def get_square_board(list_board):
+            square_board = np.zeros((self.board_size, self.board_size))
+            for turn, (x, y) in enumerate(list_board):
+                stone_color = -1 if turn % 2 == 0 else 1
+                square_board[y][x] = stone_color
+            return square_board
+
+        list_board = get_square_board(list_board)
+        list_board = list_board.reshape(1, self.board_size, self.board_size)
+        print(self.model(list_board))
+        exit()
 
 
 if __name__ == "__main__":
