@@ -10,7 +10,7 @@ import numpy as np
 # 해결방법 1. rule.py를 만들고 각 클래스에 상속하여 동일하게 통제하기
 #End=================
 
-board_size = 5
+board_size = 9
 player_info = {
     'playerA': model.RandomChoice(board_size),
     'playerB': model.RandomChoice(board_size)

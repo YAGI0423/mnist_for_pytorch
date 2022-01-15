@@ -1,6 +1,6 @@
 import numpy as np
-# import tensorflow as tf
-# from tensorflow import keras as K
+import tensorflow as tf
+from tensorflow import keras as K
 
 
 class RandomChoice:
@@ -44,8 +44,12 @@ class AlphaO:
         model = K.models.Model(inputs=input, outputs=[policy_output, value_output])
         return model
 
+    def act(self):
+        pass
 
-# model = AlphaO(9)
-#
-# test_input = np.zeros((1, 9, 9))
-# print(model.model(test_input))
+
+if __name__ == "__main__":
+        model = AlphaO(9)
+
+        test_input = np.zeros((1, 9, 9))
+        print(model.model(test_input))
