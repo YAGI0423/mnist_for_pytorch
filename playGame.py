@@ -10,7 +10,7 @@ import numpy as np
 
 board_size = 9
 player_info = {
-    'playerA': user.User(board_size),
+    'playerA': model.AlphaO(board_size),
     'playerB': model.AlphaO(board_size)
 }
 playerA_color = bool(np.random.randint(2))   #True: Black, Flase: White
@@ -28,7 +28,9 @@ while (game_done := board.game_status()) == 0:
     now_player_key = "playerA" if playerA_color == now_turn else "playerB"
 
     stone_location = player_info[now_player_key].act(board.get_list_board())
-    if stone_location == (None, None): break;   #기권
+    if stone_location == (None, None):
+        print("surrender!")
+        break;   #기권
 
     board.put_stone(*stone_location)
     #End=============================

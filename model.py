@@ -60,8 +60,8 @@ class AlphaO(rule.Rule):
             range(self.board_size ** 2 + 1),
             p=policy_pred
         )
-
-        exit()
+        if idx == self.board_size: return (-1, -1)   #surrender
+        return (idx % self.board_size, idx // self.board_size)
 
 
 if __name__ == "__main__":
