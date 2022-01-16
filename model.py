@@ -48,12 +48,24 @@ class AlphaO(rule.Rule):
 
         list_board = get_square_board(list_board)
         list_board = list_board.reshape(1, self.board_size, self.board_size)
-        print(self.model(list_board))
+
+        policy_pred, value_pred = self.model(list_board)
+        policy_pred = np.array(policy_pred[0], dtype=np.float32)
+
+        #확률분포 조건(sum = 1)
+        over = 1 - np.sum(policy_pred)
+        policy_pred[-1] += over
+
+        idx = np.random.choice(
+            range(self.board_size ** 2 + 1),
+            p=policy_pred
+        )
+
         exit()
 
 
 if __name__ == "__main__":
         model = AlphaO(9)
 
-        test_input = np.zeros((1, 9, 9))
-        print(model.model(test_input))
+        list_board = [(0, 0)]
+        print(model.act(list_board))
