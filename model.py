@@ -23,7 +23,7 @@ class AlphaO(rule.Rule):
         self.model = self.__get_model()
 
     def __get_model(self):
-        input = K.layers.Input(shape=(self.board_size, self.board_size, 1))
+        input = K.layers.Input(shape=(self.board_size, self.board_size, 3))
         conv1 = K.layers.Conv2D(kernel_size=3, filters=64, activation="relu", padding="same")(input)
 
         flat = K.layers.Flatten()(conv1)
@@ -46,10 +46,28 @@ class AlphaO(rule.Rule):
                 square_board[y][x] = stone_color
             return square_board
 
-        list_board = get_square_board(list_board)
-        list_board = list_board.reshape(1, self.board_size, self.board_size)
+        def filt_board(square_board, stone_color):
+            #filt squre board stone
+            board = (square_board == stone_color)
+            board = board.astype(np.float64)
+            return board
 
-        policy_pred, value_pred = self.model(list_board)
+        #모델 입력 데이터(=특징 평면)================
+        square_board = get_square_board(list_board)
+        black_board = filt_board(square_board, -1)
+        white_board = filt_board(square_board, 1)
+
+        turn_board = np.zeros((self.board_size, self.board_size))
+        if len(list_board) % 2 == 1:   #백 차례일 때, 1
+            turn_board[:] = 1.
+
+        input_board = np.array((black_board, white_board, turn_board))
+        input_board = input_board.reshape(1, self.board_size, self.board_size, 3)
+        #End========================================
+
+        policy_pred, value_pred = self.model(input_board)
+        print(policy_pred, value_pred)
+        exit()
         policy_pred = np.array(policy_pred[0], dtype=np.float32)
 
         #확률분포 조건(sum = 1)
@@ -67,5 +85,5 @@ class AlphaO(rule.Rule):
 if __name__ == "__main__":
         model = AlphaO(9)
 
-        list_board = [(0, 0)]
+        list_board = [(0, 0), (5, 3)]
         print(model.act(list_board))
