@@ -1,8 +1,9 @@
 import rule
+import tree
 
 import numpy as np
-import tensorflow as tf
-from tensorflow import keras as K
+# import tensorflow as tf
+# from tensorflow import keras as K
 
 
 class RandomChoice(rule.Rule):
@@ -23,25 +24,61 @@ class AlphaO(rule.Rule):
         self.model = self.__get_model()
 
     def __get_model(self):
-        input = K.layers.Input(shape=(self.board_size, self.board_size, 3))
-        conv1 = K.layers.Conv2D(kernel_size=3, filters=64, activation="relu", padding="same")(input)
+        return None
+        # input = K.layers.Input(shape=(self.board_size, self.board_size, 3))
+        # conv1 = K.layers.Conv2D(kernel_size=3, filters=64, activation="relu", padding="same")(input)
+        #
+        # flat = K.layers.Flatten()(conv1)
+        # dense1 = K.layers.Dense(256, activation="relu")(flat)
+        #
+        # policy_dense = K.layers.Dense(128, activation="relu")(dense1)
+        # policy_output = K.layers.Dense(self.board_size ** 2 + 1, activation="softmax", name="PNN")(policy_dense)
+        #
+        # value_dense = tf.keras.layers.Dense(128, activation="relu")(dense1)
+        # value_output = tf.keras.layers.Dense(1, activation="tanh", name="VNN")(value_dense)
+        #
+        # model = K.models.Model(inputs=input, outputs=[policy_output, value_output])
+        # return model
 
-        flat = K.layers.Flatten()(conv1)
-        dense1 = K.layers.Dense(256, activation="relu")(flat)
+    def predict_stone(self, list_board):
+        #MCTS tree search
 
-        policy_dense = K.layers.Dense(128, activation="relu")(dense1)
-        policy_output = K.layers.Dense(self.board_size ** 2 + 1, activation="softmax", name="PNN")(policy_dense)
+        def get_square_board(list_board):
+            square_board = np.zeros((self.board_size, self.board_size))
+            for turn, (x, y) in enumerate(list_board):
+                stone_color = -1 if turn % 2 == 0 else 1
+                square_board[y][x] = stone_color
+            return square_board
 
-        value_dense = tf.keras.layers.Dense(128, activation="relu")(dense1)
-        value_output = tf.keras.layers.Dense(1, activation="tanh", name="VNN")(value_dense)
+        def filt_board(square_board, stone_color):
+            #filt squre board stone
+            board = (square_board == stone_color)
+            board = board.astype(np.float64)
+            return board
 
-        model = K.models.Model(inputs=input, outputs=[policy_output, value_output])
-        return model
+        #모델 입력 데이터(=특징 평면)================
+        square_board = get_square_board(list_board)
+        black_board = filt_board(square_board, -1)
+        white_board = filt_board(square_board, 1)
 
-    def predict_stone(self):
-        pass
+        turn_board = np.zeros((self.board_size, self.board_size))
+        if len(list_board) % 2 == 1:   #백 차례일 때, 1
+            turn_board[:] = 1.
+
+        input_board = np.array((black_board, white_board, turn_board))
+        input_board = input_board.reshape(1, self.board_size, self.board_size, 3)
+        #End========================================
+
+        root = tree.Node(input_board)
+        print(root)
+        print(root.state)
+        exit()
+
 
     def act(self, list_board):
+        self.predict_stone(list_board)
+        exit()
+
         def get_square_board(list_board):
             square_board = np.zeros((self.board_size, self.board_size))
             for turn, (x, y) in enumerate(list_board):
