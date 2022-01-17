@@ -38,6 +38,9 @@ class AlphaO(rule.Rule):
         model = K.models.Model(inputs=input, outputs=[policy_output, value_output])
         return model
 
+    def predict_stone(self):
+        pass
+
     def act(self, list_board):
         def get_square_board(list_board):
             square_board = np.zeros((self.board_size, self.board_size))
