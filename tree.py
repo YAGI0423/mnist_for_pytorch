@@ -6,4 +6,10 @@ class Node:
 
         self.parent = parent
         self.childrens = {}
-        self.branches = branches
+        self.branches = {
+            key: {
+                "pior": value,
+                "visit": 0,
+                "total_value": 0.
+            } for key, value in branches.items()
+        }

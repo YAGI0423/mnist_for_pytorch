@@ -17,9 +17,9 @@ class RandomChoice(rule.Rule):
         return able_loc_tup[rand_idx]
 
 
-class AlphaO(rule.Rule):
+class AlphaO():
     def __init__(self, board_size):
-        super().__init__(board_size)
+        self.rule = rule.Rule(9)
         self.board_size = board_size
         self.model = self.__get_model()
 
@@ -71,7 +71,7 @@ class AlphaO(rule.Rule):
 
         def get_loc_to_idx(list_board):
             #convert x, y location to idx
-            loc2idx = super().get_able_location(list_board)
+            loc2idx = self.rule.get_able_location(list_board)
             loc2idx = tuple(   #able loc -> idx
                 x + y * self.board_size for x, y in loc2idx
             )
