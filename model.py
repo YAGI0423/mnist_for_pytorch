@@ -2,8 +2,8 @@ import rule
 import tree
 
 import numpy as np
-# import tensorflow as tf
-# from tensorflow import keras as K
+import tensorflow as tf
+from tensorflow import keras as K
 
 
 class RandomChoice(rule.Rule):
@@ -24,21 +24,20 @@ class AlphaO(rule.Rule):
         self.model = self.__get_model()
 
     def __get_model(self):
-        return None
-        # input = K.layers.Input(shape=(self.board_size, self.board_size, 3))
-        # conv1 = K.layers.Conv2D(kernel_size=3, filters=64, activation="relu", padding="same")(input)
-        #
-        # flat = K.layers.Flatten()(conv1)
-        # dense1 = K.layers.Dense(256, activation="relu")(flat)
-        #
-        # policy_dense = K.layers.Dense(128, activation="relu")(dense1)
-        # policy_output = K.layers.Dense(self.board_size ** 2 + 1, activation="softmax", name="PNN")(policy_dense)
-        #
-        # value_dense = tf.keras.layers.Dense(128, activation="relu")(dense1)
-        # value_output = tf.keras.layers.Dense(1, activation="tanh", name="VNN")(value_dense)
-        #
-        # model = K.models.Model(inputs=input, outputs=[policy_output, value_output])
-        # return model
+        input = K.layers.Input(shape=(self.board_size, self.board_size, 3))
+        conv1 = K.layers.Conv2D(kernel_size=3, filters=64, activation="relu", padding="same")(input)
+
+        flat = K.layers.Flatten()(conv1)
+        dense1 = K.layers.Dense(256, activation="relu")(flat)
+
+        policy_dense = K.layers.Dense(128, activation="relu")(dense1)
+        policy_output = K.layers.Dense(self.board_size ** 2 + 1, activation="softmax", name="PNN")(policy_dense)
+
+        value_dense = tf.keras.layers.Dense(128, activation="relu")(dense1)
+        value_output = tf.keras.layers.Dense(1, activation="tanh", name="VNN")(value_dense)
+
+        model = K.models.Model(inputs=input, outputs=[policy_output, value_output])
+        return model
 
     def predict_stone(self, list_board):
         #MCTS tree search
@@ -69,7 +68,25 @@ class AlphaO(rule.Rule):
         input_board = input_board.reshape(1, self.board_size, self.board_size, 3)
         #End========================================
 
-        root = tree.Node(input_board)
+        #get branch=================================
+        idx_loc_list = super().get_able_location(list_board)
+        idx_loc_list = tuple(   #able dict
+            x + y * self.board_size for x, y in idx_loc_list
+        )
+
+        policy_pred, value_pred = self.model(input_board)
+        policy_pred = np.array(policy_pred[0])
+        #End========================================
+
+        value_pred = np.array(value_pred[0][0])
+
+        branches = {idx: policy_pred[idx] for idx in idx_loc_list}
+        root = tree.Node(input_board, value_pred, None, branches)
+        print(root.branches)
+
+        exit()
+
+
         print(root)
         print(root.state)
         exit()
