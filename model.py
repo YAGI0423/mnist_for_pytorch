@@ -55,7 +55,7 @@ class AlphaO(rule.Rule):
             board = board.astype(np.float64)
             return board
 
-        #모델 입력 데이터(=특징 평면)================
+        #모델 입력 데이터 생성(=특징 평면)==========
         square_board = get_square_board(list_board)
         black_board = filt_board(square_board, -1)
         white_board = filt_board(square_board, 1)
@@ -70,7 +70,7 @@ class AlphaO(rule.Rule):
 
         #get branch=================================
         idx_loc_list = super().get_able_location(list_board)
-        idx_loc_list = tuple(   #able dict
+        idx_loc_list = tuple(   #able loc -> idx
             x + y * self.board_size for x, y in idx_loc_list
         )
 
