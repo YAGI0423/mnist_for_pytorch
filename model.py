@@ -55,32 +55,38 @@ class AlphaO(rule.Rule):
             board = board.astype(np.float64)
             return board
 
-        #모델 입력 데이터 생성(=특징 평면)==========
-        square_board = get_square_board(list_board)
-        black_board = filt_board(square_board, -1)
-        white_board = filt_board(square_board, 1)
+        def get_input_data(list_board):
+            #list_board ==> moel input tensor
+            square_board = get_square_board(list_board)
+            black_board = filt_board(square_board, -1)
+            white_board = filt_board(square_board, 1)
 
-        turn_board = np.zeros((self.board_size, self.board_size))
-        if len(list_board) % 2 == 1:   #백 차례일 때, 1
-            turn_board[:] = 1.
+            turn_board = np.zeros((self.board_size, self.board_size))
+            if len(list_board) % 2 == 1:   #백 차례일 때, 1
+                turn_board[:] = 1.
 
-        input_board = np.array((black_board, white_board, turn_board))
-        input_board = input_board.reshape(1, self.board_size, self.board_size, 3)
-        #End========================================
+            input_tensor = np.array((black_board, white_board, turn_board))
+            input_tensor = input_tensor.reshape(1, self.board_size, self.board_size, 3)
+            return input_tensor
 
-        #get branch=================================
-        idx_loc_list = super().get_able_location(list_board)
-        idx_loc_list = tuple(   #able loc -> idx
-            x + y * self.board_size for x, y in idx_loc_list
-        )
+        def get_loc_to_idx(list_board):
+            #convert x, y location to idx
+            loc2idx = super().get_able_location(list_board)
+            loc2idx = tuple(   #able loc -> idx
+                x + y * self.board_size for x, y in loc2idx
+            )
+            return loc2idx
+
+
+        input_board = get_input_data(list_board)
+        loc2idx = get_loc_to_idx(list_board)
 
         policy_pred, value_pred = self.model(input_board)
         policy_pred = np.array(policy_pred[0])
-        #End========================================
-
         value_pred = np.array(value_pred[0][0])
 
-        branches = {idx: policy_pred[idx] for idx in idx_loc_list}
+        branches = {idx: policy_pred[idx] for idx in loc2idx}
+
         root = tree.Node(input_board, value_pred, None, branches)
         print(root.branches)
 
