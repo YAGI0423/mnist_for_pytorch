@@ -90,12 +90,14 @@ class AlphaO():
         root = Node(input_board, value_pred, None, branches)
 
         #Select Branch
+        #가지 선택 과제 수행 필요
         for round in range(2):
             node = root
 
             total_visit = node.total_visit
             print(total_visit)
             print(node.get_branches_keys())
+
             break
 
 
