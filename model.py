@@ -1,5 +1,5 @@
 import rule
-import tree
+from tree import Node
 
 import numpy as np
 import tensorflow as tf
@@ -87,8 +87,14 @@ class AlphaO():
 
         branches = {idx: policy_pred[idx] for idx in loc2idx}
 
-        root = tree.Node(input_board, value_pred, None, branches)
-        print(root.branches)
+        root = Node(input_board, value_pred, None, branches)
+
+        #Select Branch
+        for round in range(2):
+            
+            break
+
+
 
         exit()
 
