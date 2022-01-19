@@ -91,7 +91,11 @@ class AlphaO():
 
         #Select Branch
         for round in range(2):
-            
+            node = root
+
+            total_visit = node.total_visit
+            print(total_visit)
+            print(node.get_branches_keys())
             break
 
 

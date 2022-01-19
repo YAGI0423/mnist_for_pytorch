@@ -13,3 +13,6 @@ class Node:
                 "total_value": 0.
             } for key, value in branches.items()
         }
+
+    def get_branches_keys(self):
+        return self.branches.keys()
