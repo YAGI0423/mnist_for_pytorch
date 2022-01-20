@@ -16,3 +16,8 @@ class Node:
 
     def get_branches_keys(self):
         return self.branches.keys()
+
+    def expected_value(self, move):
+        branch = self.branches[move]
+        if branch['visit'] == 0: return 0.;
+        return branch['total_value'] / branch['visit']
