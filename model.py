@@ -97,7 +97,10 @@ class AlphaO():
             total_visit = node.total_visit
             print(total_visit)
             print(node.get_branches_keys())
-            print(node.expected_value(4))
+            print(node.get_expected_value(4))
+            print(node.get_prior(4))
+            print(node.get_visit(4))
+
             break
 
 
