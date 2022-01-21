@@ -14,21 +14,23 @@ class Node:
             } for key, value in branches.items()
         }
 
+    def has_child(self, branch_idx):
+        return branch_idx in self.childrens
+
     def get_branches_keys(self):
+        #return has branch keys
         return self.branches.keys()
 
     def get_expected_value(self, branch_idx):
-        #Branch별 방문에 대한 평균 기댓값
+        #Branch별 방문에 대한 평균 기댓값(Q)
         branch = self.branches[branch_idx]
         if branch['visit'] == 0: return 0.;
         return branch['total_value'] / branch['visit']
 
     def get_prior(self, branch_idx):
-        #후보 수의 사전확률
+        #후보 수의 사전확률(P)
         return self.branches[branch_idx]['pior']
 
     def get_visit(self, branch_idx):
-        #Branch 방문 횟수
-        if branch_idx in self.branches:
-            return self.branches[branch_idx]['visit']
-        return 0
+        #Branch 방문 횟수(n)
+        return self.branches[branch_idx]['visit']

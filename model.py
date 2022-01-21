@@ -23,6 +23,8 @@ class AlphaO():
         self.board_size = board_size
         self.model = self.__get_model()
 
+        self.c = np.sqrt(2)
+
     def __get_model(self):
         input = K.layers.Input(shape=(self.board_size, self.board_size, 3))
         conv1 = K.layers.Conv2D(kernel_size=3, filters=64, activation="relu", padding="same")(input)
@@ -77,6 +79,17 @@ class AlphaO():
             )
             return loc2idx
 
+        def select_branch(node):
+            #Evaluate Branch and Select
+            total_n = node.total_visit
+
+            def score_branch(branch_idx):
+                #Calculate Branch Value
+                q = node.get_expected_value(branch_idx)
+                p = node.get_prior(branch_idx)
+                n = node.get_visit(branch_idx)
+                return q + self.c * p * np.sqrt(total_n) / (n + 1)
+            return max(node.get_branches_keys(), key=score_branch)
 
         input_board = get_input_data(list_board)
         loc2idx = get_loc_to_idx(list_board)
@@ -93,15 +106,12 @@ class AlphaO():
         #가지 선택 과제 수행 필요
         for round in range(2):
             node = root
+            branch_idx = select_branch(node)
 
-            total_visit = node.total_visit
-            print(total_visit)
-            print(node.get_branches_keys())
-            print(node.get_expected_value(4))
-            print(node.get_prior(4))
-            print(node.get_visit(4))
+            while node.has_child(branch_idx):
+                #has child: follow root, no child: stop
+                exit()
 
-            break
 
 
 
