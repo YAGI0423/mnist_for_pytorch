@@ -79,6 +79,9 @@ class AlphaO():
             )
             return loc2idx
 
+        def create_node(state, branch_idx=None, parent=None):
+            pass
+
         def select_branch(node):
             #Evaluate Branch and Select
             total_n = node.total_visit
@@ -100,7 +103,9 @@ class AlphaO():
 
         branches = {idx: policy_pred[idx] for idx in loc2idx}
 
+        #root Node 생성을 create_node()로 대체하기
         root = Node(input_board, value_pred, None, branches)
+        
 
         #Select Branch
         #가지 선택 과제 수행 필요
@@ -113,7 +118,7 @@ class AlphaO():
                 pass   #일단 child가 없어서 넘어가진다.
 
             #create Node
-            
+            create_node()
 
         exit()
 
