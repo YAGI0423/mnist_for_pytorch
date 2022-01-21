@@ -111,7 +111,9 @@ class AlphaO():
             while node.has_child(branch_idx):
                 #has child: follow root, no child: stop
                 pass   #일단 child가 없어서 넘어가진다.
-            print("hi")
+
+            #create Node
+            
 
         exit()
 
