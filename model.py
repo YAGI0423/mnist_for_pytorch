@@ -103,9 +103,12 @@ class AlphaO():
 
         branches = {idx: policy_pred[idx] for idx in loc2idx}
 
+        def create_node():
+            pass
+
         #root Node 생성을 create_node()로 대체하기
         root = Node(input_board, value_pred, None, branches)
-        
+
 
         #Select Branch
         #가지 선택 과제 수행 필요
