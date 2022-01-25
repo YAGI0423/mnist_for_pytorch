@@ -79,9 +79,6 @@ class AlphaO():
             )
             return loc2idx
 
-        def create_node(state, branch_idx=None, parent=None):
-            pass
-
         def select_branch(node):
             #Evaluate Branch and Select
             total_n = node.total_visit
