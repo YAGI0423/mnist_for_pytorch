@@ -118,7 +118,7 @@ class AlphaO():
                 pass   #일단 child가 없어서 넘어가진다.
 
             #create Node
-            create_node()
+            node = create_node()
 
         exit()
 
