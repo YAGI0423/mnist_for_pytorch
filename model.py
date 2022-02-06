@@ -104,7 +104,12 @@ class AlphaO():
             pass
 
         #root Node 생성을 create_node()로 대체하기
-        root = Node(input_board, value_pred, None, branches)
+        root = Node(
+            state=input_board,
+            value=value_pred,
+            parent=None,
+            branches=branches
+        )
 
 
         #Select Branch
@@ -118,6 +123,11 @@ class AlphaO():
                 pass   #일단 child가 없어서 넘어가진다.
 
             #create Node
+
+            #선택된 가지(branch_idx)를 바탕으로
+            #state 만들기
+            #tree class에 branch_idx를 입력하면
+            #state 반환하도록 하기
             node = create_node()
 
         exit()
