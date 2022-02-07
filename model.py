@@ -135,6 +135,11 @@ class AlphaO():
             #tree class에 branch_idx를 입력하면
             #state 반환하도록 하기
 
+            #idx를 x, y좌표로 변환
+            #돌 색 확인하기
+            #현재 board의 좌표에 돌 놓기
+            #new node state 생성하기
+
             exit()
             node = create_node()
 
