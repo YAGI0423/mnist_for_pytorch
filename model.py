@@ -100,7 +100,7 @@ class AlphaO():
 
 
         input_board = get_input_data(list_board)
-        loc2idx = get_loc_to_idx(list_board)
+        loc2idx = get_loc_to_idx(list_board)   #only able loc
 
         policy_pred, value_pred = self.model(input_board)
         policy_pred = np.array(policy_pred[0])
@@ -134,7 +134,7 @@ class AlphaO():
             #state 만들기
             #tree class에 branch_idx를 입력하면
             #state 반환하도록 하기
-            
+
             exit()
             node = create_node()
 
