@@ -81,6 +81,7 @@ class AlphaO():
 
         def select_branch(node):
             #Evaluate Branch and Select
+            #return branch idx
             total_n = node.total_visit
 
             def score_branch(branch_idx):
@@ -91,6 +92,13 @@ class AlphaO():
                 return q + self.c * p * np.sqrt(total_n) / (n + 1)
             return max(node.get_branches_keys(), key=score_branch)
 
+        def get_branch_state(now_board, branch_idx):
+            pass
+
+        def create_node():
+            pass
+
+
         input_board = get_input_data(list_board)
         loc2idx = get_loc_to_idx(list_board)
 
@@ -100,8 +108,7 @@ class AlphaO():
 
         branches = {idx: policy_pred[idx] for idx in loc2idx}
 
-        def create_node():
-            pass
+
 
         #root Node 생성을 create_node()로 대체하기
         root = Node(
@@ -122,12 +129,13 @@ class AlphaO():
                 #has child: follow root, no child: stop
                 pass   #일단 child가 없어서 넘어가진다.
 
-            #create Node
 
             #선택된 가지(branch_idx)를 바탕으로
             #state 만들기
             #tree class에 branch_idx를 입력하면
             #state 반환하도록 하기
+            
+            exit()
             node = create_node()
 
         exit()
