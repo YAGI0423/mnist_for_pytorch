@@ -71,13 +71,19 @@ class AlphaO():
             input_tensor = input_tensor.reshape(1, self.board_size, self.board_size, 3)
             return input_tensor
 
-        def get_loc_to_idx(list_board):
+        def xyBoard_to_idxBoard(list_board):
             #convert x, y location to idx
             loc2idx = self.rule.get_able_location(list_board)
             loc2idx = tuple(   #able loc -> idx
                 x + y * self.board_size for x, y in loc2idx
             )
             return loc2idx
+
+        def get_idx_to_loc(branch_idx):
+            #convert branch idx, to x, y location
+            x = branch_idx % self.board_size
+            y = branch_idx // self.board_size
+            return x, y
 
         def select_branch(node):
             #Evaluate Branch and Select
@@ -99,20 +105,21 @@ class AlphaO():
             pass
 
 
+        #make input data for model
         input_board = get_input_data(list_board)
-        loc2idx = get_loc_to_idx(list_board)   #only able loc
-
         policy_pred, value_pred = self.model(input_board)
         policy_pred = np.array(policy_pred[0])
         value_pred = np.array(value_pred[0][0])
 
+        #get node's branches
+        loc2idx = xyBoard_to_idxBoard(list_board)   #only able loc
         branches = {idx: policy_pred[idx] for idx in loc2idx}
 
 
 
         #root Node 생성을 create_node()로 대체하기
         root = Node(
-            state=input_board,
+            state=list_board,
             value=value_pred,
             parent=None,
             branches=branches
@@ -136,8 +143,16 @@ class AlphaO():
             #state 반환하도록 하기
 
             #idx를 x, y좌표로 변환
-            #돌 색 확인하기
+            loc = get_idx_to_loc(branch_idx)
+
             #현재 board의 좌표에 돌 놓기
+            branch_board = list(node.state)
+            branch_board.append(loc)
+            branch_board = tuple(branch_board)
+
+            print(branch_board)
+            print(node.state)
+
             #new node state 생성하기
 
             exit()
