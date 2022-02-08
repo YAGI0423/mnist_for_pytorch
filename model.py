@@ -57,20 +57,6 @@ class AlphaO():
             board = board.astype(np.float64)
             return board
 
-        def get_input_data(list_board):
-            #list_board ==> moel input tensor
-            square_board = get_square_board(list_board)
-            black_board = filt_board(square_board, -1)
-            white_board = filt_board(square_board, 1)
-
-            turn_board = np.zeros((self.board_size, self.board_size))
-            if len(list_board) % 2 == 1:   #백 차례일 때, 1
-                turn_board[:] = 1.
-
-            input_tensor = np.array((black_board, white_board, turn_board))
-            input_tensor = input_tensor.reshape(1, self.board_size, self.board_size, 3)
-            return input_tensor
-
         def xyBoard_to_idxBoard(list_board):
             #convert x, y location to idx
             loc2idx = self.rule.get_able_location(list_board)
@@ -98,6 +84,28 @@ class AlphaO():
                 return q + self.c * p * np.sqrt(total_n) / (n + 1)
             return max(node.get_branches_keys(), key=score_branch)
 
+        def model_predict(list_board):
+            #get policy, value
+            def get_input_data(list_board):
+                #list_board ==> moel input tensor
+                square_board = get_square_board(list_board)
+                black_board = filt_board(square_board, -1)
+                white_board = filt_board(square_board, 1)
+
+                turn_board = np.zeros((self.board_size, self.board_size))
+                if len(list_board) % 2 == 1:   #백 차례일 때, 1
+                    turn_board[:] = 1.
+
+                input_tensor = np.array((black_board, white_board, turn_board))
+                input_tensor = input_tensor.reshape(1, self.board_size, self.board_size, 3)
+                return input_tensor
+
+            input_board = get_input_data(list_board)
+            policy_pred, value_pred = self.model(input_board)
+            policy_pred = np.array(policy_pred[0])
+            value_pred = np.array(value_pred[0][0])
+            return policy_pred, value_pred
+
         def get_branch_state(now_board, branch_idx):
             pass
 
@@ -105,13 +113,12 @@ class AlphaO():
             pass
 
 
-        #make input data for model
-        input_board = get_input_data(list_board)
-        policy_pred, value_pred = self.model(input_board)
-        policy_pred = np.array(policy_pred[0])
-        value_pred = np.array(value_pred[0][0])
+        policy_pred, value_pred = model_predict(list_board)
 
         #get node's branches
+
+        #able loc 추려내는 함수, x,y to idx 변환 함수 따로 분리하기
+        
         loc2idx = xyBoard_to_idxBoard(list_board)   #only able loc
         branches = {idx: policy_pred[idx] for idx in loc2idx}
 
