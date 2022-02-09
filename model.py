@@ -57,11 +57,10 @@ class AlphaO():
             board = board.astype(np.float64)
             return board
 
-        def xyBoard_to_idxBoard(list_board):
+        def xy_to_idx(list_board):
             #convert x, y location to idx
-            loc2idx = self.rule.get_able_location(list_board)
             loc2idx = tuple(   #able loc -> idx
-                x + y * self.board_size for x, y in loc2idx
+                x + y * self.board_size for x, y in list_board
             )
             return loc2idx
 
@@ -116,13 +115,12 @@ class AlphaO():
         policy_pred, value_pred = model_predict(list_board)
 
         #get node's branches
+        able_loc = self.rule.get_able_location(list_board)   #oly able loc
+        idx_board = xy_to_idx(able_loc)
+        branches = {idx: policy_pred[idx] for idx in idx_board}
 
-        #able loc 추려내는 함수, x,y to idx 변환 함수 따로 분리하기
-        
-        loc2idx = xyBoard_to_idxBoard(list_board)   #only able loc
-        branches = {idx: policy_pred[idx] for idx in loc2idx}
-
-
+        print(branches)
+        exit()
 
         #root Node 생성을 create_node()로 대체하기
         root = Node(
