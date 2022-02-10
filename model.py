@@ -105,31 +105,27 @@ class AlphaO():
             value_pred = np.array(value_pred[0][0])
             return policy_pred, value_pred
 
-        def get_branch_state(now_board, branch_idx):
-            pass
+        def create_node(list_board, parent):
+            policy_pred, value_pred = model_predict(list_board)
 
-        def create_node():
-            pass
+            #get node's branches
+            able_loc = self.rule.get_able_location(list_board)   #oly able loc
+            idx_board = xy_to_idx(able_loc)
+            branches = {idx: policy_pred[idx] for idx in idx_board}
+
+            node = Node(
+                state=list_board,
+                value=value_pred,
+                parent=parent,
+                branches=branches
+            )
+            return node
 
 
-        policy_pred, value_pred = model_predict(list_board)
-
-        #get node's branches
-        able_loc = self.rule.get_able_location(list_board)   #oly able loc
-        idx_board = xy_to_idx(able_loc)
-        branches = {idx: policy_pred[idx] for idx in idx_board}
-
-        print(branches)
+        root = create_node(list_board, None)
+        print(root.state)
+        print(root.branches)
         exit()
-
-        #root Node 생성을 create_node()로 대체하기
-        root = Node(
-            state=list_board,
-            value=value_pred,
-            parent=None,
-            branches=branches
-        )
-
 
         #Select Branch
         #가지 선택 과제 수행 필요
