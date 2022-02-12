@@ -151,8 +151,7 @@ class AlphaO():
             branch_board.append(loc)
             branch_board = tuple(branch_board)
 
-            print(branch_board)
-            print(node.state)
+            child = create_node(branch_board, parent=node)
 
             #new node state 생성하기
 
