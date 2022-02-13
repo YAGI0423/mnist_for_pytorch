@@ -152,12 +152,7 @@ class AlphaO():
             branch_board = tuple(branch_board)
 
             child = create_node(branch_board, parent=node)
-
-            #new node state 생성하기
-
             exit()
-            node = create_node()
-
         exit()
 
 
