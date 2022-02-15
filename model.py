@@ -153,7 +153,6 @@ class AlphaO():
 
             child = create_node(branch_board, parent=node)
             exit()
-        exit()
 
 
         print(root)
