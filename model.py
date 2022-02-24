@@ -129,7 +129,7 @@ class AlphaO():
 
         #Select Branch
         #가지 선택 과제 수행 필요
-        for round in range(5):
+        for round in range(1):
             node = root
             branch_idx = select_branch(node)
 
