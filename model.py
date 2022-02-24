@@ -92,7 +92,7 @@ class AlphaO():
                 white_board = filt_board(square_board, 1)
 
                 turn_board = np.zeros((self.board_size, self.board_size))
-                if len(list_board) % 2 == 1:   #백 차례일 때, 1
+                if len(list_board) % 2 == 1:   #흑: 0, 백: 1
                     turn_board[:] = 1.
 
                 input_tensor = np.array((black_board, white_board, turn_board))
@@ -123,9 +123,6 @@ class AlphaO():
 
 
         root = create_node(list_board, None)
-        print(root.state)
-        print(root.branches)
-        exit()
 
         #Select Branch
         #가지 선택 과제 수행 필요
@@ -151,7 +148,13 @@ class AlphaO():
             branch_board.append(loc)
             branch_board = tuple(branch_board)
 
-            child = create_node(branch_board, parent=node)
+            node = create_node(branch_board, parent=node)
+
+            #parent를 따라 방문 기록하기
+            while node is not None:
+                node = node.parent
+                print("hi")
+            print("HI")
             exit()
 
 
