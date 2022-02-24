@@ -148,12 +148,12 @@ class AlphaO():
             branch_board.append(loc)
             branch_board = tuple(branch_board)
 
-            node = create_node(branch_board, parent=node)
+            child_node = create_node(branch_board, parent=node)
 
             #parent를 따라 방문 기록하기
             while node is not None:
+                print(node.parent)
                 node = node.parent
-                print("hi")
             print("HI")
             exit()
 
