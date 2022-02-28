@@ -153,7 +153,6 @@ class AlphaO():
             #parent를 따라 방문 기록하기
             while node is not None:
                 #node의 branch_idx를 기록하기
-                print(node.parent)
                 node = node.parent
             print("HI")
             exit()
