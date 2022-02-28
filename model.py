@@ -109,7 +109,7 @@ class AlphaO():
             policy_pred, value_pred = model_predict(list_board)
 
             #get node's branches
-            able_loc = self.rule.get_able_location(list_board)   #oly able loc
+            able_loc = self.rule.get_able_location(list_board)   #only able loc
             idx_board = xy_to_idx(able_loc)
             branches = {idx: policy_pred[idx] for idx in idx_board}
 
@@ -122,11 +122,11 @@ class AlphaO():
             return node
 
 
-        root = create_node(list_board, None)
+        root = create_node(list_board, parent=None)
 
         #Select Branch
         #가지 선택 과제 수행 필요
-        for round in range(5):
+        for round in range(1):
             node = root
             branch_idx = select_branch(node)
 
@@ -152,6 +152,7 @@ class AlphaO():
 
             #parent를 따라 방문 기록하기
             while node is not None:
+                #node의 branch_idx를 기록하기
                 print(node.parent)
                 node = node.parent
             print("HI")
