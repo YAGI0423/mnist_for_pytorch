@@ -154,7 +154,6 @@ class AlphaO():
             while node is not None:
                 #node의 branch_idx를 기록하기
                 node = node.parent
-            print("HI")
             exit()
 
 
