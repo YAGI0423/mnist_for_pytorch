@@ -131,7 +131,7 @@ class AlphaO():
 
         #Select Branch
         #가지 선택 과제 수행 필요
-        for round in range(200):
+        for round in range(150):
             node = root
             branch_idx = select_branch(node)
 
@@ -167,7 +167,9 @@ class AlphaO():
                 node = node.parent
 
         print(root)
-        print(root.branches)
+        for idx, value in root.branches.items():
+            print(f'{idx}: {value}')
+
         exit()
 
 
