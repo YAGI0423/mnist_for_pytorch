@@ -38,5 +38,5 @@ class Node:
 
     def record_visit(self, branch_idx, value):
         self.total_visit += 1
-        self.branches[branch_idx].visit += 1
-        self.branches[branch_idx].total_value += value
+        self.branches[branch_idx]['visit'] += 1
+        self.branches[branch_idx]['total_value'] += value

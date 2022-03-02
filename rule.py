@@ -1,3 +1,5 @@
+import random
+
 class Rule:
     def __init__(self, board_size):
         self.board_size = board_size
@@ -16,6 +18,9 @@ class Rule:
             for y in range(self.board_size)
         )
         able_loc -= set(list_board)
+        able_loc = list(able_loc)
+
+        random.shuffle(able_loc)
 
         able_loc = tuple(
             loc for loc in able_loc \

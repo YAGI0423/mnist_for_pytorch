@@ -110,6 +110,8 @@ class AlphaO():
 
             #get node's branches
             able_loc = self.rule.get_able_location(list_board)   #only able loc
+            print(able_loc)
+            exit()
             idx_board = xy_to_idx(able_loc)
             branches = {idx: policy_pred[idx] for idx in idx_board}
 
@@ -155,17 +157,17 @@ class AlphaO():
 
             child_node = create_node(branch_board, idx=branch_idx, parent=node)
             child_idx = child_node.idx
+            value = -1. * child_node.value
 
             #parent를 따라 방문 기록하기
             while node is not None:
                 #node의 branch_idx를 기록하기
+                node.record_visit(child_idx, value)
 
-                #parent에 child 등록하기
-                print(node.childrens)
-                print(node.idx)
-                print(child_node.idx)
-
+                value = -1. * value
+                child_idx = node.idx
                 node = node.parent
+            print(root.branches)
             exit()
 
 
