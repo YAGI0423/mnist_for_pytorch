@@ -105,7 +105,7 @@ class AlphaO():
             value_pred = np.array(value_pred[0][0])
             return policy_pred, value_pred
 
-        def create_node(list_board, parent):
+        def create_node(list_board, idx, parent):
             policy_pred, value_pred = model_predict(list_board)
 
             #get node's branches
@@ -116,13 +116,14 @@ class AlphaO():
             node = Node(
                 state=list_board,
                 value=value_pred,
+                idx=idx,
                 parent=parent,
                 branches=branches
             )
             return node
 
 
-        root = create_node(list_board, parent=None)
+        root = create_node(list_board, idx=None, parent=None)
 
         #Select Branch
         #가지 선택 과제 수행 필요
@@ -148,7 +149,9 @@ class AlphaO():
             branch_board.append(loc)
             branch_board = tuple(branch_board)
 
-            child_node = create_node(branch_board, parent=node)
+            child_node = create_node(branch_board, idx=branch_idx, parent=node)
+            print(child_node.idx)
+            exit()
 
             #parent를 따라 방문 기록하기
             while node is not None:
