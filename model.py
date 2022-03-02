@@ -77,7 +77,7 @@ class AlphaO():
 
             def score_branch(branch_idx):
                 #Calculate Branch Value
-                q = node.get_expected_value(branch_idx)
+                q = node.get_expected_value(branch_idx)   #total value / visit
                 p = node.get_prior(branch_idx)
                 n = node.get_visit(branch_idx)
                 return q + self.c * p * np.sqrt(total_n) / (n + 1)
@@ -110,8 +110,6 @@ class AlphaO():
 
             #get node's branches
             able_loc = self.rule.get_able_location(list_board)   #only able loc
-            print(able_loc)
-            exit()
             idx_board = xy_to_idx(able_loc)
             branches = {idx: policy_pred[idx] for idx in idx_board}
 
@@ -133,14 +131,14 @@ class AlphaO():
 
         #Select Branch
         #가지 선택 과제 수행 필요
-        for round in range(1):
+        for round in range(200):
             node = root
             branch_idx = select_branch(node)
 
             while node.has_child(branch_idx):
                 #has child: follow root, no child: stop
-                pass   #일단 child가 없어서 넘어가진다.
-
+                node = node.childrens[branch_idx]
+                branch_idx = select_branch(node)
 
             #선택된 가지(branch_idx)를 바탕으로
             #state 만들기
@@ -167,12 +165,9 @@ class AlphaO():
                 value = -1. * value
                 child_idx = node.idx
                 node = node.parent
-            print(root.branches)
-            exit()
-
 
         print(root)
-        print(root.state)
+        print(root.branches)
         exit()
 
 
