@@ -120,6 +120,10 @@ class AlphaO():
                 parent=parent,
                 branches=branches
             )
+
+            #add child to parent
+            if parent is not None:
+                parent.childrens[idx] = node
             return node
 
 
@@ -150,12 +154,17 @@ class AlphaO():
             branch_board = tuple(branch_board)
 
             child_node = create_node(branch_board, idx=branch_idx, parent=node)
-            print(child_node.idx)
-            exit()
+            child_idx = child_node.idx
 
             #parent를 따라 방문 기록하기
             while node is not None:
                 #node의 branch_idx를 기록하기
+
+                #parent에 child 등록하기
+                print(node.childrens)
+                print(node.idx)
+                print(child_node.idx)
+
                 node = node.parent
             exit()
 
