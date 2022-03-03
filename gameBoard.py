@@ -1,9 +1,9 @@
 import numpy as np
 import rule
 
-class GameBoard(rule.Rule):
+class GameBoard():
     def __init__(self, board_size):
-        super().__init__(board_size)
+        self.rule = rule.Rule(board_size=board_size)
         self.board_size = board_size
         self.sequence_num = 5
         self.__board = []
@@ -23,7 +23,7 @@ class GameBoard(rule.Rule):
         return square_board
 
     def put_stone(self, x, y):
-        if super().check_able_location(self.__board, x, y):
+        if self.rule.check_able_location(self.__board, x, y):
             self.__board.append((x, y))
             return True
         return False
