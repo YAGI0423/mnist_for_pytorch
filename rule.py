@@ -29,12 +29,7 @@ class Rule:
         )
         return able_loc
 
-    def get_square_board(self, list_board):
-        square_board = np.zeros((self.board_size, self.board_size))
-        for turn, (x, y) in enumerate(list_board):
-            stone_color = -1 if turn % 2 == 0 else 1
-            square_board[y][x] = stone_color
-        return square_board
+
 
     def game_status(self, list_board):
         #0: during, 1: win, 2: draw
