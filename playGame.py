@@ -1,4 +1,5 @@
 import user
+import rule
 import model
 import gameBoard
 
@@ -15,11 +16,12 @@ player_info = {
 }
 playerA_color = bool(np.random.randint(2))   #True: Black, Flase: White
 board = gameBoard.GameBoard(board_size)
+_rule = rule.Rule(board_size=board_size)
 
 
 while (game_done := board.game_status()) == 0:
     print("=" * 100)
-    print(board.get_square_board())
+    print(_rule.get_square_board(board.get_list_board()))
 
     #Put Stone=======================
     now_turn = board.now_turn()
@@ -45,5 +47,5 @@ else:
     else:
         print("Black Win")
 
-print(board.get_square_board())
+print(_rule.get_square_board(board.get_list_board()))
 print(stone_location)

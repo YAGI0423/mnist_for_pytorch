@@ -43,14 +43,6 @@ class AlphaO():
 
     def predict_stone(self, list_board):
         #MCTS tree search
-
-        def get_square_board(list_board):
-            square_board = np.zeros((self.board_size, self.board_size))
-            for turn, (x, y) in enumerate(list_board):
-                stone_color = -1 if turn % 2 == 0 else 1
-                square_board[y][x] = stone_color
-            return square_board
-
         def filt_board(square_board, stone_color):
             #filt squre board stone
             board = (square_board == stone_color)
@@ -87,7 +79,7 @@ class AlphaO():
             #get policy, value
             def get_input_data(list_board):
                 #list_board ==> moel input tensor
-                square_board = get_square_board(list_board)
+                square_board = self.rule.get_square_board(list_board)
                 black_board = filt_board(square_board, -1)
                 white_board = filt_board(square_board, 1)
 

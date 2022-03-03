@@ -15,13 +15,6 @@ class GameBoard():
     def get_list_board(self):
         return tuple(self.__board.copy())
 
-    def get_square_board(self):
-        square_board = np.zeros((self.board_size, self.board_size))
-        for turn, (x, y) in enumerate(self.__board):
-            stone_color = -1 if turn % 2 == 0 else 1
-            square_board[y][x] = stone_color
-        return square_board
-
     def put_stone(self, x, y):
         if self.rule.check_able_location(self.__board, x, y):
             self.__board.append((x, y))
@@ -82,7 +75,11 @@ class GameBoard():
         stone_color = -1 if last_turn else 1
         #End======================================
 
-        cropped_board = crop_board(self.get_square_board(), (last_x, last_y), cut_size)
+        cropped_board = crop_board(
+            self.rule.get_square_board(self.__board),
+            (last_x, last_y),
+            cut_size
+        )
 
         for angle in range(2):   #90도
             row = (cropped_board[cut_size] == stone_color)   #수평축
