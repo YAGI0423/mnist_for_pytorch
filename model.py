@@ -19,7 +19,7 @@ class RandomChoice(rule.Rule):
 
 class AlphaO():
     def __init__(self, board_size):
-        self.rule = rule.Rule(9)
+        self.rule = rule.Rule(board_size=board_size)
         self.board_size = board_size
         self.model = self.__get_model()
 
@@ -60,7 +60,7 @@ class AlphaO():
         def xy_to_idx(list_board):
             #convert x, y location to idx
             loc2idx = tuple(   #able loc -> idx
-                x + y * self.board_size for x, y in list_board
+                y * self.board_size + x for x, y in list_board
             )
             return loc2idx
 
@@ -131,7 +131,7 @@ class AlphaO():
 
         #Select Branch
         #가지 선택 과제 수행 필요
-        for round in range(150):
+        for round in range(300):
             node = root
             branch_idx = select_branch(node)
 

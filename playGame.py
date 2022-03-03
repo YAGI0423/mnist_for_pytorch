@@ -8,7 +8,7 @@ import numpy as np
 
 #End=================
 
-board_size = 9
+board_size = 6
 player_info = {
     'playerA': model.AlphaO(board_size),
     'playerB': model.AlphaO(board_size)
