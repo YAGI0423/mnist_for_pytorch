@@ -8,9 +8,6 @@ class GameBoard():
         self.__board = []
         # self.__board = [(0, 0), (1, 2), (1, 0), (1, 3), (2, 0), (6, 7), (3, 0), (5, 6), (4, 0)]
 
-    def now_turn(self):
-        return len(self.__board) % 2 == 0   #True: 흑, False: 백
-
     def get_list_board(self):
         return tuple(self.__board.copy())
 
