@@ -12,7 +12,4 @@ class GameBoard():
         return tuple(self.__board.copy())
 
     def put_stone(self, x, y):
-        if self.rule.check_able_location(self.__board, x, y):
-            self.__board.append((x, y))
-            return True
-        return False
+        self.__board.append((x, y))
