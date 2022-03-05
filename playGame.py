@@ -10,8 +10,8 @@ import numpy as np
 
 #End=================
 
-board_size = 6
-win_seq_num = 5
+board_size = 4
+win_seq_num = 3
 player_info = {
     'playerA': model.RandomChoice(board_size),
     'playerB': model.RandomChoice(board_size)
