@@ -19,7 +19,6 @@ player_info = {
 playerA_color = bool(np.random.randint(2))   #True: Black, Flase: White
 board = gameBoard.GameBoard(board_size)
 _rule = rule.Rule(board_size=board_size)
-util = util.Util(board_size=board_size)
 
 
 while (game_done := _rule.game_status(board.get_list_board())) == 0:
