@@ -11,7 +11,7 @@ import numpy as np
 #End=================
 
 board_size = 4
-win_seq_num = 3
+win_seq = 3
 player_info = {
     'playerA': model.RandomChoice(board_size),
     'playerB': model.RandomChoice(board_size)
@@ -19,7 +19,11 @@ player_info = {
 playerA_color = bool(np.random.randint(2))   #True: Black, Flase: White
 
 board = GameBoard()
-rule = Rule(board_size=board_size)
+rule = Rule(board_size=board_size, win_seq=5)
+
+
+print(board.get_board())
+exit()
 
 
 while (game_done := _rule.game_status(board.get_list_board())) == 0:
