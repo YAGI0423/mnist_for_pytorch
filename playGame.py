@@ -2,7 +2,7 @@ import user
 import rule
 from util import Util
 import model
-import gameBoard
+from gameBoard import GameBoard
 
 import numpy as np
 
@@ -17,7 +17,8 @@ player_info = {
     'playerB': model.RandomChoice(board_size)
 }
 playerA_color = bool(np.random.randint(2))   #True: Black, Flase: White
-board = gameBoard.GameBoard(board_size)
+board = GameBoard(board_size)
+
 _rule = rule.Rule(board_size=board_size)
 
 
