@@ -1,6 +1,6 @@
 import user
 import rule
-import util
+from util import Util
 import model
 import gameBoard
 
@@ -23,7 +23,7 @@ _rule = rule.Rule(board_size=board_size)
 
 while (game_done := _rule.game_status(board.get_list_board())) == 0:
     print("=" * 100)
-    print(util.Util.get_square_board(board.get_list_board(), board_size))
+    print(Util.get_square_board(board.get_list_board(), board_size))
     exit()
 
     #Put Stone=======================
