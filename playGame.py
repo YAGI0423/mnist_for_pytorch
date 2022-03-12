@@ -22,7 +22,13 @@ board = GameBoard()
 rule = Rule(board_size=board_size, win_seq=5)
 
 
-print(board.get_board())
+now_board = board.get_board()
+
+while rule.game_status(now_board) == 0:
+    print("=" * 100)
+    print(Util.seq_to_square(now_board, board_size))
+
+    exit()
 exit()
 
 
