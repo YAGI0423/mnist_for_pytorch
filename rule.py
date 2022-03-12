@@ -30,8 +30,6 @@ class Rule:
         )
         return able_loc
 
-
-
     def game_status(self, list_board):
         #0: during, 1: win, 2: draw
 
