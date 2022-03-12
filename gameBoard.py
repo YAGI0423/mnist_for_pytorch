@@ -1,8 +1,7 @@
 import numpy as np
 
 class GameBoard():
-    def __init__(self, board_size):
-        self.board_size = board_size
+    def __init__(self):
         self.__board = []
 
     def get_list_board(self):

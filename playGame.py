@@ -17,8 +17,8 @@ player_info = {
     'playerB': model.RandomChoice(board_size)
 }
 playerA_color = bool(np.random.randint(2))   #True: Black, Flase: White
-board = GameBoard(board_size)
 
+board = GameBoard()
 rule = Rule(board_size=board_size)
 
 
