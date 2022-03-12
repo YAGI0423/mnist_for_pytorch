@@ -23,7 +23,8 @@ _rule = rule.Rule(board_size=board_size)
 
 while (game_done := _rule.game_status(board.get_list_board())) == 0:
     print("=" * 100)
-    print(util.get_square_board(board.get_list_board()))
+    print(util.Util.get_square_board(board.get_list_board(), board_size))
+    exit()
 
     #Put Stone=======================
     now_turn = board.now_turn()
