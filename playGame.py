@@ -26,8 +26,16 @@ now_board = board.get_board()
 
 while rule.game_status(now_board) == 0:
     print("=" * 100)
+    print('square board', '-' * 30)
     print(Util.seq_to_square(now_board, board_size))
+    print('-' * 43)
 
+    #put ston=============
+    now_turn = Util.now_turn(now_board)
+
+    print('\nnow turn: ', end='')
+    print('Black') if now_turn else print('White')
+    #End==================
     exit()
 exit()
 

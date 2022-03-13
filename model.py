@@ -2,8 +2,8 @@ import rule
 from tree import Node
 
 import numpy as np
-import tensorflow as tf
-from tensorflow import keras as K
+# import tensorflow as tf
+# from tensorflow import keras as K
 
 
 class RandomChoice:
