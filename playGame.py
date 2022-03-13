@@ -13,10 +13,9 @@ import numpy as np
 board_size = 4
 win_seq = 3
 player_info = {
-    'playerA': model.RandomChoice(board_size),
-    'playerB': model.RandomChoice(board_size)
+    'black': model.RandomChoice(board_size),
+    'white': model.RandomChoice(board_size)
 }
-playerA_color = bool(np.random.randint(2))   #True: Black, Flase: White
 
 board = GameBoard()
 rule = Rule(board_size=board_size, win_seq=5)
@@ -32,6 +31,9 @@ while rule.game_status(now_board) == 0:
 
     #put ston=============
     now_turn = Util.now_turn(now_board)
+    now_player = player_info['black'] if now_turn else player_info['white']
+
+    
 
     print('\nnow turn: ', end='')
     print('Black') if now_turn else print('White')

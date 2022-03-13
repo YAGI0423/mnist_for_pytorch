@@ -1,4 +1,3 @@
-import rule
 from tree import Node
 
 import numpy as np
