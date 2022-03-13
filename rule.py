@@ -9,6 +9,13 @@ class Rule:
         self.win_seq = win_seq
 
     def game_status(self, seq_xy_board):
+        #새로운 규칙
+        #None: during, 0: black win, 1: white win
+        #{
+        #   done: [True, False],
+        #   win: [0, 1]
+        #}
+
         #0: during, 1: win, 2: draw
 
         #승패 결정 불가 턴
