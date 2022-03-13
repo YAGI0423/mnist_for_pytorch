@@ -13,7 +13,6 @@ class Rule:
 
         #승패 결정 불가 턴
         if len(seq_xy_board) < self.win_seq * 2 - 1:
-            print("hi")
             return 0   #during
 
         #함수 선언================================
@@ -87,7 +86,7 @@ class Rule:
 
             cropped_board = np.rot90(cropped_board)   #90도 회전
 
-        if len(list_board) == self.board_size ** 2:
+        if len(seq_xy_board) == self.board_size ** 2:
             return 2   #draw
         return 0   #during
 

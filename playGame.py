@@ -18,7 +18,7 @@ player_info = {
 }
 
 board = GameBoard()
-rule = Rule(board_size=board_size, win_seq=5)
+rule = Rule(board_size=board_size, win_seq=win_seq)
 
 
 now_board = board.get_board()
