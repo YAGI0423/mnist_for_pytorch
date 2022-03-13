@@ -2,7 +2,7 @@ class User():
     def __init__(self, board_size):
         self.board_size = board_size
 
-    def act(self, status):
+    def act(self, state):
         def check_input(message):
             #check user input value
             while True:
@@ -17,6 +17,6 @@ class User():
 
         while True:
             input_x, input_y = check_input("x"), check_input("y")
-            if (input_x, input_y) in status['able_loc']: break;
+            if (input_x, input_y) in state['able_loc']: break;
             if (input_x, input_y) == (None, None): break;   #기권
         return (input_x, input_y)

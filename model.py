@@ -9,8 +9,8 @@ class RandomChoice:
     def __init__(self, board_size):
         self.board_size = board_size
 
-    def act(self, status):
-        able_loc = status['able_loc']
+    def act(self, state):
+        able_loc = state['able_loc']
         rand_idx = np.random.choice(len(able_loc))
         return able_loc[rand_idx]
 
