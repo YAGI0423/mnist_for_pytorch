@@ -13,6 +13,7 @@ class Rule:
 
         #승패 결정 불가 턴
         if len(seq_xy_board) < self.win_seq * 2 - 1:
+            print("hi")
             return 0   #during
 
         #함수 선언================================

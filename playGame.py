@@ -24,7 +24,6 @@ rule = Rule(board_size=board_size, win_seq=5)
 now_board = board.get_board()
 
 while rule.game_status(now_board) == 0:
-    #put ston=============
     now_turn = Util.now_turn(now_board)
     now_player = player_info['black'] if now_turn else player_info['white']
 
@@ -35,9 +34,6 @@ while rule.game_status(now_board) == 0:
 
     act_loc = now_player.act(status)
     board.put_stone(*act_loc)
-    #End==================
-
-
 
 
     #print================
@@ -51,6 +47,13 @@ while rule.game_status(now_board) == 0:
 
     print(f'\nact loc: {act_loc}')
     #End==================
+
+
+    now_board = board.get_board()
+
+    print(now_board)
+    print(Util.seq_to_square(now_board, board_size))
+    print(rule.game_status(now_board))
     exit()
 exit()
 

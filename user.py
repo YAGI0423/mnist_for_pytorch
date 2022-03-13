@@ -15,9 +15,8 @@ class User():
                 except:
                     continue
 
-        able_loc = status['able_loc']
         while True:
             input_x, input_y = check_input("x"), check_input("y")
-            if (input_x, input_y) in able_loc: break;
+            if (input_x, input_y) in status['able_loc']: break;
             if (input_x, input_y) == (None, None): break;   #기권
         return (input_x, input_y)
