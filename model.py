@@ -7,13 +7,12 @@ import numpy as np
 
 class RandomChoice:
     def __init__(self, board_size):
-        self.rule = rule.Rule(board_size=board_size)
         self.board_size = board_size
 
-    def act(self, board):
-        able_loc_tup = self.rule.get_able_location(board)
-        rand_idx = np.random.choice(len(able_loc_tup))
-        return able_loc_tup[rand_idx]
+    def act(self, status):
+        able_loc = status['able_loc']
+        rand_idx = np.random.choice(len(able_loc))
+        return able_loc[rand_idx]
 
 
 class AlphaO:

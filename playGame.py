@@ -24,19 +24,31 @@ rule = Rule(board_size=board_size, win_seq=5)
 now_board = board.get_board()
 
 while rule.game_status(now_board) == 0:
+    #put ston=============
+    now_turn = Util.now_turn(now_board)
+    now_player = player_info['black'] if now_turn else player_info['white']
+
+    status = {
+        'seq_xy_board': now_board,
+        'able_loc': rule.get_able_loc(now_board)
+    }
+
+    act_loc = now_player.act(status)
+
+    
+    #End==================
+
+
+    #print================
     print("=" * 100)
     print('square board', '-' * 30)
     print(Util.seq_to_square(now_board, board_size))
     print('-' * 43)
 
-    #put ston=============
-    now_turn = Util.now_turn(now_board)
-    now_player = player_info['black'] if now_turn else player_info['white']
-
-    
-
     print('\nnow turn: ', end='')
     print('Black') if now_turn else print('White')
+
+
     #End==================
     exit()
 exit()
