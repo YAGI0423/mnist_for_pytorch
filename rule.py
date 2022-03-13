@@ -11,7 +11,7 @@ class Rule:
     def game_status(self, seq_xy_board):
         #0: during, 1: win, 2: draw
 
-        #이전까지는 승패 결정 불가
+        #승패 결정 불가 턴
         if len(seq_xy_board) < self.win_seq * 2 - 1:
             return 0   #during
 

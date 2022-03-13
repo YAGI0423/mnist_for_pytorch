@@ -1,11 +1,8 @@
-import rule
-
-class User(rule.Rule):
+class User():
     def __init__(self, board_size):
-        super().__init__(board_size)
         self.board_size = board_size
 
-    def act(self, board):
+    def act(self, status):
         def check_input(message):
             #check user input value
             while True:
@@ -18,9 +15,9 @@ class User(rule.Rule):
                 except:
                     continue
 
-        able_loc_tup = super().get_able_location(board)
+        able_loc = status['able_loc']
         while True:
             input_x, input_y = check_input("x"), check_input("y")
-            if (input_x, input_y) in able_loc_tup: break;
+            if (input_x, input_y) in able_loc: break;
             if (input_x, input_y) == (None, None): break;   #기권
         return (input_x, input_y)

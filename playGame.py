@@ -1,4 +1,4 @@
-import user
+from user import User
 import model
 from rule import Rule
 from util import Util
@@ -13,8 +13,8 @@ import numpy as np
 board_size = 4
 win_seq = 3
 player_info = {
-    'black': model.RandomChoice(board_size),
-    'white': model.RandomChoice(board_size)
+    'black': User(board_size),
+    'white': User(board_size)
 }
 
 board = GameBoard()
@@ -34,9 +34,10 @@ while rule.game_status(now_board) == 0:
     }
 
     act_loc = now_player.act(status)
-
-    
+    board.put_stone(*act_loc)
     #End==================
+
+
 
 
     #print================
@@ -48,7 +49,7 @@ while rule.game_status(now_board) == 0:
     print('\nnow turn: ', end='')
     print('Black') if now_turn else print('White')
 
-
+    print(f'\nact loc: {act_loc}')
     #End==================
     exit()
 exit()
