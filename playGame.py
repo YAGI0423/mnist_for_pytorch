@@ -1,5 +1,5 @@
-from user import User
 import model
+from user import User
 from rule import Rule
 from util import Util
 from gameBoard import GameBoard
