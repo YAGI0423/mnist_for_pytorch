@@ -147,7 +147,7 @@ class AlphaO:
         root = create_node(seq_xy_board, idx=None, parent=None)
 
         #Select Branch
-        for round in range(500):
+        for round in range(2000):
             node = root
             branch_idx = select_branch(node)
 
@@ -169,9 +169,16 @@ class AlphaO:
             branch_board.append(xy_loc)
             branch_board = tuple(branch_board)
 
-            child_node = create_node(branch_board, idx=branch_idx, parent=node)
-            child_idx = child_node.idx
-            value = -1. * child_node.value
+            #create child node
+            game_status = self.rule.game_status(branch_board)
+            if game_status['during']:   #during
+                child_node = create_node(branch_board, idx=branch_idx, parent=node)
+                value = -1. * child_node.value
+            else:   #done | is terminal node
+                #draw: 0, win: -1
+                value = 0. if game_status['win'] == 2 else -1.
+
+            child_idx = branch_idx
 
             #parent를 따라 방문 기록하기
             while node is not None:
