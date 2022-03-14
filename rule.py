@@ -11,24 +11,20 @@ class Rule:
     def game_status(self, seq_xy_board):
         #새로운 규칙
         #{
-        #   done: [True, False],
+        #   during: [True, False],
         #   win: [0: black, 1: white, 2: draw]
         #}
 
         now_player = Util.now_turn(seq_xy_board)
 
         #surrender
-        try:
-            last_loc = seq_xy_board[-1]
-        except:
-            pass
-        else:
-            if last_loc == (None, None):
-                return {'done': True, 'win': int(not now_player)}
+        if len(seq_xy_board) > 0:
+            if seq_xy_board[-1] == (None, None):
+                return {'during': False, 'win': int(not now_player)}
 
         #before able judge
         if len(seq_xy_board) < self.win_seq * 2 - 1:
-            return {'done': False}
+            return {'during': True}
 
         #함수 선언================================
         def crop_board(square_board, stone_location, cut_size):
@@ -98,13 +94,13 @@ class Rule:
                 row = np.diag(cropped_board) == stone_color   #대각축
 
                 if seq_num >= cut_size:
-                    return {'done': True, 'win': int(now_player)}   #win
+                    return {'during': False, 'win': int(now_player)}   #win
 
             cropped_board = np.rot90(cropped_board)   #90도 회전
 
         if len(seq_xy_board) == self.board_size ** 2:
-            return {'done': True, 'win': 2}   #draw
-        return {'done': False}
+            return {'during': False, 'win': 2}   #draw
+        return {'during': True}
 
     def check_able_loc(self, seq_xy_board, x, y):
         if x >= self.board_size: return False;

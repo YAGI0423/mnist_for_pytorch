@@ -28,7 +28,7 @@ print(now_board)
 print(rule.game_status(now_board))
 exit()
 
-while rule.game_status(now_board) == 0:
+while rule.game_status(now_board)['done'] is False:
     now_turn = Util.now_turn(now_board)
     now_player = player_info['black'] if now_turn else player_info['white']
 
