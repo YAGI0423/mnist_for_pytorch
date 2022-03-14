@@ -2,14 +2,15 @@ from tree import Node
 from util import Util
 
 import numpy as np
-import tensorflow as tf
-from tensorflow import keras as K
+# import tensorflow as tf
+# from tensorflow import keras as K
 
 class User:
     def __init__(self, board_size, rule):
         self.board_size = board_size
+        self.rule = rule
 
-    def act(self, state):
+    def act(self, seq_xy_board):
         def check_input(message):
             #check user input value
             while True:
@@ -24,7 +25,8 @@ class User:
 
         while True:
             input_x, input_y = check_input("x"), check_input("y")
-            if (input_x, input_y) in state['able_loc']: break;
+            able_loc = self.rule.get_able_loc(seq_xy_board)
+            if (input_x, input_y) in able_loc: break;   #aleady put stone
             if (input_x, input_y) == (None, None): break;   #기권
         return (input_x, input_y)
 
@@ -32,9 +34,10 @@ class User:
 class RandomChoice:
     def __init__(self, board_size, rule):
         self.board_size = board_size
+        self.rule = rule
 
-    def act(self, state):
-        able_loc = state['able_loc']
+    def act(self, seq_xy_board):
+        able_loc = self.rule.get_able_loc(seq_xy_board)
         rand_idx = np.random.choice(len(able_loc))
         return able_loc[rand_idx]
 

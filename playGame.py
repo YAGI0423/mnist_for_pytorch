@@ -15,7 +15,7 @@ board = GameBoard()
 rule = Rule(board_size=board_size, win_seq=win_seq)
 
 player_info = {
-    'black': model.RandomChoice(board_size, rule),
+    'black': model.User(board_size, rule),
     'white': model.RandomChoice(board_size, rule)
 }
 
@@ -28,15 +28,10 @@ while rule.game_status(now_board)['during']:
     now_turn = Util.now_turn(now_board)
     now_player = player_info['black'] if now_turn else player_info['white']
 
-    status = {
-        'seq_xy_board': now_board,
-        'able_loc': rule.get_able_loc(now_board)
-    }
-
     print('\nnow turn: ', end='')
     print('Black') if now_turn else print('White')
 
-    act_loc = now_player.act(status)
+    act_loc = now_player.act(now_board)
     board.put_stone(*act_loc)
 
     print(f'\nact loc: {act_loc}\n\n')

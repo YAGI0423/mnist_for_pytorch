@@ -15,7 +15,7 @@ class Rule:
         #   win: [0: black, 1: white, 2: draw]
         #}
         '''
-        
+
         now_player = Util.now_turn(seq_xy_board)
 
         #surrender
