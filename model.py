@@ -163,12 +163,10 @@ class AlphaO:
 
             #idx를 x, y좌표로 변환
             xy_loc = element_idx_to_xy(branch_idx)
-            print(xy_loc)
-            exit()
 
             #현재 board의 좌표에 돌 놓기
             branch_board = list(node.state)
-            branch_board.append(loc)
+            branch_board.append(xy_loc)
             branch_board = tuple(branch_board)
 
             child_node = create_node(branch_board, idx=branch_idx, parent=node)
