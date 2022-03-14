@@ -9,12 +9,13 @@ class Rule:
         self.win_seq = win_seq
 
     def game_status(self, seq_xy_board):
-        #새로운 규칙
+        '''
         #{
         #   during: [True, False],
         #   win: [0: black, 1: white, 2: draw]
         #}
-
+        '''
+        
         now_player = Util.now_turn(seq_xy_board)
 
         #surrender

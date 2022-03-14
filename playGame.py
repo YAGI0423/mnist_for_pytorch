@@ -23,12 +23,9 @@ rule = Rule(board_size=board_size, win_seq=win_seq)
 
 now_board = board.get_board()
 
-print(Util.seq_to_square(now_board, board_size))
-print(now_board)
-print(rule.game_status(now_board))
-exit()
+print(rule.game_status(now_board)['during'])
 
-while rule.game_status(now_board)['done'] is False:
+while rule.game_status(now_board)['during']:
     now_turn = Util.now_turn(now_board)
     now_player = player_info['black'] if now_turn else player_info['white']
 
