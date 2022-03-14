@@ -9,16 +9,15 @@ import numpy as np
 
 #End=================
 
-board_size = 4
+board_size = 3
 win_seq = 3
-player_info = {
-    'black': model.User(board_size),
-    'white': model.User(board_size)
-}
-
 board = GameBoard()
 rule = Rule(board_size=board_size, win_seq=win_seq)
 
+player_info = {
+    'black': model.RandomChoice(board_size, rule),
+    'white': model.RandomChoice(board_size, rule)
+}
 
 now_board = board.get_board()
 

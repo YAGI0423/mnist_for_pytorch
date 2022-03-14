@@ -1,11 +1,12 @@
 from tree import Node
+from util import Util
 
 import numpy as np
-# import tensorflow as tf
-# from tensorflow import keras as K
+import tensorflow as tf
+from tensorflow import keras as K
 
-class User():
-    def __init__(self, board_size):
+class User:
+    def __init__(self, board_size, rule):
         self.board_size = board_size
 
     def act(self, state):
@@ -29,7 +30,7 @@ class User():
 
 
 class RandomChoice:
-    def __init__(self, board_size):
+    def __init__(self, board_size, rule):
         self.board_size = board_size
 
     def act(self, state):
@@ -39,10 +40,10 @@ class RandomChoice:
 
 
 class AlphaO:
-    def __init__(self, board_size):
-        self.rule = rule.Rule(board_size=board_size)
+    def __init__(self, board_size, rule):
         self.board_size = board_size
         self.model = self.__get_model()
+        self.rule = rule
 
         self.c = np.sqrt(2)
 
@@ -62,7 +63,7 @@ class AlphaO:
         model = K.models.Model(inputs=input, outputs=[policy_output, value_output])
         return model
 
-    def predict_stone(self, list_board):
+    def predict_stone(self, state):
         #MCTS tree search
         def filt_board(square_board, stone_color):
             #filt squre board stone
@@ -70,18 +71,60 @@ class AlphaO:
             board = board.astype(np.float64)
             return board
 
-        def xy_to_idx(list_board):
+        def seq_xy_to_idx(seq_xy_board):
             #convert x, y location to idx
             loc2idx = tuple(   #able loc -> idx
-                y * self.board_size + x for x, y in list_board
+                y * self.board_size + x for x, y in seq_xy_board
             )
             return loc2idx
 
-        def get_idx_to_loc(branch_idx):
+        def element_idx_to_xy(idx_loc):
             #convert branch idx, to x, y location
-            x = branch_idx % self.board_size
-            y = branch_idx // self.board_size
+            x = idx_loc % self.board_size
+            y = idx_loc // self.board_size
             return x, y
+
+        def model_predict(seq_xy_board):
+            #get policy, value
+            def get_input_data(seq_xy_board):
+                #list_board ==> moel input tensor
+                square_board = Util.seq_to_square(seq_xy_board, self.board_size)
+                black_board = filt_board(square_board, -1)
+                white_board = filt_board(square_board, 1)
+
+                turn_board = np.zeros((self.board_size, self.board_size))
+                if len(seq_xy_board) % 2 == 1:   #흑: 0, 백: 1
+                    turn_board[:] = 1.
+
+                input_tensor = np.array((black_board, white_board, turn_board))
+                input_tensor = input_tensor.reshape(1, self.board_size, self.board_size, 3)
+                return input_tensor
+
+            input_board = get_input_data(seq_xy_board)
+            policy_pred, value_pred = self.model(input_board)
+            policy_pred = np.array(policy_pred[0])
+            value_pred = np.array(value_pred[0][0])
+            return policy_pred, value_pred
+
+        def create_node(state, idx, parent):
+            policy_pred, value_pred = model_predict(state['seq_xy_board'])
+
+            #get node's branches
+            seq_idx_board = seq_xy_to_idx(state['able_loc'])
+            branches = {idx: policy_pred[idx] for idx in seq_idx_board}
+
+            node = Node(
+                state=state['seq_xy_board'],
+                value=value_pred,
+                idx=idx,
+                parent=parent,
+                branches=branches
+            )
+
+            #add child to parent
+            if parent is not None:
+                parent.childrens[idx] = node
+            return node
 
         def select_branch(node):
             #Evaluate Branch and Select
@@ -96,54 +139,9 @@ class AlphaO:
                 return q + self.c * p * np.sqrt(total_n) / (n + 1)
             return max(node.get_branches_keys(), key=score_branch)
 
-        def model_predict(list_board):
-            #get policy, value
-            def get_input_data(list_board):
-                #list_board ==> moel input tensor
-                square_board = self.rule.get_square_board(list_board)
-                black_board = filt_board(square_board, -1)
-                white_board = filt_board(square_board, 1)
-
-                turn_board = np.zeros((self.board_size, self.board_size))
-                if len(list_board) % 2 == 1:   #흑: 0, 백: 1
-                    turn_board[:] = 1.
-
-                input_tensor = np.array((black_board, white_board, turn_board))
-                input_tensor = input_tensor.reshape(1, self.board_size, self.board_size, 3)
-                return input_tensor
-
-            input_board = get_input_data(list_board)
-            policy_pred, value_pred = self.model(input_board)
-            policy_pred = np.array(policy_pred[0])
-            value_pred = np.array(value_pred[0][0])
-            return policy_pred, value_pred
-
-        def create_node(list_board, idx, parent):
-            policy_pred, value_pred = model_predict(list_board)
-
-            #get node's branches
-            able_loc = self.rule.get_able_location(list_board)   #only able loc
-            idx_board = xy_to_idx(able_loc)
-            branches = {idx: policy_pred[idx] for idx in idx_board}
-
-            node = Node(
-                state=list_board,
-                value=value_pred,
-                idx=idx,
-                parent=parent,
-                branches=branches
-            )
-
-            #add child to parent
-            if parent is not None:
-                parent.childrens[idx] = node
-            return node
-
-
-        root = create_node(list_board, idx=None, parent=None)
+        root = create_node(state, idx=None, parent=None)
 
         #Select Branch
-        #가지 선택 과제 수행 필요
         for round in range(500):
             node = root
             branch_idx = select_branch(node)
@@ -159,7 +157,9 @@ class AlphaO:
             #state 반환하도록 하기
 
             #idx를 x, y좌표로 변환
-            loc = get_idx_to_loc(branch_idx)
+            xy_loc = element_idx_to_xy(branch_idx)
+            print(xy_loc)
+            exit()
 
             #현재 board의 좌표에 돌 놓기
             branch_board = list(node.state)
@@ -186,8 +186,8 @@ class AlphaO:
         exit()
 
 
-    def act(self, list_board):
-        self.predict_stone(list_board)
+    def act(self, state):
+        self.predict_stone(state)
         exit()
 
         def get_square_board(list_board):
