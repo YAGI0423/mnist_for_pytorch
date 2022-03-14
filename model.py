@@ -2,8 +2,8 @@ from tree import Node
 from util import Util
 
 import numpy as np
-# import tensorflow as tf
-# from tensorflow import keras as K
+import tensorflow as tf
+from tensorflow import keras as K
 
 class User:
     def __init__(self, board_size, rule):
@@ -66,7 +66,7 @@ class AlphaO:
         model = K.models.Model(inputs=input, outputs=[policy_output, value_output])
         return model
 
-    def predict_stone(self, state):
+    def predict_stone(self, seq_xy_board):
         #MCTS tree search
         def filt_board(square_board, stone_color):
             #filt squre board stone
@@ -109,15 +109,16 @@ class AlphaO:
             value_pred = np.array(value_pred[0][0])
             return policy_pred, value_pred
 
-        def create_node(state, idx, parent):
-            policy_pred, value_pred = model_predict(state['seq_xy_board'])
+        def create_node(seq_xy_board, idx, parent):
+            policy_pred, value_pred = model_predict(seq_xy_board)
 
             #get node's branches
-            seq_idx_board = seq_xy_to_idx(state['able_loc'])
+            able_loc = self.rule.get_able_loc(seq_xy_board)
+            seq_idx_board = seq_xy_to_idx(able_loc)
             branches = {idx: policy_pred[idx] for idx in seq_idx_board}
 
             node = Node(
-                state=state['seq_xy_board'],
+                state=seq_xy_board,
                 value=value_pred,
                 idx=idx,
                 parent=parent,
@@ -142,7 +143,8 @@ class AlphaO:
                 return q + self.c * p * np.sqrt(total_n) / (n + 1)
             return max(node.get_branches_keys(), key=score_branch)
 
-        root = create_node(state, idx=None, parent=None)
+
+        root = create_node(seq_xy_board, idx=None, parent=None)
 
         #Select Branch
         for round in range(500):
@@ -189,8 +191,8 @@ class AlphaO:
         exit()
 
 
-    def act(self, state):
-        self.predict_stone(state)
+    def act(self, seq_xy_board):
+        self.predict_stone(seq_xy_board)
         exit()
 
         def get_square_board(list_board):

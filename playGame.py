@@ -15,7 +15,7 @@ board = GameBoard()
 rule = Rule(board_size=board_size, win_seq=win_seq)
 
 player_info = {
-    'black': model.User(board_size, rule),
+    'black': model.AlphaO(board_size, rule),
     'white': model.RandomChoice(board_size, rule)
 }
 
