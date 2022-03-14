@@ -68,6 +68,8 @@ class AlphaO:
 
     def predict_stone(self, seq_xy_board):
         #MCTS tree search
+
+        #function====================================
         def filt_board(square_board, stone_color):
             #filt squre board stone
             board = (square_board == stone_color)
@@ -142,29 +144,24 @@ class AlphaO:
                 n = node.get_visit(branch_idx)
                 return q + self.c * p * np.sqrt(total_n) / (n + 1)
             return max(node.get_branches_keys(), key=score_branch)
+        #End=========================================
 
 
         root = create_node(seq_xy_board, idx=None, parent=None)
 
-        #Select Branch
-        for round in range(2000):
+        for round in range(1000):
             node = root
             branch_idx = select_branch(node)
 
+            #explore tree
             while node.has_child(branch_idx):
                 #has child: follow root, no child: stop
                 node = node.childrens[branch_idx]
                 branch_idx = select_branch(node)
 
-            #선택된 가지(branch_idx)를 바탕으로
-            #state 만들기
-            #tree class에 branch_idx를 입력하면
-            #state 반환하도록 하기
-
-            #idx를 x, y좌표로 변환
+            #create new state
             xy_loc = element_idx_to_xy(branch_idx)
 
-            #현재 board의 좌표에 돌 놓기
             branch_board = list(node.state)
             branch_board.append(xy_loc)
             branch_board = tuple(branch_board)
@@ -177,12 +174,10 @@ class AlphaO:
             else:   #done | is terminal node
                 #draw: 0, win: -1
                 value = 0. if game_status['win'] == 2 else -1.
-
             child_idx = branch_idx
 
-            #parent를 따라 방문 기록하기
+            #record visit
             while node is not None:
-                #node의 branch_idx를 기록하기
                 node.record_visit(child_idx, value)
 
                 value = -1. * value
