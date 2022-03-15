@@ -9,7 +9,7 @@ class Util:
     def seq_to_square(seq_xy_board, board_size):
         square_board = np.zeros((board_size, board_size))
         for turn, (x, y) in enumerate(seq_xy_board):
-            surrender_TF = (x, y) != (None, None)   #surrender
+            surrender_TF = (x, y) != (0, board_size)   #surrender
             pass_TF = (x, y) != (-1, -1)   #stone pass
 
             if surrender_TF and pass_TF:

@@ -79,7 +79,7 @@ class AlphaO:
         def seq_xy_to_idx(seq_xy_board):
             #convert x, y location to idx
             loc2idx = tuple(   #able loc -> idx
-                y * self.board_size + x for x, y in seq_xy_board
+                x + y * self.board_size for x, y in seq_xy_board
             )
             return loc2idx
 
@@ -116,7 +116,16 @@ class AlphaO:
 
             #get node's branches
             able_loc = self.rule.get_able_loc(seq_xy_board)
+
+            #surrender is another algorithm
+            able_loc = list(able_loc)
+            able_loc.remove((None, None))
+            able_loc = tuple(able_loc)
+
             seq_idx_board = seq_xy_to_idx(able_loc)
+            print(able_loc)
+            print(seq_idx_board)
+            exit()
             branches = {idx: policy_pred[idx] for idx in seq_idx_board}
 
             node = Node(
