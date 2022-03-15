@@ -6,7 +6,7 @@ from gameBoard import GameBoard
 import numpy as np
 
 #해결 필요 문제======
-
+# 차례 넘기기 규칙
 #End=================
 
 board_size = 3
@@ -15,7 +15,7 @@ board = GameBoard()
 rule = Rule(board_size=board_size, win_seq=win_seq)
 
 player_info = {
-    'black': model.AlphaO(board_size, rule),
+    'black': model.User(board_size, rule),
     'white': model.RandomChoice(board_size, rule)
 }
 
@@ -24,6 +24,7 @@ now_board = board.get_board()
 while rule.game_status(now_board)['during']:
     print("=" * 100)
     print(Util.seq_to_square(now_board, board_size))
+    print(board.get_board())
 
     now_turn = Util.now_turn(now_board)
     now_player = player_info['black'] if now_turn else player_info['white']
