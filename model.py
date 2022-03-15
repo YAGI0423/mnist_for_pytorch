@@ -149,7 +149,7 @@ class AlphaO:
 
         root = create_node(seq_xy_board, idx=None, parent=None)
 
-        for round in range(1000):
+        for round in range(3000):
             node = root
             branch_idx = select_branch(node)
 
@@ -173,7 +173,17 @@ class AlphaO:
                 value = -1. * child_node.value
             else:   #done | is terminal node
                 #draw: 0, win: -1
-                value = 0. if game_status['win'] == 2 else -1.
+                value = 0. if game_status['win'] == 2 else 1.
+
+
+                #test======================
+                print('hi')
+                print(branch_board)
+
+                test_seq = seq_xy_to_idx(branch_board)
+                print(test_seq)
+                #End=======================
+
             child_idx = branch_idx
 
             #record visit
@@ -184,10 +194,23 @@ class AlphaO:
                 child_idx = node.idx
                 node = node.parent
 
-        print(root)
-        for idx, value in root.branches.items():
-            print(f'{idx}: {value}')
+        # print(root)
+        # for idx, value in root.branches.items():
+        #     print(f'{idx}: {value}')
 
+
+        #test================
+        test_node = root
+
+        for idx in test_seq:
+            print('\n\n')
+            if test_node.parent is not None:
+                print(test_node.parent.idx, '==>', end=' ')
+            print(test_node.idx)
+            for x_idx, value in test_node.branches.items():
+                print(f'{x_idx}: {value}')
+            test_node = test_node.childrens[idx]
+        #End=================
         exit()
 
 
