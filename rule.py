@@ -23,6 +23,9 @@ class Rule:
             if seq_xy_board[-1] == (None, None):
                 return {'during': False, 'win': int(not now_player)}
 
+            if seq_xy_board[-1] == (0, self.board_size):
+                return {'during': True}
+
         #before able judge
         if len(seq_xy_board) < self.win_seq * 2 - 1:
             return {'during': True}
@@ -75,8 +78,9 @@ class Rule:
         stone_color = -1 if last_turn else 1
         #End======================================
 
+        square_board = Util.seq_to_square(seq_xy_board, self.board_size)
         cropped_board = crop_board(
-            Util.seq_to_square(seq_xy_board, self.board_size),
+            square_board,
             (last_x, last_y),
             cut_size
         )
@@ -99,7 +103,7 @@ class Rule:
 
             cropped_board = np.rot90(cropped_board)   #90도 회전
 
-        if len(seq_xy_board) == self.board_size ** 2:
+        if 0 not in square_board:   #full stone
             return {'during': False, 'win': 2}   #draw
         return {'during': True}
 

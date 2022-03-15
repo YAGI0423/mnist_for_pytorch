@@ -16,7 +16,7 @@ rule = Rule(board_size=board_size, win_seq=win_seq)
 
 player_info = {
     'black': model.AlphaO(board_size, rule),
-    'white': model.RandomChoice(board_size, rule)
+    'white': model.AlphaO(board_size, rule)
 }
 
 now_board = board.get_board()
