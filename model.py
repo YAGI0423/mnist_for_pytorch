@@ -149,7 +149,7 @@ class AlphaO:
 
         root = create_node(seq_xy_board, idx=None, parent=None)
 
-        for round in range(3000):
+        for round in range(5000):
             node = root
             branch_idx = select_branch(node)
 
@@ -193,6 +193,9 @@ class AlphaO:
                 value = -1. * value
                 child_idx = node.idx
                 node = node.parent
+
+            if not game_status['during']:
+                break
 
         # print(root)
         # for idx, value in root.branches.items():
