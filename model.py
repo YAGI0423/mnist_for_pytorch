@@ -123,9 +123,6 @@ class AlphaO:
             able_loc = tuple(able_loc)
 
             seq_idx_board = seq_xy_to_idx(able_loc)
-            print(able_loc)
-            print(seq_idx_board)
-            exit()
             branches = {idx: policy_pred[idx] for idx in seq_idx_board}
 
             node = Node(
@@ -194,6 +191,5 @@ class AlphaO:
                 child_idx = node.idx
                 node = node.parent
 
-        print(max(root.branches.keys(), key=root.get_visit))
-        exit()
-        return max(root.branches.keys(), key=root.get_visit)
+        result_idx = max(root.branches.keys(), key=root.get_visit)
+        return element_idx_to_xy(result_idx)
