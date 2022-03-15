@@ -2,8 +2,8 @@ from tree import Node
 from util import Util
 
 import numpy as np
-# import tensorflow as tf
-# from tensorflow import keras as K
+import tensorflow as tf
+from tensorflow import keras as K
 
 class User:
     def __init__(self, board_size, rule):
@@ -26,8 +26,6 @@ class User:
         while True:
             input_x, input_y = check_input("x"), check_input("y")
             able_loc = self.rule.get_able_loc(seq_xy_board)
-            if (input_x, input_y) == (-1, -1): break;   #차례 넘기기
-            if (input_x, input_y) == (None, None): break;   #기권
             if (input_x, input_y) in able_loc: break;   #aleady put stone
         return (input_x, input_y)
 
@@ -38,7 +36,8 @@ class RandomChoice:
         self.rule = rule
 
     def act(self, seq_xy_board):
-        able_loc = self.rule.get_able_loc(seq_xy_board)
+        able_loc = list(self.rule.get_able_loc(seq_xy_board))
+        able_loc.remove((None, None))   #surrender
         rand_idx = np.random.choice(len(able_loc))
         return able_loc[rand_idx]
 

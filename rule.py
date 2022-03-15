@@ -104,6 +104,8 @@ class Rule:
         return {'during': True}
 
     def check_able_loc(self, seq_xy_board, x, y):
+        if (x, y) == (-1, -1): return True;   #pass stone
+        if (x, y) == (None, None): return True;   #surrender
         if x >= self.board_size: return False;
         if y >= self.board_size: return False;
         if (x, y) in seq_xy_board: return False;
@@ -118,6 +120,7 @@ class Rule:
         )
         able_loc -= set(seq_xy_board)
         able_loc = list(able_loc)
+        able_loc.extend(((None, None), (-1, -1)))   #add surrender, pass
         random.shuffle(able_loc)
 
         able_loc = tuple(
