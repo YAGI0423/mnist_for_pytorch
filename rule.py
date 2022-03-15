@@ -18,11 +18,12 @@ class Rule:
 
         now_player = Util.now_turn(seq_xy_board)
 
-        #surrender
         if len(seq_xy_board) > 0:
+            #surrender
             if seq_xy_board[-1] == (None, None):
                 return {'during': False, 'win': int(not now_player)}
 
+            #pass stone
             if seq_xy_board[-1] == (0, self.board_size):
                 return {'during': True}
 
