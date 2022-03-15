@@ -66,7 +66,7 @@ class AlphaO:
         model = K.models.Model(inputs=input, outputs=[policy_output, value_output])
         return model
 
-    def predict_stone(self, seq_xy_board):
+    def act(self, seq_xy_board):
         #MCTS tree search
 
         #function====================================
@@ -175,15 +175,6 @@ class AlphaO:
                 #draw: 0, win: -1
                 value = 0. if game_status['win'] == 2 else 1.
 
-
-                #test======================
-                print('hi')
-                print(branch_board)
-
-                test_seq = seq_xy_to_idx(branch_board)
-                print(test_seq)
-                #End=======================
-
             child_idx = branch_idx
 
             #record visit
@@ -193,79 +184,7 @@ class AlphaO:
                 value = -1. * value
                 child_idx = node.idx
                 node = node.parent
-
-            if not game_status['during']:
-                break
-
-        # print(root)
-        # for idx, value in root.branches.items():
-        #     print(f'{idx}: {value}')
-
-
-        #test================
-        test_node = root
-
-        for idx in test_seq:
-            print('\n\n')
-            if test_node.parent is not None:
-                print(test_node.parent.idx, '==>', end=' ')
-            print(test_node.idx)
-            for x_idx, value in test_node.branches.items():
-                print(f'{x_idx}: {value}')
-            test_node = test_node.childrens[idx]
-        #End=================
+                
+        print(max(root.branches.keys(), key=root.get_visit))
         exit()
-
-
-    def act(self, seq_xy_board):
-        self.predict_stone(seq_xy_board)
-        exit()
-
-        def get_square_board(list_board):
-            square_board = np.zeros((self.board_size, self.board_size))
-            for turn, (x, y) in enumerate(list_board):
-                stone_color = -1 if turn % 2 == 0 else 1
-                square_board[y][x] = stone_color
-            return square_board
-
-        def filt_board(square_board, stone_color):
-            #filt squre board stone
-            board = (square_board == stone_color)
-            board = board.astype(np.float64)
-            return board
-
-        #모델 입력 데이터(=특징 평면)================
-        square_board = get_square_board(list_board)
-        black_board = filt_board(square_board, -1)
-        white_board = filt_board(square_board, 1)
-
-        turn_board = np.zeros((self.board_size, self.board_size))
-        if len(list_board) % 2 == 1:   #백 차례일 때, 1
-            turn_board[:] = 1.
-
-        input_board = np.array((black_board, white_board, turn_board))
-        input_board = input_board.reshape(1, self.board_size, self.board_size, 3)
-        #End========================================
-
-        policy_pred, value_pred = self.model(input_board)
-        print(policy_pred, value_pred)
-        exit()
-        policy_pred = np.array(policy_pred[0], dtype=np.float32)
-
-        #확률분포 조건(sum = 1)
-        over = 1 - np.sum(policy_pred)
-        policy_pred[-1] += over
-
-        idx = np.random.choice(
-            range(self.board_size ** 2 + 1),
-            p=policy_pred
-        )
-        if idx == self.board_size: return (-1, -1)   #surrender
-        return (idx % self.board_size, idx // self.board_size)
-
-
-if __name__ == "__main__":
-        model = AlphaO(9)
-
-        list_board = [(0, 0), (5, 3)]
-        print(model.act(list_board))
+        return max(root.branches.keys(), key=root.get_visit)
