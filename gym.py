@@ -13,9 +13,11 @@ win_seq = 3
 board = GameBoard()
 rule = Rule(board_size=board_size, win_seq=win_seq)
 
+agent = model.AlphaO(board_size, rule)
+
 player_info = {
-    'black': model.AlphaO(board_size, rule),
-    'white': model.AlphaO(board_size, rule)
+    'black': agent,
+    'white': agent
 }
 
 now_board = board.get_board()
