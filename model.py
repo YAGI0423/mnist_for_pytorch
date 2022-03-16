@@ -43,12 +43,13 @@ class RandomChoice:
 
 
 class AlphaO:
-    def __init__(self, board_size, rule):
+    def __init__(self, board_size, rule, round_num=1600):
         self.board_size = board_size
         self.model = self.__get_model()
         self.rule = rule
 
         self.c = np.sqrt(2)
+        self.round_num = round_num
 
     def __get_model(self):
         input = K.layers.Input(shape=(self.board_size, self.board_size, 3))
@@ -66,7 +67,7 @@ class AlphaO:
         model = K.models.Model(inputs=input, outputs=[policy_output, value_output])
         return model
 
-    def act(self, seq_xy_board):
+    def predict_stone(self, seq_xy_board):
         #MCTS tree search
 
         #function====================================
@@ -155,7 +156,7 @@ class AlphaO:
 
         root = create_node(seq_xy_board, idx=None, parent=None)
 
-        for round in range(5000):
+        for round in range(self.round_num):
             node = root
             branch_idx = select_branch(node)
 
@@ -192,4 +193,8 @@ class AlphaO:
                 node = node.parent
 
         result_idx = max(root.branches.keys(), key=root.get_visit)
-        return element_idx_to_xy(result_idx)
+        return root, element_idx_to_xy(result_idx)
+
+    def act(self, seq_xy_board):
+        root, xy_loc = self.predict_stone(seq_xy_board)
+        return {'root': root, 'xy_loc': xy_loc}

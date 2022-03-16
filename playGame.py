@@ -31,7 +31,7 @@ while rule.game_status(now_board)['during']:
     print('\nnow turn: ', end='')
     print('Black') if now_turn else print('White')
 
-    act_loc = now_player.act(now_board)
+    act_loc = now_player.act(now_board)['xy_loc']
     board.put_stone(*act_loc)
 
     print(f'\nact loc: {act_loc}\n\n')
