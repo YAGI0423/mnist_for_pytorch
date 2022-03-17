@@ -27,7 +27,7 @@ class User:
             input_x, input_y = check_input("x"), check_input("y")
             able_loc = self.rule.get_able_loc(seq_xy_board)
             if (input_x, input_y) in able_loc: break;   #aleady put stone
-        return (input_x, input_y)
+        return {'xy_loc':(input_x, input_y)}
 
 
 class RandomChoice:
@@ -39,7 +39,7 @@ class RandomChoice:
         able_loc = list(self.rule.get_able_loc(seq_xy_board))
         able_loc.remove((None, None))   #surrender
         rand_idx = np.random.choice(len(able_loc))
-        return able_loc[rand_idx]
+        return {'xy_loc': able_loc[rand_idx]}
 
 
 class AlphaO:
