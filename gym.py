@@ -29,12 +29,13 @@ while rule.game_status(now_board)['during']:
     act = agent.act(now_board)
     act_loc = act['xy_loc']
 
-    databook.add_data(act['root'])
-
-    exit()
     board.put_stone(*act_loc)
+
+    databook.add_data(act)
 
     print(f'\nact loc: {act_loc}\n\n')
     now_board = board.get_board()
 
 print('winner:', rule.game_status(now_board)['win'])
+
+print(databook.__dict__)

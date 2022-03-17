@@ -67,6 +67,27 @@ class AlphaO:
         model = K.models.Model(inputs=input, outputs=[policy_output, value_output])
         return model
 
+    def get_model_input(self, seq_xy_board):
+        #list_board ==> moel input tensor
+
+        def filt_board(square_board, stone_color):
+            #filt squre board stone
+            board = (square_board == stone_color)
+            board = board.astype(np.float64)
+            return board
+
+        square_board = Util.seq_to_square(seq_xy_board, self.board_size)
+        black_board = filt_board(square_board, -1)
+        white_board = filt_board(square_board, 1)
+
+        turn_board = np.zeros((self.board_size, self.board_size))
+        if len(seq_xy_board) % 2 == 1:   #흑: 0, 백: 1
+            turn_board[:] = 1.
+
+        input_tensor = np.array((black_board, white_board, turn_board))
+        input_tensor = input_tensor.reshape(1, self.board_size, self.board_size, 3)
+        return input_tensor
+
     def predict_stone(self, seq_xy_board):
         #MCTS tree search
 
@@ -86,8 +107,7 @@ class AlphaO:
 
         def model_predict(seq_xy_board):
             #get policy, value
-
-            input_board = Util.get_model_input(seq_xy_board, self.board_size)
+            input_board = self.get_model_input(seq_xy_board)
             policy_pred, value_pred = self.model(input_board)
             policy_pred = np.array(policy_pred[0])
             value_pred = np.array(value_pred[0][0])
@@ -177,5 +197,24 @@ class AlphaO:
         return root, element_idx_to_xy(result_idx)
 
     def act(self, seq_xy_board):
+
+        def get_policy_y(branches):
+            policy_y = [0] * (self.board_size ** 2 + 1)
+
+            for idx, value in branches.items():
+                policy_y[idx] = value['visit']
+
+            _sum = sum(policy_y)
+
+            policy_y = tuple(value/_sum for value in policy_y)
+            return policy_y
+
         root, xy_loc = self.predict_stone(seq_xy_board)
-        return {'root': root, 'xy_loc': xy_loc}
+
+        return {
+            'state': self.get_model_input(root.state),
+            'policy_y
+
+            ': get_policy_y(root.branches),
+            'xy_loc': xy_loc
+        }
