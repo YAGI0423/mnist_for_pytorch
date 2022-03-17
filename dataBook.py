@@ -1,3 +1,9 @@
 class DataBook:
     def __init__(self):
-        pass
+        self.state = []
+        self.policy_y = []
+        self.value_y = []
+
+    def add_data(self, node):
+        
+        exit()

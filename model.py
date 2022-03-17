@@ -71,12 +71,6 @@ class AlphaO:
         #MCTS tree search
 
         #function====================================
-        def filt_board(square_board, stone_color):
-            #filt squre board stone
-            board = (square_board == stone_color)
-            board = board.astype(np.float64)
-            return board
-
         def seq_xy_to_idx(seq_xy_board):
             #convert x, y location to idx
             loc2idx = tuple(   #able loc -> idx
@@ -92,21 +86,8 @@ class AlphaO:
 
         def model_predict(seq_xy_board):
             #get policy, value
-            def get_input_data(seq_xy_board):
-                #list_board ==> moel input tensor
-                square_board = Util.seq_to_square(seq_xy_board, self.board_size)
-                black_board = filt_board(square_board, -1)
-                white_board = filt_board(square_board, 1)
 
-                turn_board = np.zeros((self.board_size, self.board_size))
-                if len(seq_xy_board) % 2 == 1:   #흑: 0, 백: 1
-                    turn_board[:] = 1.
-
-                input_tensor = np.array((black_board, white_board, turn_board))
-                input_tensor = input_tensor.reshape(1, self.board_size, self.board_size, 3)
-                return input_tensor
-
-            input_board = get_input_data(seq_xy_board)
+            input_board = Util.get_model_input(seq_xy_board, self.board_size)
             policy_pred, value_pred = self.model(input_board)
             policy_pred = np.array(policy_pred[0])
             value_pred = np.array(value_pred[0][0])

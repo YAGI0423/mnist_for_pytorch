@@ -1,6 +1,7 @@
 import model
 from rule import Rule
 from util import Util
+from dataBook import DataBook
 from gameBoard import GameBoard
 
 import numpy as np
@@ -12,8 +13,9 @@ board_size = 3
 win_seq = 3
 board = GameBoard()
 rule = Rule(board_size=board_size, win_seq=win_seq)
-
+databook = DataBook()
 agent = model.AlphaO(board_size, rule, round_num=500)
+
 
 now_board = board.get_board()
 
@@ -26,8 +28,9 @@ while rule.game_status(now_board)['during']:
 
     act = agent.act(now_board)
     act_loc = act['xy_loc']
-    root = act['root']
-    print(root.branches)
+
+    databook.add_data(act['root'])
+
     exit()
     board.put_stone(*act_loc)
 
