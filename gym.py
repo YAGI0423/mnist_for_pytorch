@@ -6,7 +6,15 @@ from gameBoard import GameBoard
 
 import numpy as np
 
-#해결 필요 문제======
+#function============
+def get_value_y(seq_xy_board, win_code):
+    turn_count = len(seq_xy_board)
+    value_y = [0.] * turn_count
+
+    if win_code < 2:
+        for idx in range(turn_count):
+            value_y[idx] = float(win_code == (idx % 2))
+    return tuple(value_y)
 #End=================
 
 board_size = 3
@@ -39,9 +47,25 @@ while rule.game_status(now_board)['during']:
 win_code = rule.game_status(now_board)['win']
 print('winner:', win_code)
 
-turn_count = len(now_board)
-value_y = [0.] * turn_count
+value_y = get_value_y(now_board, win_code)
+databook.add_data({'value_y': value_y})
 
-if win_code < 2:
-    for idx in range(turn_count):
-        value_y[idx] = float(win_code == (idx % 2))
+dataset = databook.get_data()
+
+print(dataset)
+
+print(dataset['x'].shape)
+print(dataset['policy_y'].shape)
+print(dataset['value_y'].shape)
+
+
+
+agent.model.compile(
+    optimizer='Adam',
+    loss=['categorical_crossentropy', 'mse']
+)
+
+agent.model.fit(
+    dataset['x'],
+    [dataset['policy_y'], dataset['value_y']]
+)
