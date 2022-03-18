@@ -54,7 +54,7 @@ def play_game(board_size, win_seq, play_num, rule, agent):
                 now_board = board.get_board()
 
         win_code = rule.game_status(now_board)['win']
-        print('winner:', win_code)
+        print('winner:', win_code, end='\n\n')
 
         value_y = get_value_y(now_board, win_code)
         databook.add_data({'value_y': value_y})

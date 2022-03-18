@@ -215,6 +215,7 @@ class AlphaO:
             return policy_y
 
         root, xy_loc = self.predict_stone(seq_xy_board)
+        print(f'value: {root.value:.3f}')
 
         return {
             'state': self.get_model_input(root.state),
