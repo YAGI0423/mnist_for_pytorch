@@ -65,6 +65,11 @@ class AlphaO:
         value_output = tf.keras.layers.Dense(1, activation="tanh", name="VNN")(value_dense)
 
         model = K.models.Model(inputs=input, outputs=[policy_output, value_output])
+
+        model.compile(
+            optimizer='Adam',
+            loss=['categorical_crossentropy', 'mse']
+        )
         return model
 
     def get_model_input(self, seq_xy_board):
