@@ -7,7 +7,7 @@ from gameBoard import GameBoard
 import numpy as np
 
 #function============
-def playGame(board_size, win_seq, play_num, rule, agent):
+def play_game(board_size, win_seq, play_num, rule, agent):
 
     def get_value_y(seq_xy_board, win_code):
         turn_count = len(seq_xy_board)
@@ -44,6 +44,15 @@ def playGame(board_size, win_seq, play_num, rule, agent):
             print(f'\nact loc: {act_loc}\n\n')
             now_board = board.get_board()
 
+            #when repeat pass stone
+            if now_board[-10:].count((0, board_size)) >= 10:
+                loc = list(rule.get_able_loc(now_board))
+                loc.remove((None, None))
+                loc.remove((0, board_size))
+
+                board.put_stone(*loc[0])
+                now_board = board.get_board()
+
         win_code = rule.game_status(now_board)['win']
         print('winner:', win_code)
 
@@ -54,13 +63,13 @@ def playGame(board_size, win_seq, play_num, rule, agent):
 
 board_size = 3
 win_seq = 3
-play_num = 10
+play_num = 1
 
 rule = Rule(board_size=board_size, win_seq=win_seq)
 agent = model.AlphaO(board_size, rule, round_num=100)
 
 
-databook = playGame(
+databook = play_game(
     board_size=board_size, win_seq=win_seq, play_num=play_num,
     rule=rule, agent=agent
 )
