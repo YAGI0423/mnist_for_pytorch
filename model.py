@@ -213,8 +213,6 @@ class AlphaO:
 
         return {
             'state': self.get_model_input(root.state),
-            'policy_y
-
-            ': get_policy_y(root.branches),
+            'policy_y': get_policy_y(root.branches),
             'xy_loc': xy_loc
         }

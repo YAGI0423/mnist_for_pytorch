@@ -36,6 +36,14 @@ while rule.game_status(now_board)['during']:
     print(f'\nact loc: {act_loc}\n\n')
     now_board = board.get_board()
 
-print('winner:', rule.game_status(now_board)['win'])
+win_code = rule.game_status(now_board)['win']
+print('winner:', win_code)
 
-print(databook.__dict__)
+value_y = [0.] * len(now_board)
+
+if win_code < 2:
+    win_header = not win_code
+    a = [win_code and (idx % 2) for idx in range(len(now_board))]
+
+print(a)
+print(value_y)
