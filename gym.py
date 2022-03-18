@@ -14,7 +14,7 @@ win_seq = 3
 board = GameBoard()
 rule = Rule(board_size=board_size, win_seq=win_seq)
 databook = DataBook()
-agent = model.AlphaO(board_size, rule, round_num=500)
+agent = model.AlphaO(board_size, rule, round_num=100)
 
 
 now_board = board.get_board()
@@ -39,11 +39,9 @@ while rule.game_status(now_board)['during']:
 win_code = rule.game_status(now_board)['win']
 print('winner:', win_code)
 
-value_y = [0.] * len(now_board)
+turn_count = len(now_board)
+value_y = [0.] * turn_count
 
 if win_code < 2:
-    win_header = not win_code
-    a = [win_code and (idx % 2) for idx in range(len(now_board))]
-
-print(a)
-print(value_y)
+    for idx in range(turn_count):
+        value_y[idx] = float(win_code == (idx % 2))
