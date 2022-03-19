@@ -55,7 +55,6 @@ class AlphaO:
         else:
             self.model = K.models.load_model(model_dir)
 
-
     def create_model(self):
         input = K.layers.Input(shape=(self.board_size, self.board_size, 3))
         conv1 = K.layers.Conv2D(kernel_size=3, filters=64, activation="relu", padding="same")(input)
