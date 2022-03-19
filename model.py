@@ -222,3 +222,10 @@ class AlphaO:
             'policy_y': get_policy_y(root.branches),
             'xy_loc': xy_loc
         }
+
+    def train_model(self, dataset, batch_size=1):
+        self.model.fit(
+            dataset['x'],
+            [dataset['policy_y'], dataset['value_y']],
+            batch_size = batch_size
+        )

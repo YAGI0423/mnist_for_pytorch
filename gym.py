@@ -9,15 +9,21 @@ import numpy as np
 #function============
 def play_game(board_size, win_seq, play_num, rule, agent):
 
-    def get_value_y(seq_xy_board, win_code):
+    def get_value_y(seq_xy_board, win_code, discount_factor):
         turn_count = len(seq_xy_board)
         value_y = [0.] * turn_count
 
         if win_code < 2:
             for idx in range(turn_count):
-                value_y[idx] = float(win_code == (idx % 2))
-                print(value_y)
-                exit()
+                value_y[idx] = float(win_code == (idx % 2)) * 2 - 1
+
+            #discount factor
+            gamma = 1.
+            for idx in range(turn_count):
+                value_y[idx] *= gamma
+
+                if idx % 2:
+                    gamma *= discount_factor
         return tuple(value_y)
 
     board_size = board_size
@@ -58,14 +64,14 @@ def play_game(board_size, win_seq, play_num, rule, agent):
         win_code = rule.game_status(now_board)['win']
         print('winner:', win_code, end='\n\n')
 
-        value_y = get_value_y(now_board, win_code)
+        value_y = get_value_y(now_board, win_code, discount_factor=1.)
         databook.add_data({'value_y': value_y})
     return databook
 #End=================
 
 board_size = 3
 win_seq = 3
-play_num = 1
+play_num = 10
 
 rule = Rule(board_size=board_size, win_seq=win_seq)
 agent = model.AlphaO(board_size, rule, round_num=100)
@@ -78,8 +84,4 @@ databook = play_game(
 
 dataset = databook.get_data(shuffle=True)
 
-agent.model.fit(
-    dataset['x'],
-    [dataset['policy_y'], dataset['value_y']],
-    batch_size = 2
-)
+agent.train_model(dataset, 5)
