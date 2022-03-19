@@ -71,10 +71,10 @@ def play_game(board_size, win_seq, play_num, rule, agent):
 
 board_size = 3
 win_seq = 3
-play_num = 10
+play_num = 5
 
 rule = Rule(board_size=board_size, win_seq=win_seq)
-agent = model.AlphaO(board_size, rule, round_num=100)
+agent = model.AlphaO(board_size, rule, model_dir='./model/mymodel.h5', round_num=100)
 
 
 databook = play_game(
@@ -85,3 +85,4 @@ databook = play_game(
 dataset = databook.get_data(shuffle=True)
 
 agent.train_model(dataset, 5)
+agent.save_model()

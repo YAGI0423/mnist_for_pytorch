@@ -43,15 +43,20 @@ class RandomChoice:
 
 
 class AlphaO:
-    def __init__(self, board_size, rule, round_num=1600):
+    def __init__(self, board_size, rule, model_dir=None, round_num=1600):
         self.board_size = board_size
-        self.model = self.__get_model()
         self.rule = rule
 
         self.c = np.sqrt(2)
         self.round_num = round_num
 
-    def __get_model(self):
+        if model_dir is None:
+            self.model = self.create_model()
+        else:
+            self.model = K.models.load_model(model_dir)
+
+
+    def create_model(self):
         input = K.layers.Input(shape=(self.board_size, self.board_size, 3))
         conv1 = K.layers.Conv2D(kernel_size=3, filters=64, activation="relu", padding="same")(input)
 
@@ -229,3 +234,6 @@ class AlphaO:
             [dataset['policy_y'], dataset['value_y']],
             batch_size = batch_size
         )
+
+    def save_model(self):
+        self.model.save('./model/mymodel.h5')
