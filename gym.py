@@ -16,6 +16,8 @@ def play_game(board_size, win_seq, play_num, rule, agent):
         if win_code < 2:
             for idx in range(turn_count):
                 value_y[idx] = float(win_code == (idx % 2))
+                print(value_y)
+                exit()
         return tuple(value_y)
 
     board_size = board_size
