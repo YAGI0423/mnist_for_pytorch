@@ -84,5 +84,5 @@ databook = play_game(
 
 dataset = databook.get_data(shuffle=True)
 
-agent.train_model(dataset, 5)
+agent.train_model(dataset, batch_size=5)
 agent.save_model()
