@@ -236,6 +236,8 @@ class AlphaO:
         )
 
     def save_model(self, epoch):
+        #file name rule
+        #IDX_START EPOCH_END EPOCH_TIME.h5
         if self.model_dir is None:
             dir = f'./model/0_0_{eopch}.h5'
         self.model.save('./model/mymodel.h5')
