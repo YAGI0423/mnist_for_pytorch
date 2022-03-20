@@ -71,18 +71,20 @@ def play_game(board_size, win_seq, play_num, rule, agent):
 
 board_size = 3
 win_seq = 3
-play_num = 5
+buffer_num = 4
+epoch = 10
 
 rule = Rule(board_size=board_size, win_seq=win_seq)
-agent = model.AlphaO(board_size, rule, model_dir='./model/mymodel.h5', round_num=100)
+agent = model.AlphaO(board_size, rule, model_dir=None, round_num=500)
 
+for e in range(epoch):
+    databook = play_game(
+        board_size=board_size, win_seq=win_seq, play_num=buffer_num,
+        rule=rule, agent=agent
+    )
 
-databook = play_game(
-    board_size=board_size, win_seq=win_seq, play_num=play_num,
-    rule=rule, agent=agent
-)
+    dataset = databook.get_data(shuffle=True)
 
-dataset = databook.get_data(shuffle=True)
+    agent.train_model(dataset, batch_size=8)
 
-agent.train_model(dataset, batch_size=5)
-agent.save_model()
+agent.save_model(epoch)

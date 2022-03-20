@@ -50,7 +50,8 @@ class AlphaO:
         self.c = np.sqrt(2)
         self.round_num = round_num
 
-        if model_dir is None:
+        self.model_dir = model_dir
+        if self.model_dir is None:
             self.model = self.create_model()
         else:
             self.model = K.models.load_model(model_dir)
@@ -234,5 +235,7 @@ class AlphaO:
             batch_size = batch_size
         )
 
-    def save_model(self):
+    def save_model(self, epoch):
+        if self.model_dir is None:
+            dir = f'./model/0_0_{eopch}.h5'
         self.model.save('./model/mymodel.h5')
