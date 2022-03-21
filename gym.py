@@ -117,4 +117,5 @@ now = f'{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}'
 if model_dir is None:   #fisrt
     info_dir = f'0_0_{epoch}_'
     agent.save_model(main_dir + info_dir + now + '.h5')
+    agent.save_model(previous_dir + info_dir + now + '.h5')
 else:
