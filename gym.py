@@ -6,6 +6,7 @@ from gameBoard import GameBoard
 
 import os
 import time
+import random
 import numpy as np
 
 #function============
@@ -87,8 +88,6 @@ buffer_num = 4
 epoch = 2
 
 model_dir = check_main_model()
-print(model_dir)
-exit()
 
 rule = Rule(board_size=board_size, win_seq=win_seq)
 agent = model.AlphaO(board_size, rule, model_dir=model_dir, round_num=500)
@@ -109,11 +108,13 @@ for e in range(epoch):
 # #file name rule
 # #IDX_START EPOCH_END EPOCH_TIME.h5
 
-root_dir = f'./model/main_model/'
+main_dir = f'./model/main_model/'
+previous_dir = f'./model/previous_model/'
 
 now = time.localtime()
 now = f'{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}'
 
-if model_dir is None:
+if model_dir is None:   #fisrt
     info_dir = f'0_0_{epoch}_'
-    agent.save_model(root_dir + info_dir + now + '.h5')
+    agent.save_model(main_dir + info_dir + now + '.h5')
+else:
