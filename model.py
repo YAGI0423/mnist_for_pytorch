@@ -239,13 +239,4 @@ class AlphaO:
         )
 
     def save_model(self, dir):
-        # #file name rule
-        # #IDX_START EPOCH_END EPOCH_TIME.h5
-        # root_dir = f'./model/main_model/'
-        #
-        # now = time.localtime()
-        # now = f'{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}'
-        # if self.model_dir is None:
-        #     info_dir = f'0_0_{epoch}_'
-
         self.model.save(dir)

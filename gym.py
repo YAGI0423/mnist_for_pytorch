@@ -5,6 +5,7 @@ from dataBook import DataBook
 from gameBoard import GameBoard
 
 import os
+import time
 import numpy as np
 
 #function============
@@ -76,22 +77,24 @@ def play_game(board_size, win_seq, play_num, rule, black, white):
 
         value_y = get_value_y(now_board, win_code, discount_factor=1.)
         databook.add_data({'value_y': value_y})
-    return databook
+    return win_code, databook
 #End=================
 
 board_size = 3
 win_seq = 3
 buffer_num = 4
 
-epoch = 8
+epoch = 2
 
 model_dir = check_main_model()
+print(model_dir)
+exit()
 
 rule = Rule(board_size=board_size, win_seq=win_seq)
 agent = model.AlphaO(board_size, rule, model_dir=model_dir, round_num=500)
 
 for e in range(epoch):
-    databook = play_game(
+    _, databook = play_game(
         board_size=board_size, win_seq=win_seq, play_num=buffer_num,
         rule=rule, black=agent, white=agent
     )
@@ -100,4 +103,17 @@ for e in range(epoch):
 
     agent.train_model(dataset, batch_size=4)
 
-agent.save_model()
+
+#compete previous model
+
+# #file name rule
+# #IDX_START EPOCH_END EPOCH_TIME.h5
+
+root_dir = f'./model/main_model/'
+
+now = time.localtime()
+now = f'{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}'
+
+if model_dir is None:
+    info_dir = f'0_0_{epoch}_'
+    agent.save_model(root_dir + info_dir + now + '.h5')
