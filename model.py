@@ -1,6 +1,7 @@
 from tree import Node
 from util import Util
 
+import time
 import numpy as np
 import tensorflow as tf
 from tensorflow import keras as K
@@ -59,14 +60,17 @@ class AlphaO:
     def create_model(self):
         input = K.layers.Input(shape=(self.board_size, self.board_size, 3))
         conv1 = K.layers.Conv2D(kernel_size=3, filters=64, activation="relu", padding="same")(input)
+        conv2 = K.layers.Conv2D(kernel_size=3, filters=128, activation="relu", padding="same")(conv1)
+        conv3 = K.layers.Conv2D(kernel_size=3, filters=128, activation="relu", padding="same")(conv2)
 
-        flat = K.layers.Flatten()(conv1)
-        dense1 = K.layers.Dense(256, activation="relu")(flat)
-
-        policy_dense = K.layers.Dense(128, activation="relu")(dense1)
+        policy_conv = K.layers.Conv2D(kernel_size=2, filters=256, activation="relu", padding="same")(conv3)
+        policy_flat = K.layers.Flatten()(policy_conv)
+        policy_dense = K.layers.Dense(128, activation="relu")(policy_flat)
         policy_output = K.layers.Dense(self.board_size ** 2 + 1, activation="softmax", name="PNN")(policy_dense)
 
-        value_dense = tf.keras.layers.Dense(128, activation="relu")(dense1)
+        value_conv = K.layers.Conv2D(kernel_size=2, filters=256, activation="relu", padding="same")(conv3)
+        value_flat = K.layers.Flatten()(value_conv)
+        value_dense = tf.keras.layers.Dense(128, activation="relu")(value_flat)
         value_output = tf.keras.layers.Dense(1, activation="tanh", name="VNN")(value_dense)
 
         model = K.models.Model(inputs=input, outputs=[policy_output, value_output])
@@ -238,6 +242,11 @@ class AlphaO:
     def save_model(self, epoch):
         #file name rule
         #IDX_START EPOCH_END EPOCH_TIME.h5
+        root_dir = f'./model/main_model/'
+
+        now = time.localtime()
+        now = f'{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}'
         if self.model_dir is None:
-            dir = f'./model/0_0_{eopch}.h5'
-        self.model.save('./model/mymodel.h5')
+            info_dir = f'0_0_{epoch}'
+
+        self.model.save(root_dir + info_dir + now + '.h5')
