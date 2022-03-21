@@ -15,7 +15,7 @@ def check_main_model():
         return main_root + model_list[0]
     return None   #Empty
 
-def play_game(board_size, win_seq, play_num, rule, agent):
+def play_game(board_size, win_seq, play_num, rule, black, white):
 
     def get_value_y(seq_xy_board, win_code, discount_factor):
         turn_count = len(seq_xy_board)
@@ -34,8 +34,7 @@ def play_game(board_size, win_seq, play_num, rule, agent):
                     gamma *= discount_factor
         return tuple(value_y)
 
-    board_size = board_size
-    win_seq = win_seq
+    player_info = {'black': black, 'white': white}
 
     databook = DataBook()
 
@@ -47,10 +46,13 @@ def play_game(board_size, win_seq, play_num, rule, agent):
             print("=" * 100)
             print(Util.seq_to_square(now_board, board_size))
 
-            print('\nnow turn: ', end='')
-            print('Black') if Util.now_turn(now_board) else print('White')
+            now_turn = Util.now_turn(now_board)
+            now_player = player_info['black'] if now_turn else player_info['white']
 
-            act = agent.act(now_board)
+            print('\nnow turn: ', end='')
+            print('Black') if now_turn else print('White')
+
+            act = now_player.act(now_board)
             act_loc = act['xy_loc']
 
             board.put_stone(*act_loc)
@@ -80,7 +82,9 @@ def play_game(board_size, win_seq, play_num, rule, agent):
 board_size = 3
 win_seq = 3
 buffer_num = 4
-epoch = 2
+
+epoch = 8
+
 model_dir = check_main_model()
 
 rule = Rule(board_size=board_size, win_seq=win_seq)
@@ -89,11 +93,11 @@ agent = model.AlphaO(board_size, rule, model_dir=model_dir, round_num=500)
 for e in range(epoch):
     databook = play_game(
         board_size=board_size, win_seq=win_seq, play_num=buffer_num,
-        rule=rule, agent=agent
+        rule=rule, black=agent, white=agent
     )
 
     dataset = databook.get_data(shuffle=True)
 
-    agent.train_model(dataset, batch_size=8)
+    agent.train_model(dataset, batch_size=4)
 
-agent.save_model(epoch)
+agent.save_model()
