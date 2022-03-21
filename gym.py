@@ -4,9 +4,17 @@ from util import Util
 from dataBook import DataBook
 from gameBoard import GameBoard
 
+import os
 import numpy as np
 
 #function============
+def check_main_model():
+    main_root = './model/main_model/'
+    model_list = os.listdir(main_root)
+    if model_list:   #Exist
+        return main_root + model_list[0]
+    return None   #Empty
+
 def play_game(board_size, win_seq, play_num, rule, agent):
 
     def get_value_y(seq_xy_board, win_code, discount_factor):
@@ -72,10 +80,11 @@ def play_game(board_size, win_seq, play_num, rule, agent):
 board_size = 3
 win_seq = 3
 buffer_num = 4
-epoch = 10
+epoch = 2
+model_dir = check_main_model()
 
 rule = Rule(board_size=board_size, win_seq=win_seq)
-agent = model.AlphaO(board_size, rule, model_dir=None, round_num=500)
+agent = model.AlphaO(board_size, rule, model_dir=model_dir, round_num=500)
 
 for e in range(epoch):
     databook = play_game(
