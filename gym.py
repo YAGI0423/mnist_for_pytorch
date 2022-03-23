@@ -119,3 +119,4 @@ if model_dir is None:   #fisrt
     agent.save_model(main_dir + info_dir + now + '.h5')
     agent.save_model(previous_dir + info_dir + now + '.h5')
 else:
+    pass
