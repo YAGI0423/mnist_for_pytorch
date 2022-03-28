@@ -85,7 +85,7 @@ board_size = 3
 win_seq = 3
 buffer_num = 4
 
-epoch = 3
+epoch = 2
 
 model_dir = check_main_model()
 
