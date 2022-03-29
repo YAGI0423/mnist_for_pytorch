@@ -106,6 +106,19 @@ for e in range(epoch):
 #compete previous model
 previous_agent = model.AlphaO(board_size, rule, model_dir=model_dir, round_num=500)
 
+args = {
+    'board_size':P board_size,
+    'win_seq': win_seq,
+    'play_num': buffer_num,
+    'rule': rule
+    'black': agent
+    'white': previous_agent
+}
+
+if random.randint(0, 1):
+    args['black'], args['white'] = agent, previous_agent
+else:
+    args['black'], args['white'] = previous_agent, agent
 
 
 for e in range(10):
