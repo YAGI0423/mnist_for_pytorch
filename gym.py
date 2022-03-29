@@ -81,7 +81,7 @@ def play_game(board_size, win_seq, play_num, rule, black, white):
     return win_code, databook
 #End=================
 
-board_size = 3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+board_size = 3
 win_seq = 3
 buffer_num = 4
 
@@ -100,13 +100,19 @@ for e in range(epoch):
     )
 
     dataset = databook.get_data(shuffle=True)
-    print(dataset)
-    exit()
-
     agent.train_model(dataset, batch_size=4)
 
 
 #compete previous model
+previous_agent = model.AlphaO(board_size, rule, model_dir=model_dir, round_num=500)
+
+
+
+for e in range(10):
+    wincode, _ = play_game(
+        board_size=board_size, win_seq=win_seq, play_num=buffer_num,
+        rule=rule, black=agent, white=agent
+    )
 
 # #file name rule
 # #IDX_START EPOCH_END EPOCH_TIME.h5
