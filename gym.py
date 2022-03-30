@@ -107,7 +107,7 @@ for e in range(epoch):
 previous_agent = model.AlphaO(board_size, rule, model_dir=model_dir, round_num=500)
 
 args = {
-    'board_size':P board_size,
+    'board_size': board_size,
     'win_seq': win_seq,
     'play_num': buffer_num,
     'rule': rule
