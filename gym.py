@@ -116,9 +116,12 @@ args = {
 
 for e in range(10):
     if random.randint(0, 1):
+        main_agent_color = 0
         args['black'], args['white'] = agent, previous_agent
     else:
+        main_agent_color = 1
         args['black'], args['white'] = previous_agent, agent
+
 
     win_code, _ = play_game(**args)
     print(win_code)
