@@ -120,8 +120,9 @@ for e in range(10):
     else:
         args['black'], args['white'] = previous_agent, agent
 
-    wincode, _ = play_game(**args)
-
+    win_code, _ = play_game(**args)
+    print(win_code)
+    exit()
 
 # #file name rule
 # #IDX_START EPOCH_END EPOCH_TIME.h5
