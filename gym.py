@@ -114,7 +114,7 @@ args = {
 }
 
 
-for e in range(10):
+for e in range(5):
     if random.randint(0, 1):
         main_agent_color = 0
         args['black'], args['white'] = agent, previous_agent
