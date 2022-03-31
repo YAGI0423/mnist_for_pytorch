@@ -114,6 +114,7 @@ args = {
 }
 
 
+
 for e in range(5):
     if random.randint(0, 1):
         main_agent_color = 0
@@ -125,6 +126,9 @@ for e in range(5):
 
     win_code, _ = play_game(**args)
     print(win_code)
+
+    if win_code == main_agent_color:   #when main agent win
+        pass
     exit()
 
 # #file name rule
