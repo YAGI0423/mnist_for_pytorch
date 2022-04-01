@@ -137,8 +137,6 @@ print(win_num / COMPETE_NUM)
 
 if (win_num / COMPETE_NUM) > 0.5:
     pass    #success
-else:
-    pass    #fail
 
 
 # #file name rule
