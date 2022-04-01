@@ -127,13 +127,10 @@ for e in range(COMPETE_NUM):
 
 
     win_code, _ = play_game(**args)
-    print(win_code)
 
     if win_code == main_agent_color:   #when main agent win
         win_num += 1
 
-print(win_num)
-print(win_num / COMPETE_NUM)
 
 if (win_num / COMPETE_NUM) > 0.5:
     pass    #success
