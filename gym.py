@@ -114,10 +114,10 @@ args = {
 }
 
 
-compete_num = 10
+COMPETE_NUM = 5
 win_num = 0
 
-for e in range(compete_num):
+for e in range(COMPETE_NUM):
     if random.randint(0, 1):
         main_agent_color = 0
         args['black'], args['white'] = agent, previous_agent
@@ -133,8 +133,13 @@ for e in range(compete_num):
         win_num += 1
 
 print(win_num)
-print(win_num / compete_num)
-exit()
+print(win_num / COMPETE_NUM)
+
+if (win_num / COMPETE_NUM) > 0.5:
+    pass    #success
+else:
+    pass    #fail
+
 
 # #file name rule
 # #IDX_START EPOCH_END EPOCH_TIME.h5
