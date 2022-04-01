@@ -114,8 +114,10 @@ args = {
 }
 
 
+compete_num = 10
+win_num = 0
 
-for e in range(5):
+for e in range(compete_num):
     if random.randint(0, 1):
         main_agent_color = 0
         args['black'], args['white'] = agent, previous_agent
@@ -128,8 +130,11 @@ for e in range(5):
     print(win_code)
 
     if win_code == main_agent_color:   #when main agent win
-        pass
-    exit()
+        win_num += 1
+
+print(win_num)
+print(win_num / compete_num)
+exit()
 
 # #file name rule
 # #IDX_START EPOCH_END EPOCH_TIME.h5
