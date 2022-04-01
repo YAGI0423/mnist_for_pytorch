@@ -125,7 +125,6 @@ for e in range(COMPETE_NUM):
         main_agent_color = 1
         args['black'], args['white'] = previous_agent, agent
 
-
     win_code, _ = play_game(**args)
 
     if win_code == main_agent_color:   #when main agent win
@@ -134,7 +133,8 @@ for e in range(COMPETE_NUM):
 
 if (win_num / COMPETE_NUM) > 0.5:
     pass    #success
-
+#새롭게 업데이트된 모델을 main으로 두고
+#기존 모델은 previous에 넣기
 
 # #file name rule
 # #IDX_START EPOCH_END EPOCH_TIME.h5
