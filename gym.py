@@ -151,12 +151,8 @@ else:   #have main agent
             win_num += 1.
         elif win_code_list[0] != 2:
             win_num -= 1.
- 
 
-    print(win_num)
-    print(win_num / COMPETE_NUM)
+    print(f'win rate: {win_num / COMPETE_NUM}')
 
-#     if (win_num / COMPETE_NUM) > 0.5:
-#         pass    #success
-#     #새롭게 업데이트된 모델을 main으로 두고
-#     #기존 모델은 previous에 넣기
+    if (win_num / COMPETE_NUM) > 0.:
+        pass
