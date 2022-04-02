@@ -123,12 +123,6 @@ if main_agent_dir is None:    #has no main agent
 
     print('has no main agent')
 else:   #have main agent
-    pre_agent_dir = os.listdir('./model/previous_model/')
-    pre_agent_dir = random.choice(pre_agent_dir)
-    pre_agent_dir = './model/previous_model/' + pre_agent_dir
-
-    pre_agent = model.AlphaO(board_size, rule, model_dir=pre_agent_dir, round_num=500)
-    
     args = {
         'board_size': board_size,
         'win_seq': win_seq,
@@ -140,11 +134,18 @@ else:   #have main agent
     win_num = 0
 
     for e in range(COMPETE_NUM):
+        pre_agent_dir = os.listdir('./model/previous_model/')
+        pre_agent_dir = random.choice(pre_agent_dir)
+        pre_agent_dir = './model/previous_model/' + pre_agent_dir
+
+        pre_agent = model.AlphaO(board_size, rule, model_dir=pre_agent_dir, round_num=500)
+
         if main_agent_color := random.randint(0, 1):
             args['black'], args['white'] = pre_agent, main_agent
         else:
             args['black'], args['white'] = main_agent, pre_agent
 
+        print('main:', main_agent_color)
         win_code_list, _ = play_game(**args)
         print(win_code_list)
         exit()
