@@ -79,6 +79,16 @@ def play_game(board_size, win_seq, play_num, rule, black, white):
         value_y = get_value_y(now_board, win_code, discount_factor=1.)
         databook.add_data({'value_y': value_y})
     return win_code, databook
+
+def save_agent(agent, root_dir, idx, start_epoch, end_epoch):
+    # #file name rule
+    # #IDX_START EPOCH_END EPOCH_TIME.h5
+
+    now = time.localtime()
+    now = f'{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}'
+
+    info_dir = f'{idx}_{start_epoch}_{end_epoch}_'
+    agent.save_model(root_dir + info_dir + now + '.h5')
 #End=================
 
 
@@ -91,10 +101,11 @@ epoch = 2
 
 main_agent_dir = get_main_agent_dir()
 
-if main_agent_dire is None:    #has no main agent
-    rule = Rule(board_size=board_size, win_seq=win_seq)
-    main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=500)
+rule = Rule(board_size=board_size, win_seq=win_seq)
+main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=500)
 
+
+if main_agent_dir is None:    #has no main agent
     for e in range(epoch):
         _, databook = play_game(
             board_size=board_size, win_seq=win_seq, play_num=buffer_num,
@@ -102,57 +113,54 @@ if main_agent_dire is None:    #has no main agent
         )
 
         dataset = databook.get_data(shuffle=True)
-        agent.train_model(dataset, batch_size=4)
+        main_agent.train_model(dataset, batch_size=4)
+
+    #save model
+    save_agent(main_agent, './model/main_model/', 0, 0, epoch)
+    save_agent(main_agent, './model/previous_model/', 0, 0, epoch)
 else:   #have main agent
     pass
 
 
-def save_agent():
-    pass
 
-# #file name rule
-# #IDX_START EPOCH_END EPOCH_TIME.h5
-
-main_root_dir = f'./model/main_model/'
-pre_root_dir = f'./model/previous_model/'
-
-now = time.localtime()
-now = f'{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}'
-
-if main_model_name is None:   #fisrt
-    info_dir = f'0_0_{epoch}_'
-    agent.save_model(main_root_dir + info_dir + now + '.h5')
-    agent.save_model(pre_root_dir + info_dir + now + '.h5')
-else:
-    #compete previous model
-    previous_agent = model.AlphaO(board_size, rule, model_dir=model_dir, round_num=500)
-
-    args = {
-        'board_size': board_size,
-        'win_seq': win_seq,
-        'play_num': buffer_num,
-        'rule': rule
-    }
+    
 
 
-    COMPETE_NUM = 5
-    win_num = 0
 
-    for e in range(COMPETE_NUM):
-        if random.randint(0, 1):
-            main_agent_color = 0
-            args['black'], args['white'] = agent, previous_agent
-        else:
-            main_agent_color = 1
-            args['black'], args['white'] = previous_agent, agent
+# if main_model_name is None:   #fisrt
+#     info_dir = f'0_0_{epoch}_'
+#     agent.save_model(main_root_dir + info_dir + now + '.h5')
+#     agent.save_model(pre_root_dir + info_dir + now + '.h5')
+# else:
+#     #compete previous model
+#     previous_agent = model.AlphaO(board_size, rule, model_dir=model_dir, round_num=500)
 
-        win_code, _ = play_game(**args)
+#     args = {
+#         'board_size': board_size,
+#         'win_seq': win_seq,
+#         'play_num': buffer_num,
+#         'rule': rule
+#     }
 
-        if win_code == main_agent_color:   #when main agent win
-            win_num += 1
+
+#     COMPETE_NUM = 5
+#     win_num = 0
+
+#     for e in range(COMPETE_NUM):
+#         if random.randint(0, 1):
+#             main_agent_color = 0
+#             args['black'], args['white'] = agent, previous_agent
+#         else:
+#             main_agent_color = 1
+#             args['black'], args['white'] = previous_agent, agent
+
+#         win_code, _ = play_game(**args)
+
+#         if win_code == main_agent_color:   #when main agent win
+#             win_num += 1
 
 
-    if (win_num / COMPETE_NUM) > 0.5:
-        pass    #success
-    #새롭게 업데이트된 모델을 main으로 두고
-    #기존 모델은 previous에 넣기
+#     if (win_num / COMPETE_NUM) > 0.5:
+#         pass    #success
+#     #새롭게 업데이트된 모델을 main으로 두고
+#     #기존 모델은 previous에 넣기
