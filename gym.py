@@ -106,17 +106,17 @@ main_agent_dir = get_main_agent_dir()
 rule = Rule(board_size=board_size, win_seq=win_seq)
 main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=500)
 
+for e in range(epoch):
+    _, databook = play_game(
+        board_size=board_size, win_seq=win_seq, play_num=buffer_num,
+        rule=rule, black=main_agent, white=main_agent
+    )
+
+    dataset = databook.get_data(shuffle=True)
+    main_agent.train_model(dataset, batch_size=4)
+
 
 if main_agent_dir is None:    #has no main agent
-    for e in range(epoch):
-        _, databook = play_game(
-            board_size=board_size, win_seq=win_seq, play_num=buffer_num,
-            rule=rule, black=main_agent, white=main_agent
-        )
-
-        dataset = databook.get_data(shuffle=True)
-        main_agent.train_model(dataset, batch_size=4)
-
     #save model
     save_agent(main_agent, './model/main_model/', 0, 0, epoch)
     save_agent(main_agent, './model/previous_model/', 0, 0, epoch)
@@ -146,14 +146,15 @@ else:   #have main agent
             args['black'], args['white'] = main_agent, pre_agent
 
         win_code_list, _ = play_game(**args)
+        print(win_code_list)
+        exit()
 
         if win_code_list[0] == main_agent_color:   #when main agent win
             win_num += 1.
-        elif win_code_list[0] == 2:
-            win_num += 0.5
+ 
 
-print(win_num)
-print(win_num / COMPETE_NUM)
+    print(win_num)
+    print(win_num / COMPETE_NUM)
 
 #     if (win_num / COMPETE_NUM) > 0.5:
 #         pass    #success
