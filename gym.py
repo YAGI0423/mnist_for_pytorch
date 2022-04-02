@@ -119,8 +119,8 @@ if main_agent_dir is None:    #has no main agent
     save_agent(main_agent, './model/main_model/', 0, 0, epoch)
     save_agent(main_agent, './model/previous_model/', 0, 0, epoch)
 else:   #have main agent
-    pass
-
+    pre_list = os.listdir('./model/previous_model/')
+    print(random.choice(pre_list))
 
 
     
