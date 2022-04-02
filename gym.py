@@ -37,8 +37,8 @@ def play_game(board_size, win_seq, play_num, rule, black, white):
         return tuple(value_y)
 
     player_info = {'black': black, 'white': white}
-
     databook = DataBook()
+    win_code_list = []
 
     for idx in range(play_num):
         board = GameBoard()
@@ -74,11 +74,13 @@ def play_game(board_size, win_seq, play_num, rule, black, white):
                 now_board = board.get_board()
 
         win_code = rule.game_status(now_board)['win']
+        win_code_list.append(win_code)
+
         print('winner:', win_code, end='\n\n')
 
         value_y = get_value_y(now_board, win_code, discount_factor=1.)
         databook.add_data({'value_y': value_y})
-    return win_code, databook
+    return win_code_list, databook
 
 def save_agent(agent, root_dir, idx, start_epoch, end_epoch):
     # #file name rule
@@ -118,47 +120,40 @@ if main_agent_dir is None:    #has no main agent
     #save model
     save_agent(main_agent, './model/main_model/', 0, 0, epoch)
     save_agent(main_agent, './model/previous_model/', 0, 0, epoch)
+
+    print('has no main agent')
 else:   #have main agent
-    pre_list = os.listdir('./model/previous_model/')
-    print(random.choice(pre_list))
+    pre_agent_dir = os.listdir('./model/previous_model/')
+    pre_agent_dir = random.choice(pre_agent_dir)
+    pre_agent_dir = './model/previous_model/' + pre_agent_dir
 
-
+    pre_agent = model.AlphaO(board_size, rule, model_dir=pre_agent_dir, round_num=500)
     
+    args = {
+        'board_size': board_size,
+        'win_seq': win_seq,
+        'play_num': 1,
+        'rule': rule
+    }
 
+    COMPETE_NUM = 5
+    win_num = 0
 
+    for e in range(COMPETE_NUM):
+        if main_agent_color := random.randint(0, 1):
+            args['black'], args['white'] = pre_agent, main_agent
+        else:
+            args['black'], args['white'] = main_agent, pre_agent
 
-# if main_model_name is None:   #fisrt
-#     info_dir = f'0_0_{epoch}_'
-#     agent.save_model(main_root_dir + info_dir + now + '.h5')
-#     agent.save_model(pre_root_dir + info_dir + now + '.h5')
-# else:
-#     #compete previous model
-#     previous_agent = model.AlphaO(board_size, rule, model_dir=model_dir, round_num=500)
+        win_code_list, _ = play_game(**args)
 
-#     args = {
-#         'board_size': board_size,
-#         'win_seq': win_seq,
-#         'play_num': buffer_num,
-#         'rule': rule
-#     }
+        if win_code_list[0] == main_agent_color:   #when main agent win
+            win_num += 1.
+        elif win_code_list[0] == 2:
+            win_num += 0.5
 
-
-#     COMPETE_NUM = 5
-#     win_num = 0
-
-#     for e in range(COMPETE_NUM):
-#         if random.randint(0, 1):
-#             main_agent_color = 0
-#             args['black'], args['white'] = agent, previous_agent
-#         else:
-#             main_agent_color = 1
-#             args['black'], args['white'] = previous_agent, agent
-
-#         win_code, _ = play_game(**args)
-
-#         if win_code == main_agent_color:   #when main agent win
-#             win_num += 1
-
+print(win_num)
+print(win_num / COMPETE_NUM)
 
 #     if (win_num / COMPETE_NUM) > 0.5:
 #         pass    #success
