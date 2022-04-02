@@ -145,13 +145,12 @@ else:   #have main agent
         else:
             args['black'], args['white'] = main_agent, pre_agent
 
-        print('main:', main_agent_color)
         win_code_list, _ = play_game(**args)
-        print(win_code_list)
-        exit()
 
         if win_code_list[0] == main_agent_color:   #when main agent win
             win_num += 1.
+        elif win_code_list[0] != 2:
+            win_num -= 1.
  
 
     print(win_num)
