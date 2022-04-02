@@ -87,60 +87,27 @@ buffer_num = 4
 
 epoch = 2
 
-model_dir = check_main_model()
+main_model_name = check_main_model()
 
 
-rule = Rule(board_size=board_size, win_seq=win_seq)
-agent = model.AlphaO(board_size, rule, model_dir=model_dir, round_num=500)
+# rule = Rule(board_size=board_size, win_seq=win_seq)
+# main_agent = model.AlphaO(board_size, rule, model_dir=main_model_dir, round_num=500)
 
-for e in range(epoch):
-    _, databook = play_game(
-        board_size=board_size, win_seq=win_seq, play_num=buffer_num,
-        rule=rule, black=agent, white=agent
-    )
+# for e in range(epoch):
+#     _, databook = play_game(
+#         board_size=board_size, win_seq=win_seq, play_num=buffer_num,
+#         rule=rule, black=main_agent, white=main_agent
+#     )
 
-    dataset = databook.get_data(shuffle=True)
-    agent.train_model(dataset, batch_size=4)
+#     dataset = databook.get_data(shuffle=True)
+#     agent.train_model(dataset, batch_size=4)
 
-
-#compete previous model
-previous_agent = model.AlphaO(board_size, rule, model_dir=model_dir, round_num=500)
-
-args = {
-    'board_size': board_size,
-    'win_seq': win_seq,
-    'play_num': buffer_num,
-    'rule': rule
-}
-
-
-COMPETE_NUM = 5
-win_num = 0
-
-for e in range(COMPETE_NUM):
-    if random.randint(0, 1):
-        main_agent_color = 0
-        args['black'], args['white'] = agent, previous_agent
-    else:
-        main_agent_color = 1
-        args['black'], args['white'] = previous_agent, agent
-
-    win_code, _ = play_game(**args)
-
-    if win_code == main_agent_color:   #when main agent win
-        win_num += 1
-
-
-if (win_num / COMPETE_NUM) > 0.5:
-    pass    #success
-#새롭게 업데이트된 모델을 main으로 두고
-#기존 모델은 previous에 넣기
 
 # #file name rule
 # #IDX_START EPOCH_END EPOCH_TIME.h5
 
-main_dir = f'./model/main_model/'
-previous_dir = f'./model/previous_model/'
+main_root_dir = f'./model/main_model/'
+pre_root_dir = f'./model/previous_model/'
 
 now = time.localtime()
 now = f'{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}'
@@ -150,4 +117,35 @@ if model_dir is None:   #fisrt
     agent.save_model(main_dir + info_dir + now + '.h5')
     agent.save_model(previous_dir + info_dir + now + '.h5')
 else:
-    pass
+    #compete previous model
+    previous_agent = model.AlphaO(board_size, rule, model_dir=model_dir, round_num=500)
+
+    args = {
+        'board_size': board_size,
+        'win_seq': win_seq,
+        'play_num': buffer_num,
+        'rule': rule
+    }
+
+
+    COMPETE_NUM = 5
+    win_num = 0
+
+    for e in range(COMPETE_NUM):
+        if random.randint(0, 1):
+            main_agent_color = 0
+            args['black'], args['white'] = agent, previous_agent
+        else:
+            main_agent_color = 1
+            args['black'], args['white'] = previous_agent, agent
+
+        win_code, _ = play_game(**args)
+
+        if win_code == main_agent_color:   #when main agent win
+            win_num += 1
+
+
+    if (win_num / COMPETE_NUM) > 0.5:
+        pass    #success
+    #새롭게 업데이트된 모델을 main으로 두고
+    #기존 모델은 previous에 넣기
