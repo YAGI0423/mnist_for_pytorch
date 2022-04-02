@@ -10,7 +10,7 @@ import random
 import numpy as np
 
 #function============
-def check_main_model():
+def get_main_agent_dir():
     main_root = './model/main_model/'
     model_list = os.listdir(main_root)
     if model_list:   #Exist
@@ -81,27 +81,34 @@ def play_game(board_size, win_seq, play_num, rule, black, white):
     return win_code, databook
 #End=================
 
+
 board_size = 3
 win_seq = 3
 buffer_num = 4
 
 epoch = 2
 
-main_model_name = check_main_model()
+
+main_agent_dir = get_main_agent_dir()
+
+if main_agent_dire is None:    #has no main agent
+    rule = Rule(board_size=board_size, win_seq=win_seq)
+    main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=500)
+
+    for e in range(epoch):
+        _, databook = play_game(
+            board_size=board_size, win_seq=win_seq, play_num=buffer_num,
+            rule=rule, black=main_agent, white=main_agent
+        )
+
+        dataset = databook.get_data(shuffle=True)
+        agent.train_model(dataset, batch_size=4)
+else:   #have main agent
+    pass
 
 
-# rule = Rule(board_size=board_size, win_seq=win_seq)
-# main_agent = model.AlphaO(board_size, rule, model_dir=main_model_dir, round_num=500)
-
-# for e in range(epoch):
-#     _, databook = play_game(
-#         board_size=board_size, win_seq=win_seq, play_num=buffer_num,
-#         rule=rule, black=main_agent, white=main_agent
-#     )
-
-#     dataset = databook.get_data(shuffle=True)
-#     agent.train_model(dataset, batch_size=4)
-
+def save_agent():
+    pass
 
 # #file name rule
 # #IDX_START EPOCH_END EPOCH_TIME.h5
@@ -112,10 +119,10 @@ pre_root_dir = f'./model/previous_model/'
 now = time.localtime()
 now = f'{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}'
 
-if model_dir is None:   #fisrt
+if main_model_name is None:   #fisrt
     info_dir = f'0_0_{epoch}_'
-    agent.save_model(main_dir + info_dir + now + '.h5')
-    agent.save_model(previous_dir + info_dir + now + '.h5')
+    agent.save_model(main_root_dir + info_dir + now + '.h5')
+    agent.save_model(pre_root_dir + info_dir + now + '.h5')
 else:
     #compete previous model
     previous_agent = model.AlphaO(board_size, rule, model_dir=model_dir, round_num=500)
