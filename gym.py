@@ -156,3 +156,5 @@ else:   #have main agent
 
     if (win_num / COMPETE_NUM) > 0.:
         pass
+    else:
+        pass
