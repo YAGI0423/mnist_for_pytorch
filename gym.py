@@ -7,7 +7,6 @@ from gameBoard import GameBoard
 import os
 import time
 import random
-import numpy as np
 
 #function============
 def get_main_agent_dir():
@@ -103,6 +102,9 @@ epoch = 2
 
 main_agent_dir = get_main_agent_dir()
 
+print(main_agent_dir)
+exit()
+
 rule = Rule(board_size=board_size, win_seq=win_seq)
 main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=500)
 
@@ -158,3 +160,4 @@ else:   #have main agent
         pass
     else:
         pass
+        # save_agent(main_agent, './model/previous_model/', )
