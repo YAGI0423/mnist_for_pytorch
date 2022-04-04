@@ -102,9 +102,6 @@ epoch = 2
 
 main_agent_dir = get_main_agent_dir()
 
-agent_info = main_agent_dir[len('./model/main_model/'):-3].split('_')
-print(agent_info)
-exit()
 
 rule = Rule(board_size=board_size, win_seq=win_seq)
 main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=500)
@@ -157,8 +154,11 @@ else:   #have main agent
 
     print(f'win rate: {win_num / COMPETE_NUM}')
 
+    agent_info = main_agent_dir[len('./model/main_model/'):-3]
+    idx, start_epoch, end_epoch, month, day, hour, min = agent_info.split('_')
+
     if (win_num / COMPETE_NUM) > 0.:
-        pass
+        save_agent(main_agent, './model/main_model/', idx+1, end_epoch, end_epoch+epoch)
+        os.rename(main_agent_dir, f'./model/previous_model/{agent_info}.5')
     else:
-        pass
-        # save_agent(main_agent, './model/previous_model/', )
+        save_agent(main_agent, './model/previous_model/', idx+1, end_epoch, end_epoch+epoch)
