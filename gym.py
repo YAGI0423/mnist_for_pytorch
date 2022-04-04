@@ -102,7 +102,8 @@ epoch = 2
 
 main_agent_dir = get_main_agent_dir()
 
-print(main_agent_dir)
+agent_info = main_agent_dir[len('./model/main_model/'):-3].split('_')
+print(agent_info)
 exit()
 
 rule = Rule(board_size=board_size, win_seq=win_seq)
