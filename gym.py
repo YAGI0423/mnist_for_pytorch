@@ -97,7 +97,7 @@ board_size = 3
 win_seq = 3
 buffer_num = 4
 
-epoch = 2
+epoch = 10
 
 
 main_agent_dir = get_main_agent_dir()
@@ -130,7 +130,7 @@ else:   #have main agent
         'rule': rule
     }
 
-    COMPETE_NUM = 5
+    COMPETE_NUM = 10
     win_num = 0
 
     for e in range(COMPETE_NUM):
@@ -158,7 +158,10 @@ else:   #have main agent
     idx, start_epoch, end_epoch, month, day, hour, min = agent_info.split('_')
 
     if (win_num / COMPETE_NUM) > 0.:
-        save_agent(main_agent, './model/main_model/', idx+1, end_epoch, end_epoch+epoch)
-        os.rename(main_agent_dir, f'./model/previous_model/{agent_info}.5')
+        save_agent(main_agent, './model/main_model/', int(idx)+1, int(end_epoch), int(end_epoch)+epoch)
+        try:
+            os.rename(main_agent_dir, f'./model/previous_model/{agent_info}.h5')
+        except:
+            pass
     else:
-        save_agent(main_agent, './model/previous_model/', idx+1, end_epoch, end_epoch+epoch)
+        save_agent(main_agent, './model/previous_model/', int(idx)+1, int(end_epoch), int(end_epoch)+epoch)
