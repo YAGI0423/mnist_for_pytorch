@@ -152,6 +152,7 @@ else:   #have main agent
         elif win_code_list[0] != 2:
             win_num -= 1.
 
+
     print(f'win rate: {win_num / COMPETE_NUM}')
 
     agent_info = main_agent_dir[len('./model/main_model/'):-3]
@@ -161,7 +162,7 @@ else:   #have main agent
         save_agent(main_agent, './model/main_model/', int(idx)+1, int(end_epoch), int(end_epoch)+epoch)
         
         move_dir = f'./model/previous_model/{agent_info}.h5'
-        if not move_dir in os.listdir('./model/previous_model/'):
+        if not (move_dir in os.listdir('./model/previous_model/')):
             os.rename(main_agent_dir, f'./model/previous_model/{agent_info}.h5')
     else:
         save_agent(main_agent, './model/previous_model/', int(idx)+1, int(end_epoch), int(end_epoch)+epoch)
