@@ -159,9 +159,9 @@ else:   #have main agent
 
     if (win_num / COMPETE_NUM) > 0.:
         save_agent(main_agent, './model/main_model/', int(idx)+1, int(end_epoch), int(end_epoch)+epoch)
-        try:
+        
+        move_dir = f'./model/previous_model/{agent_info}.h5'
+        if not move_dir in os.listdir('./model/previous_model/'):
             os.rename(main_agent_dir, f'./model/previous_model/{agent_info}.h5')
-        except:
-            pass
     else:
         save_agent(main_agent, './model/previous_model/', int(idx)+1, int(end_epoch), int(end_epoch)+epoch)
