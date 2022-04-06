@@ -97,7 +97,7 @@ board_size = 3
 win_seq = 3
 buffer_num = 4
 
-epoch = 5
+epoch = 10
 
 
 main_agent_dir = get_main_agent_dir()
