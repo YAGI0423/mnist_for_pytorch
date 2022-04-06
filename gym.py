@@ -64,7 +64,7 @@ def play_game(board_size, win_seq, play_num, rule, black, white):
             now_board = board.get_board()
 
             #when repeat pass stone
-            if now_board[-10:].count((0, board_size)) >= 10:
+            if now_board[-5:].count((0, board_size)) >= 5:
                 loc = list(rule.get_able_loc(now_board))
                 loc.remove((None, None))
                 loc.remove((0, board_size))
@@ -97,7 +97,7 @@ board_size = 3
 win_seq = 3
 buffer_num = 4
 
-epoch = 10
+epoch = 5
 
 
 main_agent_dir = get_main_agent_dir()
@@ -161,8 +161,9 @@ else:   #have main agent
     if (win_num / COMPETE_NUM) > 0.:
         save_agent(main_agent, './model/main_model/', int(idx)+1, int(end_epoch), int(end_epoch)+epoch)
         
-        move_dir = f'./model/previous_model/{agent_info}.h5'
-        if not (move_dir in os.listdir('./model/previous_model/')):
+        if not agent_info + '.h5' in os.listdir('./model/previous_model/'):
             os.rename(main_agent_dir, f'./model/previous_model/{agent_info}.h5')
+        else:
+            os.remove(main_agent_dir)
     else:
         save_agent(main_agent, './model/previous_model/', int(idx)+1, int(end_epoch), int(end_epoch)+epoch)
