@@ -95,6 +95,8 @@ def save_agent(agent, root_dir, idx, start_epoch, end_epoch):
 
 #수정 사항===========
 #학습 기록 하기(판다스를 이용한 csv)
+
+#속성 내용 작성하기
 #End=================
 
 board_size = 3
@@ -164,7 +166,7 @@ else:   #have main agent
 
     if (win_num / COMPETE_NUM) > 0.:
         save_agent(main_agent, './model/main_model/', int(idx)+1, int(end_epoch), int(end_epoch)+epoch)
-        
+
         if not agent_info + '.h5' in os.listdir('./model/previous_model/'):
             os.rename(main_agent_dir, f'./model/previous_model/{agent_info}.h5')
         else:
