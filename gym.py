@@ -93,6 +93,10 @@ def save_agent(agent, root_dir, idx, start_epoch, end_epoch):
 #End=================
 
 
+#수정 사항===========
+#학습 기록 하기(판다스를 이용한 csv)
+#End=================
+
 board_size = 3
 win_seq = 3
 buffer_num = 4
