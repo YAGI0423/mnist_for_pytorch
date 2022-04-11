@@ -98,7 +98,7 @@ def save_agent(agent, root_dir, idx, start_epoch, end_epoch):
 #학습 기록 하기(판다스를 이용한 csv)
 
 #속성 내용 작성하기
-#idx, parent_idx, date, start_epoch, end_epoch, win_num, win_rate
+#idx, parent_idx, date, start_epoch, end_epoch, win_num
 #End=================
 
 board_size = 3
