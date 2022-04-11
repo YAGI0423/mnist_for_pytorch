@@ -124,6 +124,9 @@ for e in range(epoch):
     main_agent.train_model(dataset, batch_size=4)
 
 
+#여기서부터 pandas 기록하기======
+#End=============================
+
 if main_agent_dir is None:    #has no main agent
     #save model
     save_agent(main_agent, './model/main_model/', 0, 0, epoch)
