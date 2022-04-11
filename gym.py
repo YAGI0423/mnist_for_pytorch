@@ -7,7 +7,7 @@ from gameBoard import GameBoard
 import os
 import time
 import random
-import pandas
+import pandas as pd
 
 #function============
 def get_main_agent_dir():
