@@ -125,6 +125,7 @@ for e in range(epoch):
 
 
 #여기서부터 pandas 기록하기======
+#csv 열기
 #End=============================
 
 if main_agent_dir is None:    #has no main agent
