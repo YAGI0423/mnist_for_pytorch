@@ -134,6 +134,10 @@ for e in range(epoch):
 #csv 닫기
 #End=============================
 
+#승률 그래프 저장하기============
+
+#End=============================
+
 if main_agent_dir is None:    #has no main agent
     #save model
     save_agent(main_agent, './model/main_model/', 0, 0, epoch)
