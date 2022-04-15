@@ -100,6 +100,8 @@ def save_agent(agent, root_dir, idx, start_epoch, end_epoch):
 
 #속성 내용 작성하기
 #idx, parent_idx, date, start_epoch, end_epoch, win_num
+
+#승률 시각화
 #End=================
 
 board_size = 3
