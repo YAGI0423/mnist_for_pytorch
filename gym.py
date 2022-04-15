@@ -136,7 +136,7 @@ for e in range(epoch):
 #End=============================
 
 #승률 그래프 저장하기============
-
+#꺾은 선 그래프
 #End=============================
 
 if main_agent_dir is None:    #has no main agent
