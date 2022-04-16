@@ -1,9 +1,20 @@
+import os
+
 import model
 from rule import Rule
 from util import Util
 from gameBoard import GameBoard
 
 import numpy as np
+
+
+def get_main_agent_dir():
+    main_root = './model/main_model/'
+    model_list = os.listdir(main_root)
+    if model_list:   #Exist
+        return main_root + model_list[0]
+    return None   #Empty
+
 
 #해결 필요 문제======
 #End=================
@@ -14,8 +25,8 @@ board = GameBoard()
 rule = Rule(board_size=board_size, win_seq=win_seq)
 
 player_info = {
-    'black': model.AlphaO(board_size, rule),
-    'white': model.AlphaO(board_size, rule)
+    'black': model.User(board_size, rule),
+    'white': model.AlphaO(board_size, rule, model_dir=get_main_agent_dir(), round_num=500)
 }
 
 now_board = board.get_board()
