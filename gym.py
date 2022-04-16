@@ -146,15 +146,14 @@ if main_agent_dir is None:    #has no main agent
     save_agent(main_agent, './model/main_model/', 0, 0, epoch)
     save_agent(main_agent, './model/previous_model/', 0, 0, epoch)
 
-
     #create pandas
     csv = pd.DataFrame({
-        'idx': None,
-        'parent_idx': None,
-        'date': None,
-        'start_epoch': None,
-        'end_epoch': None,
-        'win_num': None
+        'idx': list(),
+        'parent_idx': list(),
+        'date': list(),
+        'start_epoch': list(),
+        'end_epoch': list(),
+        'win_num': list()
         })
     csv.to_csv('./train_history.csv', index=False)
 
