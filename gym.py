@@ -193,14 +193,17 @@ else:   #have main agent
     agent_info = main_agent_dir[len('./model/main_model/'):-3]
     idx, start_epoch, end_epoch, month, day, hour, min = agent_info.split('_')
 
+    now = time.localtime()
+    now = f'{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}'
+
     csv =pd.read_csv('./train_history.csv')
     csv = csv.append({
         'idx': int(idx+1),
-        'date': list(),
-        'start_epoch': list(),
-        'end_epoch': list(),
-        'win_num': list()
-    })
+        'date': now,
+        'start_epoch': int(end_epoch),
+        'end_epoch': int(end_epoch) + epoch,
+        'win_num': win_num
+    }, ignore_index=True)
 
     if (win_num / COMPETE_NUM) > 0.:
         save_agent(main_agent, './model/main_model/', int(idx)+1, int(end_epoch), int(end_epoch)+epoch)
