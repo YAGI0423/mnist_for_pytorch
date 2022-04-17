@@ -198,7 +198,7 @@ else:   #have main agent
 
     csv =pd.read_csv('./train_history.csv')
     csv = csv.append({
-        'idx': int(idx+1),
+        'idx': int(idx) + 1,
         'date': now,
         'start_epoch': int(end_epoch),
         'end_epoch': int(end_epoch) + epoch,
