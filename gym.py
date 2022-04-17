@@ -204,6 +204,7 @@ else:   #have main agent
         'end_epoch': int(end_epoch) + epoch,
         'win_num': win_num
     }, ignore_index=True)
+    csv.to_csv('./train_history.csv', index=False)
 
     if (win_num / COMPETE_NUM) > 0.:
         save_agent(main_agent, './model/main_model/', int(idx)+1, int(end_epoch), int(end_epoch)+epoch)
