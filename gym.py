@@ -149,7 +149,6 @@ if main_agent_dir is None:    #has no main agent
     #create pandas
     csv = pd.DataFrame({
         'idx': list(),
-        'parent_idx': list(),
         'date': list(),
         'start_epoch': list(),
         'end_epoch': list(),
@@ -193,6 +192,15 @@ else:   #have main agent
 
     agent_info = main_agent_dir[len('./model/main_model/'):-3]
     idx, start_epoch, end_epoch, month, day, hour, min = agent_info.split('_')
+
+    csv =pd.read_csv('./train_history.csv')
+    csv = csv.append({
+        'idx': int(idx+1),
+        'date': list(),
+        'start_epoch': list(),
+        'end_epoch': list(),
+        'win_num': list()
+    })
 
     if (win_num / COMPETE_NUM) > 0.:
         save_agent(main_agent, './model/main_model/', int(idx)+1, int(end_epoch), int(end_epoch)+epoch)
