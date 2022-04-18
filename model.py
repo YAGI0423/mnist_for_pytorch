@@ -75,8 +75,9 @@ class AlphaO:
         model = K.models.Model(inputs=input, outputs=[policy_output, value_output])
 
         model.compile(
-            optimizer='Adam',
-            loss=['categorical_crossentropy', 'mse']
+            optimizer='adadelta',
+            loss=['categorical_crossentropy', 'mse'],
+            # loss_weights=(1, 0.5)
         )
         return model
 
