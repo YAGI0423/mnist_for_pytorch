@@ -19,14 +19,15 @@ def get_main_agent_dir():
 #해결 필요 문제======
 #End=================
 
-board_size = 3
-win_seq = 3
+board_size = 15
+win_seq = 5
 board = GameBoard()
 rule = Rule(board_size=board_size, win_seq=win_seq)
 
+
 player_info = {
-    'black': model.User(board_size, rule),
-    'white': model.AlphaO(board_size, rule, model_dir=get_main_agent_dir(), round_num=500)
+    'black': model.AlphaO(board_size, rule, model_dir=get_main_agent_dir(), round_num=500),
+    'white': model.User(board_size, rule)
 }
 
 now_board = board.get_board()
