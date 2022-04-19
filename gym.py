@@ -95,9 +95,6 @@ def save_agent(agent, root_dir, idx, start_epoch, end_epoch):
 #End=================
 
 
-#수정 사항===========   
-#승률 시각화
-#End=================
 
 board_size = 10
 win_seq = 5
