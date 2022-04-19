@@ -64,8 +64,12 @@ class AlphaO:
 
         policy_conv = K.layers.Conv2D(kernel_size=2, filters=256, activation="relu", padding="same")(conv3)
         policy_flat = K.layers.Flatten()(policy_conv)
-        policy_dense = K.layers.Dense(128, activation="relu")(policy_flat)
-        policy_output = K.layers.Dense(self.board_size ** 2 + 1, activation="softmax", name="PNN")(policy_dense)
+
+        policy_dense = K.layers.Dense(128)(policy_flat)
+        policy_batch = K.layers.BatchNormalization()(policy_dense)
+        policy_active = K.layers.Activation(activation='relu')(policy_batch)
+
+        policy_output = K.layers.Dense(self.board_size ** 2 + 1, activation="softmax", name="PNN")(policy_active)
 
         value_conv = K.layers.Conv2D(kernel_size=2, filters=256, activation="relu", padding="same")(conv3)
         value_flat = K.layers.Flatten()(value_conv)
@@ -74,7 +78,11 @@ class AlphaO:
         value_batch = K.layers.BatchNormalization()(value_dense)
         value_active = K.layers.Activation(activation='relu')(value_batch)
 
-        value_output = K.layers.Dense(1, activation="tanh", name="VNN")(value_active)
+        value_dense2 = K.layers.Dense(128)(value_active)
+        value_batch2 = K.layers.BatchNormalization()(value_dense2)
+        value_active2 = K.layers.Activation(activation='relu')(value_batch2)
+
+        value_output = K.layers.Dense(1, activation="tanh", name="VNN")(value_active2)
 
         model = K.models.Model(inputs=input, outputs=[policy_output, value_output])
 

@@ -66,7 +66,7 @@ def play_game(board_size, win_seq, play_num, rule, black, white):
             now_board = board.get_board()
 
             #when repeat pass stone
-            if now_board[-5:].count((0, board_size)) >= 5:
+            if now_board[-4:].count((0, board_size)) >= 4:
                 loc = list(rule.get_able_loc(now_board))
                 loc.remove((None, None))
                 loc.remove((0, board_size))
