@@ -99,7 +99,7 @@ def save_agent(agent, root_dir, idx, start_epoch, end_epoch):
 #승률 시각화
 #End=================
 
-board_size = 15
+board_size = 10
 win_seq = 5
 buffer_num = 1
 
@@ -150,7 +150,7 @@ else:   #have main agent
         'rule': rule
     }
 
-    COMPETE_NUM = 10
+    COMPETE_NUM = 4
     win_num = 0
 
     for e in range(COMPETE_NUM):

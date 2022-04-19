@@ -69,15 +69,19 @@ class AlphaO:
 
         value_conv = K.layers.Conv2D(kernel_size=2, filters=256, activation="relu", padding="same")(conv3)
         value_flat = K.layers.Flatten()(value_conv)
-        value_dense = tf.keras.layers.Dense(128, activation="relu")(value_flat)
-        value_output = tf.keras.layers.Dense(1, activation="tanh", name="VNN")(value_dense)
+        
+        value_dense = K.layers.Dense(128)(value_flat)
+        value_batch = K.layers.BatchNormalization()(value_dense)
+        value_active = K.layers.Activation(activation='relu')(value_batch)
+
+        value_output = K.layers.Dense(1, activation="tanh", name="VNN")(value_active)
 
         model = K.models.Model(inputs=input, outputs=[policy_output, value_output])
 
         model.compile(
-            optimizer='adadelta',
+            optimizer='adam',
             loss=['categorical_crossentropy', 'mse'],
-            # loss_weights=(1, 0.5)
+            # loss_weights=(1., 1.)
         )
         return model
 
