@@ -98,7 +98,7 @@ def save_agent(agent, root_dir, idx, start_epoch, end_epoch):
 
 board_size = 10
 win_seq = 5
-buffer_num = 1
+buffer_num = 2
 
 epoch = 10
 
