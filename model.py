@@ -65,11 +65,11 @@ class AlphaO:
         policy_conv = K.layers.Conv2D(kernel_size=2, filters=256, activation="relu", padding="same")(conv3)
         policy_flat = K.layers.Flatten()(policy_conv)
 
-        policy_dense = K.layers.Dense(128)(policy_flat)
+        policy_dense = K.layers.Dense(128, activation='relu')(policy_flat)
         policy_batch = K.layers.BatchNormalization()(policy_dense)
         policy_active = K.layers.Activation(activation='relu')(policy_batch)
 
-        policy_output = K.layers.Dense(self.board_size ** 2 + 1, activation="softmax", name="PNN")(policy_active)
+        policy_output = K.layers.Dense(self.board_size ** 2, activation="softmax", name="PNN")(policy_active)
 
         value_conv = K.layers.Conv2D(kernel_size=2, filters=256, activation="relu", padding="same")(conv3)
         value_flat = K.layers.Flatten()(value_conv)
@@ -151,7 +151,9 @@ class AlphaO:
             able_loc = tuple(able_loc)
 
             seq_idx_board = seq_xy_to_idx(able_loc)
-            branches = {idx: policy_pred[idx] for idx in seq_idx_board}
+
+            policy_pred_len = len(policy_pred)
+            branches = {idx: policy_pred[idx] for idx in seq_idx_board if idx < policy_pred_len}
 
             node = Node(
                 state=seq_xy_board,
