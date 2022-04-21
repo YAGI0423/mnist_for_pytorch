@@ -147,7 +147,7 @@ else:   #have main agent
         'rule': rule
     }
 
-    COMPETE_NUM = 4
+    COMPETE_NUM = 3
     win_num = 0
 
     for e in range(COMPETE_NUM):

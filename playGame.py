@@ -19,7 +19,7 @@ def get_main_agent_dir():
 #해결 필요 문제======
 #End=================
 
-board_size = 15
+board_size = 10
 win_seq = 5
 board = GameBoard()
 rule = Rule(board_size=board_size, win_seq=win_seq)
