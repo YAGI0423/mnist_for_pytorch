@@ -227,7 +227,7 @@ class AlphaO:
     def act(self, seq_xy_board):
 
         def get_policy_y(branches):
-            policy_y = [0] * (self.board_size ** 2 + 1)
+            policy_y = [0] * (self.board_size ** 2)
 
             for idx, value in branches.items():
                 policy_y[idx] = value['visit']
