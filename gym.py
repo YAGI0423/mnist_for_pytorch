@@ -119,10 +119,6 @@ for e in range(epoch):
     main_agent.train_model(dataset, batch_size=4)
 
 
-#승률 그래프 저장하기============
-#꺾은 선 그래프
-#End=============================
-
 if main_agent_dir is None:    #has no main agent
     #save model
     save_agent(main_agent, './model/main_model/', 0, 0, epoch)
