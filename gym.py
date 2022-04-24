@@ -18,7 +18,7 @@ def get_main_agent_dir():
         return main_root + model_list[0]
     return None   #Empty
 
-def play_game(board_size, rule, black, white):
+def play_game(board_size, rule, databook, black, white):
 
     def get_value_y(seq_xy_board, win_code, discount_factor):
         turn_count = len(seq_xy_board)
@@ -37,10 +37,9 @@ def play_game(board_size, rule, black, white):
                     gamma *= discount_factor
         return tuple(value_y)
 
-
-    player_info = {'black': black, 'white': white}
-    databook = DataBook()
     board = GameBoard()
+    player_info = {'black': black, 'white': white}
+ 
     now_board = board.get_board()
 
     while rule.game_status(now_board)['during']:
@@ -79,7 +78,7 @@ def play_game(board_size, rule, black, white):
     value_y = get_value_y(now_board, win_code, discount_factor=1.)
     databook.add_data({'value_y': value_y})
 
-    return win_code, databook
+    return win_code
 
 def save_agent(agent, root_dir, idx, start_epoch, end_epoch):
     # #file name rule
@@ -107,10 +106,13 @@ main_agent_dir = get_main_agent_dir()
 
 rule = Rule(board_size=board_size, win_seq=win_seq)
 main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=500)
+databook = DataBook()
 
 
 for e in range(epoch):
-    _, databook = play_game(board_size=board_size, rule=rule, black=main_agent, white=main_agent)
+    _ = play_game(
+        board_size=board_size, rule=rule, databook=databook, black=main_agent, white=main_agent
+    )
 
     if e % train_turm == 0 or e == (epoch - 1):
         databook.update_databook(5)

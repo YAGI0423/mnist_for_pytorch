@@ -8,14 +8,9 @@ class DataBook:
 
     def update_databook(self, buffer_size):
         state_policy_TF = len(self.state) == len(self.policy_y)
-        policy_value_TF = len(self.policy_y) == len(self.value_y[0])
-
-        print(self.policy_y)
-        print(self.value_y)
+        policy_value_TF = len(self.policy_y) == len(self.value_y)
 
         if state_policy_TF and policy_value_TF:   #must dataset size is same
-            print(self.policy_y)
-
             over_num = len(self.state) - buffer_size
 
             if over_num > 0:
@@ -23,25 +18,24 @@ class DataBook:
                     range(len(self.state)), replace=False, size=over_num
                 )
                 
-                for idx in del_idx:
+                del_idx.sort()
+                
+                for idx in del_idx[::-1]:
                     del self.state[idx]
                     del self.policy_y[idx]
-                    del self.value_y[0][idx]
+                    del self.value_y[idx]
         else:
             raise
-
-    
-        print(self.policy_y)
-        print(self.value_y)
-        
-        exit()
 
     def add_data(self, data_dict):
         check_datas = ('state', 'policy_y', 'value_y')
 
         for name in check_datas:
             if name in data_dict.keys():
-                self.__dict__[name].append(data_dict[name])
+                if name == 'value_y':
+                    self.__dict__[name].extend(data_dict[name])
+                else:
+                    self.__dict__[name].append(data_dict[name])
 
     def get_data(self, shuffle=False):
         dataset_len = len(self.state)
