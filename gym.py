@@ -18,7 +18,7 @@ def get_main_agent_dir():
         return main_root + model_list[0]
     return None   #Empty
 
-def play_game(board_size, rule, buffer_size, black, white):
+def play_game(board_size, rule, black, white):
 
     def get_value_y(seq_xy_board, win_code, discount_factor):
         turn_count = len(seq_xy_board)
@@ -39,7 +39,7 @@ def play_game(board_size, rule, buffer_size, black, white):
 
 
     player_info = {'black': black, 'white': white}
-    databook = DataBook(buffer_size=buffer_size)
+    databook = DataBook()
     board = GameBoard()
     now_board = board.get_board()
 
@@ -96,9 +96,10 @@ def save_agent(agent, root_dir, idx, start_epoch, end_epoch):
 
 board_size = 3
 win_seq = 3
-buffer_size = 20
+buffer_size = 10
 
 epoch = 10
+train_turm = 2
 
 
 main_agent_dir = get_main_agent_dir()
@@ -108,10 +109,14 @@ rule = Rule(board_size=board_size, win_seq=win_seq)
 main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=500)
 
 
-_, databook = play_game(
-    board_size=board_size, rule=rule, buffer_size=buffer_size,
-    black=main_agent, white=main_agent
-)
+for e in range(epoch):
+    _, databook = play_game(board_size=board_size, rule=rule, black=main_agent, white=main_agent)
+
+    if e % train_turm == 0 or e == (epoch - 1):
+        databook.update_databook(5)
+        exit()
+        dataset = databook.get_data(shuffle=True)
+        main_agent.train_model(dataset, batch_size=4)
 
 print(databook.get_data()['x'])
 print(len(databook.get_data()['x']))
