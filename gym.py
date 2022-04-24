@@ -18,7 +18,7 @@ def get_main_agent_dir():
         return main_root + model_list[0]
     return None   #Empty
 
-def play_game(board_size, win_seq, play_num, rule, black, white):
+def play_game(board_size, rule, buffer_size, black, white):
 
     def get_value_y(seq_xy_board, win_code, discount_factor):
         turn_count = len(seq_xy_board)
@@ -37,51 +37,49 @@ def play_game(board_size, win_seq, play_num, rule, black, white):
                     gamma *= discount_factor
         return tuple(value_y)
 
-    player_info = {'black': black, 'white': white}
-    databook = DataBook()
-    win_code_list = []
 
-    for idx in range(play_num):
-        board = GameBoard()
+    player_info = {'black': black, 'white': white}
+    databook = DataBook(buffer_size=buffer_size)
+    board = GameBoard()
+    now_board = board.get_board()
+
+    while rule.game_status(now_board)['during']:
+        print("=" * 100)
+        print(Util.seq_to_square(now_board, board_size))
+
+        now_turn = Util.now_turn(now_board)
+        now_player = player_info['black'] if now_turn else player_info['white']
+
+        print('\nnow turn: ', end='')
+        print('Black') if now_turn else print('White')
+
+        act = now_player.act(now_board)
+        act_loc = act['xy_loc']
+
+        board.put_stone(*act_loc)
+
+        databook.add_data(act)
+
+        print(f'\nact loc: {act_loc}\n\n')
         now_board = board.get_board()
 
-        while rule.game_status(now_board)['during']:
-            print("=" * 100)
-            print(Util.seq_to_square(now_board, board_size))
+        #when repeat pass stone
+        if now_board[-4:].count((0, board_size)) >= 4:
+            loc = list(rule.get_able_loc(now_board))
+            loc.remove((None, None))
+            loc.remove((0, board_size))
 
-            now_turn = Util.now_turn(now_board)
-            now_player = player_info['black'] if now_turn else player_info['white']
-
-            print('\nnow turn: ', end='')
-            print('Black') if now_turn else print('White')
-
-            act = now_player.act(now_board)
-            act_loc = act['xy_loc']
-
-            board.put_stone(*act_loc)
-
-            databook.add_data(act)
-
-            print(f'\nact loc: {act_loc}\n\n')
+            board.put_stone(*loc[0])
             now_board = board.get_board()
 
-            #when repeat pass stone
-            if now_board[-4:].count((0, board_size)) >= 4:
-                loc = list(rule.get_able_loc(now_board))
-                loc.remove((None, None))
-                loc.remove((0, board_size))
+    win_code = rule.game_status(now_board)['win']
 
-                board.put_stone(*loc[0])
-                now_board = board.get_board()
+    print('winner:', win_code, end='\n\n')
 
-        win_code = rule.game_status(now_board)['win']
-        win_code_list.append(win_code)
+    value_y = get_value_y(now_board, win_code, discount_factor=1.)
+    databook.add_data({'value_y': value_y})
 
-        print('winner:', win_code, end='\n\n')
-
-        value_y = get_value_y(now_board, win_code, discount_factor=1.)
-        databook.add_data({'value_y': value_y})
-    return win_code_list, databook
+    return win_code, databook
 
 def save_agent(agent, root_dir, idx, start_epoch, end_epoch):
     # #file name rule
@@ -98,7 +96,7 @@ def save_agent(agent, root_dir, idx, start_epoch, end_epoch):
 
 board_size = 3
 win_seq = 3
-buffer_num = 1
+buffer_size = 20
 
 epoch = 10
 
@@ -109,6 +107,15 @@ main_agent_dir = get_main_agent_dir()
 rule = Rule(board_size=board_size, win_seq=win_seq)
 main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=500)
 
+
+_, databook = play_game(
+    board_size=board_size, rule=rule, buffer_size=buffer_size,
+    black=main_agent, white=main_agent
+)
+
+print(databook.get_data()['x'])
+print(len(databook.get_data()['x']))
+exit()
 
 #check buffer dataset
 if 'buffer_dataset.csv' in os.listdir('./model/'):

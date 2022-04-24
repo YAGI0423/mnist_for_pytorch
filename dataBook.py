@@ -1,9 +1,9 @@
 import numpy as np
 
-from util import Util
-
 class DataBook:
-    def __init__(self):
+    def __init__(self, buffer_size):
+        self.buffer_size = buffer_size
+
         self.state = []
         self.policy_y = []
         self.value_y = []
