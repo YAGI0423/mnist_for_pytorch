@@ -7,6 +7,7 @@ from gameBoard import GameBoard
 import os
 import time
 import random
+import pickle
 import pandas as pd
 
 
@@ -93,12 +94,12 @@ def save_agent(agent, root_dir, idx, start_epoch, end_epoch):
 
 
 
-board_size = 3
-win_seq = 3
-buffer_size = 10
+board_size = 10
+win_seq = 5
+buffer_size = 512
 
-epoch = 10
-train_turm = 2
+play_num = 16
+train_turm = 4
 
 
 main_agent_dir = get_main_agent_dir()
@@ -109,52 +110,44 @@ main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=
 databook = DataBook()
 
 
-for e in range(epoch):
+#load pickle=====================
+if 'buffer_dataset.pickle' in os.listdir('./model/'):
+    with open('./model/buffer_dataset.pickle', 'rb') as pick:
+        data = pickle.load(pick)
+    
+    databook.state = data['state']
+    databook.policy_y = data['policy_y']
+    databook.value_y = data['value_y']
+#End=============================
+
+
+for p in range(play_num):
     _ = play_game(
         board_size=board_size, rule=rule, databook=databook, black=main_agent, white=main_agent
     )
 
-    if e % train_turm == 0 or e == (epoch - 1):
+    if p % train_turm == 0 or p == (play_num - 1):
         databook.update_databook(buffer_size=buffer_size)
  
         dataset = databook.get_data(shuffle=True)
         main_agent.train_model(dataset, batch_size=4)
 
-print(databook.value_y)
-exit()
 
-#check buffer dataset
-if 'buffer_dataset.csv' in os.listdir('./model/'):
-    print('hi')
-else:
-    print('no')
+#save_pickle=====================
+with open('./model/buffer_dataset.pickle', 'wb') as pick:
+    save_databook = {
+        'state': databook.state,
+        'policy_y': databook.policy_y,
+        'value_y': databook.value_y
+    }
+    pickle.dump(save_databook, pick)
+#End=============================
 
-
-for e in range(epoch):
-    _, databook = play_game(
-        board_size=board_size, win_seq=win_seq, play_num=buffer_num,
-        rule=rule, black=main_agent, white=main_agent
-    )
-
-    dataset = databook.get_data(shuffle=True)
-    main_agent.train_model(dataset, batch_size=4)
-
-    import pickle
-
-    with open('./model/buffer_dataset.pickle', 'wb') as pick:
-        pickle.dump(databook.get_data(shuffle=True), pick)
-
-    with open('./model/buffer_dataset.pickle', 'rb') as pick:
-        data = pickle.load(pick)
-
-    print(data)
-
-    exit()
 
 if main_agent_dir is None:    #has no main agent
     #save model
-    save_agent(main_agent, './model/main_model/', 0, 0, epoch)
-    save_agent(main_agent, './model/previous_model/', 0, 0, epoch)
+    save_agent(main_agent, './model/main_model/', 0, 0, play_num)
+    save_agent(main_agent, './model/previous_model/', 0, 0, play_num)
 
     #create pandas
     csv = pd.DataFrame({
@@ -170,8 +163,7 @@ if main_agent_dir is None:    #has no main agent
 else:   #have main agent
     args = {
         'board_size': board_size,
-        'win_seq': win_seq,
-        'play_num': 1,
+        'databook': databook,
         'rule': rule
     }
 
@@ -190,11 +182,11 @@ else:   #have main agent
         else:
             args['black'], args['white'] = main_agent, pre_agent
 
-        win_code_list, _ = play_game(**args)
+        win_code = play_game(**args)
 
-        if win_code_list[0] == main_agent_color:   #when main agent win
+        if win_code == main_agent_color:   #when main agent win
             win_num += 1.
-        elif win_code_list[0] != 2:
+        elif win_code != 2:
             win_num -= 1.
 
 
@@ -211,17 +203,28 @@ else:   #have main agent
         'idx': int(idx) + 1,
         'date': now,
         'start_epoch': int(end_epoch),
-        'end_epoch': int(end_epoch) + epoch,
+        'end_epoch': int(end_epoch) + play_num,
         'win_num': win_num
     }, ignore_index=True)
     csv.to_csv('./train_history.csv', index=False)
 
     if (win_num / COMPETE_NUM) > 0.:
-        save_agent(main_agent, './model/main_model/', int(idx)+1, int(end_epoch), int(end_epoch)+epoch)
+        save_agent(main_agent, './model/main_model/', int(idx)+1, int(end_epoch), int(end_epoch)+play_num)
 
         if not agent_info + '.h5' in os.listdir('./model/previous_model/'):
             os.rename(main_agent_dir, f'./model/previous_model/{agent_info}.h5')
         else:
             os.remove(main_agent_dir)
     else:
-        save_agent(main_agent, './model/previous_model/', int(idx)+1, int(end_epoch), int(end_epoch)+epoch)
+        save_agent(main_agent, './model/previous_model/', int(idx)+1, int(end_epoch), int(end_epoch)+play_num)
+
+
+#save_pickle=====================
+with open('./model/buffer_dataset.pickle', 'wb') as pick:
+    save_databook = {
+        'state': databook.state,
+        'policy_y': databook.policy_y,
+        'value_y': databook.value_y
+    }
+    pickle.dump(save_databook, pick)
+#End=============================
