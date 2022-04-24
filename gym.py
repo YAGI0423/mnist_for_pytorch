@@ -96,8 +96,8 @@ def save_agent(agent, root_dir, idx, start_epoch, end_epoch):
 
 
 
-board_size = 10
-win_seq = 5
+board_size = 3
+win_seq = 3
 buffer_num = 1
 
 epoch = 10
@@ -109,6 +109,14 @@ main_agent_dir = get_main_agent_dir()
 rule = Rule(board_size=board_size, win_seq=win_seq)
 main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=500)
 
+
+#check buffer dataset
+if 'buffer_dataset.csv' in os.listdir('./model/'):
+    print('hi')
+else:
+    print('no')
+
+
 for e in range(epoch):
     _, databook = play_game(
         board_size=board_size, win_seq=win_seq, play_num=buffer_num,
@@ -118,6 +126,17 @@ for e in range(epoch):
     dataset = databook.get_data(shuffle=True)
     main_agent.train_model(dataset, batch_size=4)
 
+    import pickle
+
+    with open('./model/buffer_dataset.pickle', 'wb') as pick:
+        pickle.dump(databook.get_data(shuffle=True), pick)
+
+    with open('./model/buffer_dataset.pickle', 'rb') as pick:
+        data = pickle.load(pick)
+
+    print(data)
+
+    exit()
 
 if main_agent_dir is None:    #has no main agent
     #save model
