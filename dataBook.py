@@ -32,10 +32,10 @@ class DataBook:
 
         for name in check_datas:
             if name in data_dict.keys():
-                if name == 'value_y':
-                    self.__dict__[name].extend(data_dict[name])
-                else:
+                if name == 'policy_y':
                     self.__dict__[name].append(data_dict[name])
+                else:
+                    self.__dict__[name].extend(data_dict[name])
 
     def get_data(self, shuffle=False):
         dataset_len = len(self.state)

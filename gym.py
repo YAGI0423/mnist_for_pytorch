@@ -115,13 +115,12 @@ for e in range(epoch):
     )
 
     if e % train_turm == 0 or e == (epoch - 1):
-        databook.update_databook(5)
-        exit()
+        databook.update_databook(buffer_size=buffer_size)
+ 
         dataset = databook.get_data(shuffle=True)
         main_agent.train_model(dataset, batch_size=4)
 
-print(databook.get_data()['x'])
-print(len(databook.get_data()['x']))
+print(databook.value_y)
 exit()
 
 #check buffer dataset
