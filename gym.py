@@ -101,6 +101,8 @@ buffer_size = 1024
 play_num = 16
 train_turm = 4
 
+COMPETE_NUM = 3
+
 
 main_agent_dir = get_main_agent_dir()
 
@@ -167,7 +169,7 @@ else:   #have main agent
         'rule': rule
     }
 
-    COMPETE_NUM = 3
+    
     win_num = 0
 
     for e in range(COMPETE_NUM):
