@@ -124,7 +124,7 @@ if 'buffer_dataset.pickle' in os.listdir('./model/'):
 
 
 for p in range(play_num):
-    print(f'ROUND: {p}\n\n')
+    print(f'\nTRAIN ROUND: {p}\n\n')
     _ = play_game(
         board_size=board_size, rule=rule, databook=databook, black=main_agent, white=main_agent
     )
@@ -174,6 +174,8 @@ else:   #have main agent
     win_num = 0
 
     for e in range(COMPETE_NUM):
+        print(f'\nCOMPETE ROUND: {p}\n\n')
+
         pre_agent_dir = os.listdir('./model/previous_model/')
         pre_agent_dir = random.choice(pre_agent_dir)
         pre_agent_dir = './model/previous_model/' + pre_agent_dir
