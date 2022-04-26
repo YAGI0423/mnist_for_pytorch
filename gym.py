@@ -174,7 +174,7 @@ else:   #have main agent
     win_num = 0
 
     for e in range(COMPETE_NUM):
-        print(f'\nCOMPETE ROUND: {p}\n\n')
+        print(f'\nCOMPETE ROUND: {e}\n\n')
 
         pre_agent_dir = os.listdir('./model/previous_model/')
         pre_agent_dir = random.choice(pre_agent_dir)
