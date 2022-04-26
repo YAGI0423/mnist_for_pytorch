@@ -124,6 +124,7 @@ if 'buffer_dataset.pickle' in os.listdir('./model/'):
 
 
 for p in range(play_num):
+    print(f'ROUND: {p}\n\n')
     _ = play_game(
         board_size=board_size, rule=rule, databook=databook, black=main_agent, white=main_agent
     )
