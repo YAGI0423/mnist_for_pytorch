@@ -99,7 +99,7 @@ win_seq = 5
 buffer_size = 4096
 
 play_num = 16
-train_turm = 4
+train_turm = 2
 
 COMPETE_NUM = 3
 
