@@ -67,7 +67,7 @@ class AlphaO:
         batch = K.layers.BatchNormalization()(add1)
         activation = K.layers.Activation(activation='relu')(batch)
 
-        policy_conv = K.layers.Conv2D(kernel_size=2, filters=256, activation="relu", padding="same")(activation)
+        policy_conv = K.layers.Conv2D(kernel_size=2, filters=512, activation="relu", padding="same")(activation)
         policy_flat = K.layers.Flatten()(policy_conv)
 
         policy_dense = K.layers.Dense(128, activation='relu')(policy_flat)
@@ -76,7 +76,7 @@ class AlphaO:
 
         policy_output = K.layers.Dense(self.board_size ** 2, activation="softmax", name="PNN")(policy_active)
 
-        value_conv = K.layers.Conv2D(kernel_size=2, filters=256, activation="relu", padding="same")(conv3)
+        value_conv = K.layers.Conv2D(kernel_size=2, filters=512, activation="relu", padding="same")(conv3)
         value_flat = K.layers.Flatten()(value_conv)
         
         value_dense = K.layers.Dense(128)(value_flat)
