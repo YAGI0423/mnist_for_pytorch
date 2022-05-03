@@ -2,7 +2,6 @@ from tree import Node
 from util import Util
 
 import numpy as np
-import tensorflow as tf
 from tensorflow import keras as K
 
 class User:
