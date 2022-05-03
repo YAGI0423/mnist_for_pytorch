@@ -129,5 +129,5 @@ dmypy.json
 .pyre/
 
 #personal
-./model/main_model/
-./model/previous_model/
+/model/main_model/
+/model/previous_model/
