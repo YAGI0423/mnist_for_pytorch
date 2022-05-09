@@ -107,8 +107,6 @@ class AlphaO:
             board = board.astype(np.float64)
             return board
 
-        seq_xy_board = ((0, 0), (2, 2))
-
         square_board = Util.seq_to_square(seq_xy_board, self.board_size)
 
         black_board = filt_board(square_board, -1)

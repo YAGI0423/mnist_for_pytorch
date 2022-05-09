@@ -95,7 +95,7 @@ def save_agent(agent, root_dir, idx, start_epoch, end_epoch):
 
 
 
-board_size = 7
+board_size = 10
 win_seq = 5
 buffer_size = 4096
 
@@ -134,22 +134,37 @@ def data_augment(dict_databook):
     policy_y = dict_databook['policy_y'][aug_idx_list].copy()
     value_y = dict_databook['value_y'][aug_idx_list].copy()
 
+    # print(dict_databook['x'].shape)
+    # print(dict_databook['x'][8])
     test = data_x[0]
-    print(test.reshape(3, 10, 10))
     print(test)
-    print('\n\n')
+    print(test.shape)
+
+    # rot = np.swapaxes(test, 1, 0)
+    rot = np.rot90(test, k=random.randint(1, 4))
+    print(rot)
+    print(rot.shape)
+    # print(test)
+    # print(test.reshape(3, 10, 10))
+    # print(test)
+    # print('\n\n')
 
     # print(test)
     # print(test.reshape(10, 10, 3))
     
-    # import matplotlib.pyplot as plt
-    # plt.imshow(test)
-    # plt.show()
+    import matplotlib.pyplot as plt
+    plt.subplot(1, 2, 1)
+    plt.imshow(test)
+
+    plt.subplot(1, 2, 2)
+    plt.imshow(rot)
+    plt.show()
     # print(np.rot90(test, k=1, axes=(1, 2)).reshape(3, 10, 10))
     exit()
 
 
-
+# data_augment(databook.get_data())
+# exit()
 
 
 for p in range(play_num):
