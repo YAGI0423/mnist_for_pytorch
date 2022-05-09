@@ -2,7 +2,6 @@ from tree import Node
 from util import Util
 
 import numpy as np
-import tensorflow as tf
 from tensorflow import keras as K
 
 class User:
@@ -58,11 +57,17 @@ class AlphaO:
 
     def create_model(self):
         input = K.layers.Input(shape=(self.board_size, self.board_size, 3))
-        conv1 = K.layers.Conv2D(kernel_size=3, filters=64, activation="relu", padding="same")(input)
-        conv2 = K.layers.Conv2D(kernel_size=3, filters=128, activation="relu", padding="same")(conv1)
-        conv3 = K.layers.Conv2D(kernel_size=3, filters=128, activation="relu", padding="same")(conv2)
+        conv1 = K.layers.Conv2D(kernel_size=2, filters=64, activation="relu", padding="same")(input)
+        conv2 = K.layers.Conv2D(kernel_size=2, filters=128, activation="relu", padding="same")(conv1)
+        conv3 = K.layers.Conv2D(kernel_size=2, filters=256, padding="same")(conv2)
 
-        policy_conv = K.layers.Conv2D(kernel_size=2, filters=256, activation="relu", padding="same")(conv3)
+        add_conv1 = K.layers.Conv2D(kernel_size=2, filters=64, activation='relu', padding='same')(conv3)
+        add1 = K.layers.Add()([conv1, add_conv1])
+
+        batch = K.layers.BatchNormalization()(add1)
+        activation = K.layers.Activation(activation='relu')(batch)
+
+        policy_conv = K.layers.Conv2D(kernel_size=2, filters=512, activation="relu", padding="same")(activation)
         policy_flat = K.layers.Flatten()(policy_conv)
 
         policy_dense = K.layers.Dense(128, activation='relu')(policy_flat)
@@ -71,7 +76,7 @@ class AlphaO:
 
         policy_output = K.layers.Dense(self.board_size ** 2, activation="softmax", name="PNN")(policy_active)
 
-        value_conv = K.layers.Conv2D(kernel_size=2, filters=256, activation="relu", padding="same")(conv3)
+        value_conv = K.layers.Conv2D(kernel_size=2, filters=512, activation="relu", padding="same")(conv3)
         value_flat = K.layers.Flatten()(value_conv)
         
         value_dense = K.layers.Dense(128)(value_flat)
@@ -102,7 +107,10 @@ class AlphaO:
             board = board.astype(np.float64)
             return board
 
+        seq_xy_board = ((0, 0), (2, 2))
+
         square_board = Util.seq_to_square(seq_xy_board, self.board_size)
+
         black_board = filt_board(square_board, -1)
         white_board = filt_board(square_board, 1)
 
@@ -111,8 +119,8 @@ class AlphaO:
             turn_board[:] = 1.
 
         input_tensor = np.array((black_board, white_board, turn_board))
-        input_tensor = input_tensor.reshape(1, self.board_size, self.board_size, 3)
-        return input_tensor
+        input_tensor = np.transpose(input_tensor, (1, 2, 0))
+        return input_tensor.reshape(1, self.board_size, self.board_size, 3)
 
     def predict_stone(self, seq_xy_board):
         #MCTS tree search

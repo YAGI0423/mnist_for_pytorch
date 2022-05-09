@@ -8,6 +8,7 @@ import os
 import time
 import random
 import pickle
+import numpy as np
 import pandas as pd
 
 
@@ -94,12 +95,12 @@ def save_agent(agent, root_dir, idx, start_epoch, end_epoch):
 
 
 
-board_size = 10
+board_size = 7
 win_seq = 5
-buffer_size = 1024
+buffer_size = 4096
 
 play_num = 16
-train_turm = 4
+train_turm = 2
 
 COMPETE_NUM = 3
 
@@ -121,6 +122,34 @@ if 'buffer_dataset.pickle' in os.listdir('./model/'):
     databook.policy_y = data['policy_y']
     databook.value_y = data['value_y']
 #End=============================
+
+
+def data_augment(dict_databook):
+    data_len = len(dict_databook['value_y'])
+    augment_num = int(data_len * 0.3)
+
+    aug_idx_list = random.choices(range(data_len), k=2)
+
+    data_x = dict_databook['x'][aug_idx_list].copy()
+    policy_y = dict_databook['policy_y'][aug_idx_list].copy()
+    value_y = dict_databook['value_y'][aug_idx_list].copy()
+
+    test = data_x[0]
+    print(test.reshape(3, 10, 10))
+    print(test)
+    print('\n\n')
+
+    # print(test)
+    # print(test.reshape(10, 10, 3))
+    
+    # import matplotlib.pyplot as plt
+    # plt.imshow(test)
+    # plt.show()
+    # print(np.rot90(test, k=1, axes=(1, 2)).reshape(3, 10, 10))
+    exit()
+
+
+
 
 
 for p in range(play_num):
