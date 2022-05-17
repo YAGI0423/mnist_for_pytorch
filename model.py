@@ -92,7 +92,7 @@ class AlphaO:
         model = K.models.Model(inputs=input, outputs=[policy_output, value_output])
 
         model.compile(
-            optimizer=K.optimizer.SGD(learning_rate=0.001, momentum=0.9),
+            optimizer=K.optimizers.SGD(learning_rate=0.001, momentum=0.9),
             loss=['categorical_crossentropy', 'mse'],
             # loss_weights=(1., 1.)
         )
