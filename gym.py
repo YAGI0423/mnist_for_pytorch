@@ -109,7 +109,7 @@ main_agent_dir = get_main_agent_dir()
 
 
 rule = Rule(board_size=board_size, win_seq=win_seq)
-main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=500)
+main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=2048)
 databook = DataBook()
 
 
