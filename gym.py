@@ -20,7 +20,7 @@ def get_main_agent_dir():
         return main_root + model_list[0]
     return None   #Empty
 
-def play_game(board_size, rule, databook, black, white):
+def play_game(board_size, rule, databook, black, white, diri_TF=False):
 
     def get_value_y(seq_xy_board, win_code, discount_factor):
         turn_count = len(seq_xy_board)
@@ -54,7 +54,7 @@ def play_game(board_size, rule, databook, black, white):
         print('\nnow turn: ', end='')
         print('Black') if now_turn else print('White')
 
-        act = now_player.act(now_board)
+        act = now_player.act(now_board, diri_TF)
         act_loc = act['xy_loc']
 
         board.put_stone(*act_loc)
@@ -151,7 +151,9 @@ def data_augment(dict_dataset, rate=0.3):
 for p in range(play_num):
     print(f'\nTRAIN ROUND: {p}\n\n')
     _ = play_game(
-        board_size=board_size, rule=rule, databook=databook, black=main_agent, white=main_agent
+        board_size=board_size, rule=rule,databook=databook,
+        black=main_agent, white=main_agent,
+        diri_TF=True
     )
 
     if p % train_turm == 0 or p == (play_num - 1):

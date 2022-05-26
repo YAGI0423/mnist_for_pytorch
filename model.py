@@ -47,6 +47,7 @@ class AlphaO:
         self.rule = rule
 
         self.c = np.sqrt(2)
+        self.diri_param = 0.03
         self.round_num = round_num
 
         self.model_dir = model_dir
@@ -120,7 +121,7 @@ class AlphaO:
         input_tensor = np.transpose(input_tensor, (1, 2, 0))
         return input_tensor.reshape(1, self.board_size, self.board_size, 3)
 
-    def predict_stone(self, seq_xy_board):
+    def predict_stone(self, seq_xy_board, diri_TF):
         #MCTS tree search
 
         #function====================================
@@ -145,8 +146,13 @@ class AlphaO:
             value_pred = np.array(value_pred[0][0])
             return policy_pred, value_pred
 
-        def create_node(seq_xy_board, idx, parent):
+        def create_node(seq_xy_board, idx, parent, diri_TF=False):
             policy_pred, value_pred = model_predict(seq_xy_board)
+
+            if diri_TF:
+                diri_prob = np.random.dirichlet([self.diri_param] * (self.board_size ** 2))
+                policy_pred = (policy_pred * diri_prob) / np.sum(diri_prob)
+                print('add diri')
 
             #get node's branches
             able_loc = self.rule.get_able_loc(seq_xy_board)
@@ -189,7 +195,7 @@ class AlphaO:
         #End=========================================
 
 
-        root = create_node(seq_xy_board, idx=None, parent=None)
+        root = create_node(seq_xy_board, idx=None, parent=None, diri_TF=diri_TF)
 
         for round in range(self.round_num):
             node = root
@@ -230,7 +236,7 @@ class AlphaO:
         result_idx = max(root.branches.keys(), key=root.get_visit)
         return root, element_idx_to_xy(result_idx)
 
-    def act(self, seq_xy_board):
+    def act(self, seq_xy_board, diri_TF):
 
         def get_policy_y(branches):
             policy_y = [0] * (self.board_size ** 2)
@@ -243,7 +249,7 @@ class AlphaO:
             policy_y = tuple(value/_sum for value in policy_y)
             return policy_y
 
-        root, xy_loc = self.predict_stone(seq_xy_board)
+        root, xy_loc = self.predict_stone(seq_xy_board, diri_TF)
         print(f'value: {root.value:.3f}')
 
         return {
