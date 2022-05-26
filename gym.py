@@ -99,6 +99,8 @@ board_size = 10
 win_seq = 5
 buffer_size = 8192
 
+batch_size = 4
+
 play_num = 16
 train_turm = 2
 
@@ -147,7 +149,6 @@ def data_augment(dict_dataset, rate=0.3):
     return return_dataset
 
 
-
 for p in range(play_num):
     print(f'\nTRAIN ROUND: {p}\n\n')
     _ = play_game(
@@ -161,8 +162,9 @@ for p in range(play_num):
  
         dataset = databook.get_data(shuffle=True)
         dataset = data_augment(dataset, rate=0.8)
-
-        main_agent.train_model(dataset, batch_size=4)
+        
+        if len(dataset['value_y']) >= buffer_size:
+            main_agent.train_model(dataset, batch_size=batch_size)
 
 
 #save_pickle=====================
