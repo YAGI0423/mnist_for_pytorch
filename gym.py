@@ -140,9 +140,9 @@ def data_augment(dict_dataset, rate=0.3):
     if random.randint(0, 2):
         aug_data_x = np.flip(aug_data_x, axis=2)
     
-    return_dataset['x'] = aug_data_x
-    return_dataset['policy_y'] = policy_y
-    return_dataset['value_y'] = value_y
+    return_dataset['x'] = np.concatenate(dict_dataset['x'], aug_data_x)
+    return_dataset['policy_y'] = np.concatenate(dict_dataset['policy_y'], policy_y)
+    return_dataset['value_y'] = np.concatenate(dict_dataset['value_y'], value_y)
 
     return return_dataset
 
