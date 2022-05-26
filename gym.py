@@ -163,8 +163,8 @@ def data_augment(dict_databook):
     exit()
 
 
-# data_augment(databook.get_data())
-# exit()
+data_augment(databook.get_data())
+exit()
 
 
 for p in range(play_num):
