@@ -97,7 +97,7 @@ def save_agent(agent, root_dir, idx, start_epoch, end_epoch):
 
 board_size = 10
 win_seq = 5
-buffer_size = 4096
+buffer_size = 8192
 
 play_num = 16
 train_turm = 2

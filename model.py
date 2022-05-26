@@ -60,35 +60,31 @@ class AlphaO:
         input = K.layers.Input(shape=(self.board_size, self.board_size, 3))
         conv1 = K.layers.Conv2D(kernel_size=2, filters=64, activation="relu", padding="same")(input)
         conv2 = K.layers.Conv2D(kernel_size=2, filters=128, activation="relu", padding="same")(conv1)
+        
         conv3 = K.layers.Conv2D(kernel_size=2, filters=256, padding="same")(conv2)
+        conv3_batch = K.layers.BatchNormalization()(conv3)
 
-        add_conv1 = K.layers.Conv2D(kernel_size=2, filters=64, activation='relu', padding='same')(conv3)
-        add1 = K.layers.Add()([conv1, add_conv1])
+        add_conv1 = K.layers.Conv2D(kernel_size=1, filters=256, activation='relu')(input)
+        add1 = K.layers.Add()([conv3_batch, add_conv1])
+        add_dense = K.layers.Dense(256, activation='relu')(add1)
 
-        batch = K.layers.BatchNormalization()(add1)
-        activation = K.layers.Activation(activation='relu')(batch)
-
-        policy_conv = K.layers.Conv2D(kernel_size=2, filters=512, activation="relu", padding="same")(activation)
-        policy_flat = K.layers.Flatten()(policy_conv)
+        policy_conv = K.layers.Conv2D(kernel_size=2, filters=512, padding="same")(add_dense)
+        policy_batch = K.layers.BatchNormalization()(policy_conv)
+        policy_activ = K.layers.Activation(activation='relu')(policy_batch)
+        policy_flat = K.layers.GlobalMaxPooling2D()(policy_activ)
 
         policy_dense = K.layers.Dense(128, activation='relu')(policy_flat)
-        policy_batch = K.layers.BatchNormalization()(policy_dense)
-        policy_active = K.layers.Activation(activation='relu')(policy_batch)
+        policy_output = K.layers.Dense(self.board_size ** 2, activation="softmax", name="PNN")(policy_dense)
 
-        policy_output = K.layers.Dense(self.board_size ** 2, activation="softmax", name="PNN")(policy_active)
 
-        value_conv = K.layers.Conv2D(kernel_size=2, filters=512, activation="relu", padding="same")(conv3)
-        value_flat = K.layers.Flatten()(value_conv)
+        value_conv = K.layers.Conv2D(kernel_size=2, filters=512, padding="same")(add_dense)
+        value_batch = K.layers.BatchNormalization()(value_conv)
+        value_activ = K.layers.Activation(activation='relu')(value_batch)
+        value_flat = K.layers.GlobalMaxPooling2D()(value_activ)
         
-        value_dense = K.layers.Dense(128)(value_flat)
-        value_batch = K.layers.BatchNormalization()(value_dense)
-        value_active = K.layers.Activation(activation='relu')(value_batch)
-
-        value_dense2 = K.layers.Dense(128)(value_active)
-        value_batch2 = K.layers.BatchNormalization()(value_dense2)
-        value_active2 = K.layers.Activation(activation='relu')(value_batch2)
-
-        value_output = K.layers.Dense(1, activation="tanh", name="VNN")(value_active2)
+        value_dense = K.layers.Dense(128, activation='relu')(value_flat)
+        value_dense2 = K.layers.Dense(128, activation='relu')(value_dense)
+        value_output = K.layers.Dense(1, activation="tanh", name="VNN")(value_dense2)
 
         model = K.models.Model(inputs=input, outputs=[policy_output, value_output])
 
@@ -152,7 +148,6 @@ class AlphaO:
             if diri_TF:
                 diri_prob = np.random.dirichlet([self.diri_param] * (self.board_size ** 2))
                 policy_pred = (policy_pred * diri_prob) / np.sum(diri_prob)
-                print('add diri')
 
             #get node's branches
             able_loc = self.rule.get_able_loc(seq_xy_board)
