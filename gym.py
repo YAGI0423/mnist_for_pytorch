@@ -102,14 +102,14 @@ buffer_size = 8192
 play_num = 16
 train_turm = 2
 
-COMPETE_NUM = 3
+COMPETE_NUM = 8
 
 
 main_agent_dir = get_main_agent_dir()
 
 
 rule = Rule(board_size=board_size, win_seq=win_seq)
-main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=1600)
+main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=800)
 databook = DataBook()
 
 
