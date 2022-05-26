@@ -136,6 +136,26 @@ def data_augment(dict_databook):
 
     # print(dict_databook['x'].shape)
     # print(dict_databook['x'][8])
+
+    # test = np.rot90(
+    #     data_x, k=random.randint(1, 4), axes=(1, 2)
+    # )
+
+    aug_data_x = np.rot90(data_x, k=random.randint(1, 4), axes=(1, 2))
+    if random.randint(0, 2):
+        aug_data_x = np.flip(aug_data_x, axis=2)
+    
+
+
+    import matplotlib.pyplot as plt
+    plt.subplot(1, 2, 1)
+    plt.imshow(data_x[0])
+
+    plt.subplot(1, 2, 2)
+    plt.imshow(aug_data_x[0])
+    plt.show()
+
+    exit()
     test = data_x[0]
     print(test)
     print(test.shape)
