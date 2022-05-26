@@ -124,67 +124,28 @@ if 'buffer_dataset.pickle' in os.listdir('./model/'):
 #End=============================
 
 
-def data_augment(dict_databook):
-    data_len = len(dict_databook['value_y'])
-    augment_num = int(data_len * 0.3)
+def data_augment(dict_dataset, rate=0.3):
+    return_dataset = dict()
 
-    aug_idx_list = random.choices(range(data_len), k=2)
+    data_len = len(dict_dataset['value_y'])
+    augment_num = int(data_len * rate)
 
-    data_x = dict_databook['x'][aug_idx_list].copy()
-    policy_y = dict_databook['policy_y'][aug_idx_list].copy()
-    value_y = dict_databook['value_y'][aug_idx_list].copy()
+    aug_idx_list = random.choices(range(data_len), k=augment_num)
 
-    # print(dict_databook['x'].shape)
-    # print(dict_databook['x'][8])
-
-    # test = np.rot90(
-    #     data_x, k=random.randint(1, 4), axes=(1, 2)
-    # )
+    data_x = dict_dataset['x'][aug_idx_list].copy()
+    policy_y = dict_dataset['policy_y'][aug_idx_list].copy()
+    value_y = dict_dataset['value_y'][aug_idx_list].copy()
 
     aug_data_x = np.rot90(data_x, k=random.randint(1, 4), axes=(1, 2))
     if random.randint(0, 2):
         aug_data_x = np.flip(aug_data_x, axis=2)
     
+    return_dataset['x'] = aug_data_x
+    return_dataset['policy_y'] = policy_y
+    return_dataset['value_y'] = value_y
 
+    return return_dataset
 
-    import matplotlib.pyplot as plt
-    plt.subplot(1, 2, 1)
-    plt.imshow(data_x[0])
-
-    plt.subplot(1, 2, 2)
-    plt.imshow(aug_data_x[0])
-    plt.show()
-
-    exit()
-    test = data_x[0]
-    print(test)
-    print(test.shape)
-
-    # rot = np.swapaxes(test, 1, 0)
-    rot = np.rot90(test, k=random.randint(1, 4))
-    print(rot)
-    print(rot.shape)
-    # print(test)
-    # print(test.reshape(3, 10, 10))
-    # print(test)
-    # print('\n\n')
-
-    # print(test)
-    # print(test.reshape(10, 10, 3))
-    
-    import matplotlib.pyplot as plt
-    plt.subplot(1, 2, 1)
-    plt.imshow(test)
-
-    plt.subplot(1, 2, 2)
-    plt.imshow(rot)
-    plt.show()
-    # print(np.rot90(test, k=1, axes=(1, 2)).reshape(3, 10, 10))
-    exit()
-
-
-data_augment(databook.get_data())
-exit()
 
 
 for p in range(play_num):
@@ -197,6 +158,8 @@ for p in range(play_num):
         databook.update_databook(buffer_size=buffer_size)
  
         dataset = databook.get_data(shuffle=True)
+        dataset = data_augment(dataset)
+
         main_agent.train_model(dataset, batch_size=4)
 
 
