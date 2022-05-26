@@ -9,7 +9,7 @@ class User:
         self.board_size = board_size
         self.rule = rule
 
-    def act(self, seq_xy_board):
+    def act(self, seq_xy_board, diri_TF):
         def check_input(message):
             #check user input value
             while True:
