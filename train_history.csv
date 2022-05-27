@@ -1,0 +1,1 @@
+idx,date,train_round,train_epoch,train_buffer_size,train_loss,train_val_loss,win_num,lose_num,draw_num

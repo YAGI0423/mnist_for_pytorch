@@ -260,7 +260,7 @@ class AlphaO:
             [dataset['policy_y'], dataset['value_y']],
             batch_size = batch_size,
             shuffle=True,
-            validation_rate=0.2
+            validation_split=0.2
         )
         return history
 

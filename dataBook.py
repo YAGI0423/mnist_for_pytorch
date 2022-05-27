@@ -13,10 +13,6 @@ class DataBook:
         if load_dir:
             self.load_databook(load_dir)
 
-    
-        else:
-            raise
-
     def add_data(self, data_dict):
         check_datas = ('state', 'policy_y', 'value_y')
 
@@ -46,6 +42,8 @@ class DataBook:
                         del self.state[idx]
                         del self.policy_y[idx]
                         del self.value_y[idx]
+            else:
+                raise
 
         def data_augment(x, policy_y, value_y, rate=0.3):
 
@@ -68,8 +66,8 @@ class DataBook:
 
             return x, policy_y, value_y
 
-        dataset_len = len(self.state)
         update_databook()
+        dataset_len = len(self.state)
 
         state = np.asarray(self.state, dtype=np.float64)
         policy_y = np.asarray(self.policy_y, dtype=np.float64).reshape(dataset_len, -1)

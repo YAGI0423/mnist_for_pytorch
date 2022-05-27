@@ -98,9 +98,11 @@ def play_game(board_size, rule, databook, black, white, diri_TF=False):
 
 board_size = 10
 win_seq = 5
-buffer_size = 8192
+
+round_num = 800
 
 batch_size = 4
+buffer_size = 8192
 
 play_num = 16
 train_turm = 2
@@ -112,11 +114,11 @@ main_agent_dir = get_main_agent_dir()
 
 
 rule = Rule(board_size=board_size, win_seq=win_seq)
-main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=800)
+main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=round_num)
 
 #load databook===================
 if 'buffer_dataset.pickle' in os.listdir('./dataset/'):
-    databook = DataBook('./dataset/buffer_dataset.pickle', buffer_size=buffer_size)
+    databook = DataBook(buffer_size=buffer_size, load_dir='./dataset/buffer_dataset.pickle')
 else:
     databook = DataBook(buffer_size=buffer_size)
 #End=============================
@@ -132,7 +134,6 @@ for p in range(play_num):
     )
 
     if p % train_turm == 0 or p == (play_num - 1):
-        databook.update_databook(buffer_size=buffer_size)
         dataset = databook.get_data(shuffle=True, augment_rate=8.)
         
         if len(dataset['value_y']) >= (buffer_size * 0.5):
@@ -178,7 +179,7 @@ else:   #have main agent
         pre_agent_dir = random.choice(pre_agent_dir)
         pre_agent_dir = './model/previous_model/' + pre_agent_dir
 
-        pre_agent = model.AlphaO(board_size, rule, model_dir=pre_agent_dir, round_num=800)
+        pre_agent = model.AlphaO(board_size, rule, model_dir=pre_agent_dir, round_num=round_num)
 
         if main_agent_color := random.randint(0, 1):
             args['black'], args['white'] = pre_agent, main_agent
@@ -195,7 +196,7 @@ else:   #have main agent
             lose_count += 1
 
 
-    print(f'win rate: {win_count / COMPETE_NUM}')
+    print(f'win rate: {(win_count+lose_count+draw_count) / COMPETE_NUM}')
 
     agent_info = main_agent_dir[len('./model/main_model/'):-3]
     idx, start_round, end_round, month, day, hour, min = agent_info.split('_')
@@ -209,7 +210,7 @@ else:   #have main agent
         'date': now,
         'train_round': play_num,
         'train_epoch': epoch_count,
-        'train_buffer_size': len(dataset['value_y']),
+        'train_buffer_size': len(databook.value_y),
         'train_loss': train_histroy.history['loss'][-1],
         'train_val_loss': train_histroy.history['val_loss'][-1],
         'win_num': win_count,
@@ -219,16 +220,16 @@ else:   #have main agent
     csv.to_csv('./train_history.csv', index=False)
 
     if (win_count - lose_count) > 0.:
-        main_agent.save_agent('./model/main_model/', int(idx)+1, int(end_round), int(end_round)+play_num)
+        main_agent.save_model('./model/main_model/', int(idx)+1, int(end_round), int(end_round)+play_num)
 
         if not agent_info + '.h5' in os.listdir('./model/previous_model/'):
             os.rename(main_agent_dir, f'./model/previous_model/{agent_info}.h5')
         else:
             os.remove(main_agent_dir)
     else:
-        main_agent.save_agent('./model/previous_model/', int(idx)+1, int(end_round), int(end_round)+play_num)
+        main_agent.save_model('./model/previous_model/', int(idx)+1, int(end_round), int(end_round)+play_num)
 
 
 #save_pickle=====================
-databook.save_databook(save_dir='./model/buffer_dataset.pickle')
+databook.save_databook(save_dir='./dataset/buffer_dataset.pickle')
 #End=============================
