@@ -116,9 +116,9 @@ main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=
 
 #load databook===================
 if 'buffer_dataset.pickle' in os.listdir('./dataset/'):
-    databook = DataBook('./dataset/buffer_dataset.pickle')
+    databook = DataBook('./dataset/buffer_dataset.pickle', buffer_size=buffer_size)
 else:
-    databook = DataBook()
+    databook = DataBook(buffer_size=buffer_size)
 #End=============================
 
 
@@ -145,18 +145,15 @@ databook.save_databook(save_dir='./dataset/buffer_dataset.pickle')
 
 if main_agent_dir is None:    #has no main agent
     #save model
-    main_agent.save_model('./model/main_model/', 0, 0, play_num)
-    main_agent.save_model('./model/previous_model/', 0, 0, play_num)
+    main_agent.save_model('./model/main_model/', idx=0, start_round=0, end_round=play_num)
+    main_agent.save_model('./model/previous_model/', idx=0, start_round=0, end_round=play_num)
 
     #create pandas
     csv = pd.DataFrame({
-        'idx': list(),
-        'date': list(),
-        'start_round': list(),
-        'end_round': list(),
-        'win_num': list(),
-        'lose_num': list(),
-        'draw_num': list(),
+        'idx': list(), 'date': list(),
+        'train_round': list(), 'train_epoch': list(),
+        'train_loss': list(), 'train_val_loss': list(),
+        'win_num': list(), 'lose_num': list(), 'draw_num': list(),
 
     })
     csv.to_csv('./train_history.csv', index=False)
@@ -224,11 +221,5 @@ else:   #have main agent
 
 
 #save_pickle=====================
-with open('./model/buffer_dataset.pickle', 'wb') as pick:
-    save_databook = {
-        'state': databook.state,
-        'policy_y': databook.policy_y,
-        'value_y': databook.value_y
-    }
-    pickle.dump(save_databook, pick)
+databook.save_databook(save_dir='./model/buffer_dataset.pickle')
 #End=============================

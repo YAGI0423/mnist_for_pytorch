@@ -3,7 +3,9 @@ import random
 import numpy as np
 
 class DataBook:
-    def __init__(self, load_dir=None):
+    def __init__(self, buffer_size=1024, load_dir=None):
+        self.buffer_size = buffer_size
+
         self.state = []
         self.policy_y = []
         self.value_y = []
@@ -11,24 +13,7 @@ class DataBook:
         if load_dir:
             self.load_databook(load_dir)
 
-    def update_databook(self, buffer_size):
-        state_policy_TF = len(self.state) == len(self.policy_y)
-        policy_value_TF = len(self.policy_y) == len(self.value_y)
-
-        if state_policy_TF and policy_value_TF:   #must dataset size is same
-            over_num = len(self.state) - buffer_size
-
-            if over_num > 0:
-                del_idx = np.random.choice(
-                    range(len(self.state)), replace=False, size=over_num
-                )
-                
-                del_idx.sort()
-                
-                for idx in del_idx[::-1]:
-                    del self.state[idx]
-                    del self.policy_y[idx]
-                    del self.value_y[idx]
+    
         else:
             raise
 
@@ -43,7 +28,27 @@ class DataBook:
                     self.__dict__[name].extend(data_dict[name])
 
     def get_data(self, shuffle=False, augment_rate=None):
+        def update_databook():
+            state_policy_TF = len(self.state) == len(self.policy_y)
+            policy_value_TF = len(self.policy_y) == len(self.value_y)
+
+            if state_policy_TF and policy_value_TF:   #must dataset size is same
+                over_num = len(self.state) - self.buffer_size
+
+                if over_num > 0:
+                    del_idx = np.random.choice(
+                        range(len(self.state)), replace=False, size=over_num
+                    )
+                    
+                    del_idx.sort()
+                    
+                    for idx in del_idx[::-1]:
+                        del self.state[idx]
+                        del self.policy_y[idx]
+                        del self.value_y[idx]
+
         def data_augment(x, policy_y, value_y, rate=0.3):
+
             data_len = len(value_y)
             augment_num = int(data_len * rate)
 
@@ -64,6 +69,7 @@ class DataBook:
             return x, policy_y, value_y
 
         dataset_len = len(self.state)
+        update_databook()
 
         state = np.asarray(self.state, dtype=np.float64)
         policy_y = np.asarray(self.policy_y, dtype=np.float64).reshape(dataset_len, -1)

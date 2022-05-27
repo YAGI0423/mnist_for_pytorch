@@ -255,19 +255,22 @@ class AlphaO:
         }
 
     def train_model(self, dataset, batch_size=1):
-        self.model.fit(
+        history = self.model.fit(
             dataset['x'],
             [dataset['policy_y'], dataset['value_y']],
-            batch_size = batch_size
+            batch_size = batch_size,
+            shuffle=True,
+            validation_rate=0.2
         )
+        return history
 
-    def save_model(self, root_dir, idx, start_epoch, end_epoch):
+    def save_model(self, root_dir, idx, start_round, end_round):
          # #file name rule
         # #IDX_START EPOCH_END EPOCH_TIME.h5
 
         now = time.localtime()
         now = f'{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}'
 
-        info_dir = f'{idx}_{start_epoch}_{end_epoch}_'
+        info_dir = f'{idx}_{start_round}_{end_round}_'
 
         self.model.save(root_dir + info_dir + now + '.h5')
