@@ -197,13 +197,18 @@ else:   #have main agent
             lose_count += 1
 
 
-    print(f'win rate: {(win_count - lose_count+draw_count) / COMPETE_NUM}')
+    print(f'win rate: {win_count / COMPETE_NUM}')
 
     agent_info = main_agent_dir[len('./model/main_model/'):-3]
     idx, start_round, end_round, month, day, hour, min = agent_info.split('_')
 
     now = time.localtime()
     now = f'{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}'
+
+    if train_histroy:
+        tr_loss, tr_val_loss = None, None
+    else:
+        tr_loss, tr_val_loss = train_histroy.history['loss'][-1], train_histroy.history['val_loss'][-1]
 
     csv =pd.read_csv('./train_history.csv')
     csv = csv.append({
@@ -212,8 +217,8 @@ else:   #have main agent
         'train_round': play_num,
         'train_epoch': epoch_count,
         'train_buffer_size': len(databook.value_y),
-        'train_loss': train_histroy.history['loss'][-1],
-        'train_val_loss': train_histroy.history['val_loss'][-1],
+        'train_loss': tr_loss,
+        'train_val_loss': tr_val_loss,
         'win_num': win_count,
         'lose_num': lose_count,
         'draw_num': draw_count
