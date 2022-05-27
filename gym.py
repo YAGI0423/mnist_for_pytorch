@@ -8,7 +8,6 @@ import os
 import time
 import random
 import pickle
-import numpy as np
 import pandas as pd
 
 
@@ -94,6 +93,19 @@ def save_agent(agent, root_dir, idx, start_epoch, end_epoch):
 #End=================
 
 
+#to do list==========
+#1. 이동 가능한 함수는 이동 할 것
+    #(1) save_agent: model로 이동
+    #(2) data_augment: databook으로 이동   #완료
+    #(3) get_main_agent_dir: model로 이동
+
+#2. 중간 save를 수행하도록 변경하기
+
+#3. 함수화 해야할 것
+    #(1) 데이터셋 불러오기
+    #(2) 데이터셋 저장하기
+#End=================
+
 
 board_size = 10
 win_seq = 5
@@ -104,7 +116,7 @@ batch_size = 4
 play_num = 16
 train_turm = 2
 
-COMPETE_NUM = 8
+COMPETE_NUM = 7
 
 
 main_agent_dir = get_main_agent_dir()
@@ -116,8 +128,8 @@ databook = DataBook()
 
 
 #load pickle=====================
-if 'buffer_dataset.pickle' in os.listdir('./model/'):
-    with open('./model/buffer_dataset.pickle', 'rb') as pick:
+if 'buffer_dataset.pickle' in os.listdir('./dataset/'):
+    with open('./dataset/buffer_dataset.pickle', 'rb') as pick:
         data = pickle.load(pick)
     
     databook.state = data['state']
@@ -126,27 +138,7 @@ if 'buffer_dataset.pickle' in os.listdir('./model/'):
 #End=============================
 
 
-def data_augment(dict_dataset, rate=0.3):
-    return_dataset = dict()
 
-    data_len = len(dict_dataset['value_y'])
-    augment_num = int(data_len * rate)
-
-    aug_idx_list = random.choices(range(data_len), k=augment_num)
-
-    data_x = dict_dataset['x'][aug_idx_list].copy()
-    policy_y = dict_dataset['policy_y'][aug_idx_list].copy()
-    value_y = dict_dataset['value_y'][aug_idx_list].copy()
-
-    aug_data_x = np.rot90(data_x, k=random.randint(1, 4), axes=(1, 2))
-    if random.randint(0, 2):
-        aug_data_x = np.flip(aug_data_x, axis=2)
-    
-    return_dataset['x'] = np.concatenate((dict_dataset['x'], aug_data_x), axis=0)
-    return_dataset['policy_y'] = np.concatenate((dict_dataset['policy_y'], policy_y))
-    return_dataset['value_y'] = np.concatenate((dict_dataset['value_y'], value_y))
-
-    return return_dataset
 
 
 for p in range(play_num):
@@ -159,16 +151,14 @@ for p in range(play_num):
 
     if p % train_turm == 0 or p == (play_num - 1):
         databook.update_databook(buffer_size=buffer_size)
- 
-        dataset = databook.get_data(shuffle=True)
-        dataset = data_augment(dataset, rate=0.8)
+        dataset = databook.get_data(shuffle=True, augment_rate=8.)
         
-        if len(dataset['value_y']) >= buffer_size:
+        if len(dataset['value_y']) >= (buffer_size * 0.5):
             main_agent.train_model(dataset, batch_size=batch_size)
 
 
 #save_pickle=====================
-with open('./model/buffer_dataset.pickle', 'wb') as pick:
+with open('./dataset/buffer_dataset.pickle', 'wb') as pick:
     save_databook = {
         'state': databook.state,
         'policy_y': databook.policy_y,
@@ -187,10 +177,13 @@ if main_agent_dir is None:    #has no main agent
     csv = pd.DataFrame({
         'idx': list(),
         'date': list(),
-        'start_epoch': list(),
-        'end_epoch': list(),
-        'win_num': list()
-        })
+        'start_round': list(),
+        'end_round': list(),
+        'win_num': list(),
+        'lose_num': list(),
+        'draw_num': list(),
+        
+    })
     csv.to_csv('./train_history.csv', index=False)
 
     print('has no main agent')
@@ -222,7 +215,7 @@ else:   #have main agent
 
         if win_code == main_agent_color:   #when main agent win
             win_num += 1.
-        elif win_code != 2:
+        elif win_code != 2: #무승부가 아닐 때
             win_num -= 1.
 
 

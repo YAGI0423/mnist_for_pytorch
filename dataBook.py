@@ -1,4 +1,7 @@
 import numpy as np
+import random
+
+from gym import data_augment
 
 class DataBook:
     def __init__(self):
@@ -37,7 +40,28 @@ class DataBook:
                 else:
                     self.__dict__[name].extend(data_dict[name])
 
-    def get_data(self, shuffle=False):
+    def get_data(self, shuffle=False, augment_rate=None):
+        def data_augment(x, policy_y, value_y, rate=0.3):
+            data_len = len(value_y)
+            augment_num = int(data_len * rate)
+
+            aug_idx_list = random.choices(range(data_len), k=augment_num)
+
+            aug_x = x[aug_idx_list].copy()
+            aug_policy_y = policy_y[aug_idx_list].copy()
+            aug_value_y = value_y[aug_idx_list].copy()
+
+            aug_x = np.rot90(aug_x, k=random.randint(1, 4), axes=(1, 2))
+            if random.randint(0, 2):
+                aug_x = np.flip(aug_x, axis=2)
+            
+            x = np.concatenate((x, aug_x), axis=0)
+            policy_y = np.concatenate((policy_y, aug_policy_y))
+            value_y = np.concatenate((value_y, aug_value_y))
+
+            return x, policy_y, value_y
+
+
         dataset_len = len(self.state)
 
         state = np.asarray(self.state, dtype=np.float64)
@@ -51,6 +75,9 @@ class DataBook:
             state = state[idx]
             policy_y = policy_y[idx]
             value_y = value_y[idx]
+
+        if augment_rate:
+            state, policy_y, value_y = data_augment(state, policy_y, value_y, augment_rate)
 
         return {
             'x': state,
