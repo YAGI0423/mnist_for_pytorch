@@ -134,7 +134,7 @@ for p in range(play_num):
     )
 
     if p % train_turm == 0 or p == (play_num - 1):
-        dataset = databook.get_data(shuffle=True, augment_rate=8.)
+        dataset = databook.get_data(shuffle=True, augment_rate=0.8)
         
         if len(dataset['value_y']) >= (buffer_size * 0.5):
             epoch_count += 1
@@ -196,7 +196,7 @@ else:   #have main agent
             lose_count += 1
 
 
-    print(f'win rate: {(win_count+lose_count+draw_count) / COMPETE_NUM}')
+    print(f'win rate: {(win_count - lose_count+draw_count) / COMPETE_NUM}')
 
     agent_info = main_agent_dir[len('./model/main_model/'):-3]
     idx, start_round, end_round, month, day, hour, min = agent_info.split('_')
