@@ -1,6 +1,7 @@
 from tree import Node
 from util import Util
 
+import time
 import numpy as np
 from tensorflow import keras as K
 
@@ -260,5 +261,13 @@ class AlphaO:
             batch_size = batch_size
         )
 
-    def save_model(self, dir):
-        self.model.save(dir)
+    def save_model(self, root_dir, idx, start_epoch, end_epoch):
+         # #file name rule
+        # #IDX_START EPOCH_END EPOCH_TIME.h5
+
+        now = time.localtime()
+        now = f'{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}'
+
+        info_dir = f'{idx}_{start_epoch}_{end_epoch}_'
+
+        self.model.save(root_dir + info_dir + now + '.h5')

@@ -7,7 +7,6 @@ from gameBoard import GameBoard
 import os
 import time
 import random
-import pickle
 import pandas as pd
 
 
@@ -80,22 +79,12 @@ def play_game(board_size, rule, databook, black, white, diri_TF=False):
     databook.add_data({'value_y': value_y})
 
     return win_code
-
-def save_agent(agent, root_dir, idx, start_epoch, end_epoch):
-    # #file name rule
-    # #IDX_START EPOCH_END EPOCH_TIME.h5
-
-    now = time.localtime()
-    now = f'{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}'
-
-    info_dir = f'{idx}_{start_epoch}_{end_epoch}_'
-    agent.save_model(root_dir + info_dir + now + '.h5')
 #End=================
 
 
 #to do list==========
 #1. 이동 가능한 함수는 이동 할 것
-    #(1) save_agent: model로 이동
+    #(1) save_agent: model로 이동   #완료
     #(2) data_augment: databook으로 이동   #완료
     #(3) get_main_agent_dir: model로 이동
 
@@ -158,20 +147,14 @@ for p in range(play_num):
 
 
 #save_pickle=====================
-with open('./dataset/buffer_dataset.pickle', 'wb') as pick:
-    save_databook = {
-        'state': databook.state,
-        'policy_y': databook.policy_y,
-        'value_y': databook.value_y
-    }
-    pickle.dump(save_databook, pick)
+databook.save_databook(save_dir='./dataset/buffer_dataset.pickle')
 #End=============================
 
 
 if main_agent_dir is None:    #has no main agent
     #save model
-    save_agent(main_agent, './model/main_model/', 0, 0, play_num)
-    save_agent(main_agent, './model/previous_model/', 0, 0, play_num)
+    main_agent.save_model('./model/main_model/', 0, 0, play_num)
+    main_agent.save_model('./model/previous_model/', 0, 0, play_num)
 
     #create pandas
     csv = pd.DataFrame({
@@ -182,7 +165,7 @@ if main_agent_dir is None:    #has no main agent
         'win_num': list(),
         'lose_num': list(),
         'draw_num': list(),
-        
+
     })
     csv.to_csv('./train_history.csv', index=False)
 
@@ -238,14 +221,14 @@ else:   #have main agent
     csv.to_csv('./train_history.csv', index=False)
 
     if (win_num / COMPETE_NUM) > 0.:
-        save_agent(main_agent, './model/main_model/', int(idx)+1, int(end_epoch), int(end_epoch)+play_num)
+        main_agent.save_agent('./model/main_model/', int(idx)+1, int(end_epoch), int(end_epoch)+play_num)
 
         if not agent_info + '.h5' in os.listdir('./model/previous_model/'):
             os.rename(main_agent_dir, f'./model/previous_model/{agent_info}.h5')
         else:
             os.remove(main_agent_dir)
     else:
-        save_agent(main_agent, './model/previous_model/', int(idx)+1, int(end_epoch), int(end_epoch)+play_num)
+        main_agent.save_agent('./model/previous_model/', int(idx)+1, int(end_epoch), int(end_epoch)+play_num)
 
 
 #save_pickle=====================

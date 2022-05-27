@@ -1,7 +1,6 @@
-import numpy as np
+import pickle
 import random
-
-from gym import data_augment
+import numpy as np
 
 class DataBook:
     def __init__(self):
@@ -61,7 +60,6 @@ class DataBook:
 
             return x, policy_y, value_y
 
-
         dataset_len = len(self.state)
 
         state = np.asarray(self.state, dtype=np.float64)
@@ -84,3 +82,12 @@ class DataBook:
             'policy_y': policy_y,
             'value_y': value_y
         }
+
+    def save_databook(self, save_dir):
+        with open(save_dir, 'wb') as pick:
+        save_databook = {
+            'state': self.state,
+            'policy_y': self.policy_y,
+            'value_y': self.value_y
+        }
+        pickle.dump(save_databook, pick)    
