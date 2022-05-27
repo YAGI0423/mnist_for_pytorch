@@ -113,21 +113,13 @@ main_agent_dir = get_main_agent_dir()
 
 rule = Rule(board_size=board_size, win_seq=win_seq)
 main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=800)
-databook = DataBook()
 
-
-#load pickle=====================
+#load databook===================
 if 'buffer_dataset.pickle' in os.listdir('./dataset/'):
-    with open('./dataset/buffer_dataset.pickle', 'rb') as pick:
-        data = pickle.load(pick)
-    
-    databook.state = data['state']
-    databook.policy_y = data['policy_y']
-    databook.value_y = data['value_y']
+    databook = DataBook('./dataset/buffer_dataset.pickle')
+else:
+    databook = DataBook()
 #End=============================
-
-
-
 
 
 for p in range(play_num):

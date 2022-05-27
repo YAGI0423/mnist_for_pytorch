@@ -3,10 +3,13 @@ import random
 import numpy as np
 
 class DataBook:
-    def __init__(self):
+    def __init__(self, load_dir=None):
         self.state = []
         self.policy_y = []
         self.value_y = []
+
+        if load_dir:
+            self.load_databook(load_dir)
 
     def update_databook(self, buffer_size):
         state_policy_TF = len(self.state) == len(self.policy_y)
@@ -85,9 +88,17 @@ class DataBook:
 
     def save_databook(self, save_dir):
         with open(save_dir, 'wb') as pick:
-        save_databook = {
-            'state': self.state,
-            'policy_y': self.policy_y,
-            'value_y': self.value_y
-        }
-        pickle.dump(save_databook, pick)    
+            save_databook = {
+                'state': self.state,
+                'policy_y': self.policy_y,
+                'value_y': self.value_y
+            }
+            pickle.dump(save_databook, pick)
+
+    def load_databook(self, load_dir):
+        with open(load_dir, 'rb') as pick:
+            data = pickle.load(pick)
+    
+        self.state = data['state']
+        self.policy_y = data['policy_y']
+        self.value_y = data['value_y']
