@@ -124,6 +124,7 @@ else:
 #End=============================
 
 epoch_count = 0
+train_histroy = None
 
 for p in range(play_num):
     print(f'\nTRAIN ROUND: {p}\n\n')
