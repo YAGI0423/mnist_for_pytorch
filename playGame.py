@@ -66,3 +66,33 @@ class PlayGame:
         databook.add_data({'value_y': value_y})
 
         return win_code
+
+
+if __name__ == '__main__':
+    from model import AlphaO
+
+    def win_seq_checker(win_seq, board_size):
+        win_seq_check_TF = win_seq > 7 or win_seq < 3    #seq
+        win_seq_check_TF = win_seq_check_TF or win_seq > board_size
+        return win_seq_check_TF
+
+
+    board_size = 0
+    win_seq = 0
+    
+    black = None
+    white = None
+
+    input('black stone(0: user, 1: random, 2: alphaO): ')
+
+    # while board_size > 19 or board_size < 3:
+    #     board_size = input('Board size(3 ~ 19): ')
+    #     board_size = int(board_size)
+
+
+    # while win_seq_checker(win_seq, board_size):
+    #     win_seq = input(f'win seq(3 ~ 7 and small then board_size({board_size}): ')
+    #     win_seq = int(win_seq)
+
+    
+    # play_game = PlayGame(board_size=board_size, win_seq=win_seq)
