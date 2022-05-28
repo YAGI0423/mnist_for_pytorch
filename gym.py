@@ -206,9 +206,9 @@ else:   #have main agent
     now = f'{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}'
 
     if train_histroy:
-        tr_loss, tr_val_loss = None, None
-    else:
         tr_loss, tr_val_loss = train_histroy.history['loss'][-1], train_histroy.history['val_loss'][-1]
+    else:
+        tr_loss, tr_val_loss = None, None
 
     csv =pd.read_csv('./train_history.csv')
     csv = csv.append({

@@ -35,7 +35,7 @@ class RandomChoice:
         self.board_size = board_size
         self.rule = rule
 
-    def act(self, seq_xy_board):
+    def act(self, seq_xy_board, diri_TF):
         able_loc = list(self.rule.get_able_loc(seq_xy_board))
         able_loc.remove((None, None))   #surrender
         rand_idx = np.random.choice(len(able_loc))
