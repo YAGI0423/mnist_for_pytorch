@@ -53,7 +53,7 @@ main_agent_dir = get_main_agent_dir()
 
 
 rule = Rule(board_size=board_size, win_seq=win_seq)
-play_game = PlayGame(board_size=board_size, win_seq=win_seq)
+play_game = PlayGame(board_size=board_size, rule=rule)
 main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=round_num)
 
 #load databook===================

@@ -1,12 +1,12 @@
-from rule import Rule
 from util import Util
 from gameBoard import GameBoard
+from dataBook import DataBook
 
 
 class PlayGame:
-    def __init__(self, board_size, win_seq):
+    def __init__(self, board_size, rule):
         self.board_size = board_size
-        self.rule = Rule(board_size=board_size, win_seq=win_seq)
+        self.rule = rule
         
     def play(self, black, white, databook, diri_TF=False):
         def get_value_y(seq_xy_board, win_code, discount_factor):
@@ -69,12 +69,32 @@ class PlayGame:
 
 
 if __name__ == '__main__':
-    from model import AlphaO
+    import model
+    from rule import Rule
+
+    import os
 
     def win_seq_checker(win_seq, board_size):
         win_seq_check_TF = win_seq > 7 or win_seq < 3    #seq
         win_seq_check_TF = win_seq_check_TF or win_seq > board_size
         return win_seq_check_TF
+
+    def get_agent(agent_code, board_size, rule):
+        def get_main_agent_dir():
+            main_root = './model/main_model/'
+            model_list = os.listdir(main_root)
+            if model_list:   #Exist
+                return main_root + model_list[0]
+            return None   #Empty
+
+        if agent_code == 0:   #user
+            return model.User(board_size=board_size, rule=rule)
+        elif agent_code == 1:   #random
+            return model.RandomChoice(board_size=board_size, rule=rule)
+        return model.AlphaO(
+            board_size=board_size, rule=rule,
+            model_dir=get_main_agent_dir()
+        )   #alphaO
 
 
     board_size = 0
@@ -83,17 +103,32 @@ if __name__ == '__main__':
     black = None
     white = None
 
-    model = input('black stone(0: user, 1: random, 2: alphaO): ')
+    black, white = -1, -1
     
+    while board_size > 19 or board_size < 3:
+        board_size = input('Board size(3 ~ 19): ')
+        board_size = int(board_size)
 
-    # while board_size > 19 or board_size < 3:
-    #     board_size = input('Board size(3 ~ 19): ')
-    #     board_size = int(board_size)
+
+    while win_seq_checker(win_seq, board_size):
+        win_seq = input(f'win seq(3 ~ 7 and small then board_size({board_size}): ')
+        win_seq = int(win_seq)
+
+    while not black in (0, 1, 2):
+        black = input('black stone(0: user, 1: random, 2: alphaO): ')
+        black = int(black)
+
+    while not white in (0, 1, 2):
+        white = input('white stone(0: user, 1: random, 2: alphaO): ')
+        white = int(white)
 
 
-    # while win_seq_checker(win_seq, board_size):
-    #     win_seq = input(f'win seq(3 ~ 7 and small then board_size({board_size}): ')
-    #     win_seq = int(win_seq)
+    rule = Rule(board_size=board_size, win_seq=win_seq)
+    play_game = PlayGame(board_size=board_size, rule=rule)
+    databook = DataBook()
 
+    black = get_agent(black, board_size, rule)
+    white = get_agent(white, board_size, rule)
+
+    play_game.play(black=black, white=white, databook=databook)
     
-    # play_game = PlayGame(board_size=board_size, win_seq=win_seq)
