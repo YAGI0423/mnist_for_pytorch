@@ -3,6 +3,7 @@ from rule import Rule
 from util import Util
 from dataBook import DataBook
 from gameBoard import GameBoard
+from playGame import PlayGame
 
 import os
 import time
@@ -114,6 +115,7 @@ main_agent_dir = get_main_agent_dir()
 
 
 rule = Rule(board_size=board_size, win_seq=win_seq)
+play_game = PlayGame(board_size=board_size, win_seq=win_seq)
 main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=round_num)
 
 #load databook===================
@@ -123,16 +125,12 @@ else:
     databook = DataBook(buffer_size=buffer_size)
 #End=============================
 
+
 epoch_count = 0
 train_histroy = None
 
 for p in range(play_num):
-    print(f'\nTRAIN ROUND: {p}\n\n')
-    _ = play_game(
-        board_size=board_size, rule=rule,databook=databook,
-        black=main_agent, white=main_agent,
-        diri_TF=True
-    )
+    play_game.play(black=main_agent, white=main_agent, databook=databook, diri_TF=True)
 
     if p % train_turm == 0 or p == (play_num - 1):
         dataset = databook.get_data(shuffle=True, augment_rate=0.8)
@@ -163,13 +161,6 @@ if main_agent_dir is None:    #has no main agent
     csv.to_csv('./train_history.csv', index=False)
 
     print('has no main agent')
-else:   #have main agent
-    args = {
-        'board_size': board_size,
-        'databook': databook,
-        'rule': rule
-    }
-
     
     win_count, lose_count, draw_count = 0, 0, 0
 
@@ -183,11 +174,11 @@ else:   #have main agent
         pre_agent = model.AlphaO(board_size, rule, model_dir=pre_agent_dir, round_num=round_num)
 
         if main_agent_color := random.randint(0, 1):
-            args['black'], args['white'] = pre_agent, main_agent
+            black, white = pre_agent, main_agent
         else:
-            args['black'], args['white'] = main_agent, pre_agent
+            black, white = main_agent, pre_agent
 
-        win_code = play_game(**args)
+        win_code = play_game.play(black=black, white=white, databook=databook, diri_TF=False)
 
         if win_code == main_agent_color:   #when main agent win
             win_count += 1

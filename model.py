@@ -54,8 +54,10 @@ class AlphaO:
         self.model_dir = model_dir
         if self.model_dir is None:
             self.model = self.create_model()
+            print(f'\n\ncreate new model...\n\n')
         else:
             self.model = K.models.load_model(model_dir)
+            print(f'\n\nload model from: {model_dir}\n\n')
 
     def create_model(self):
         input = K.layers.Input(shape=(self.board_size, self.board_size, 3))
