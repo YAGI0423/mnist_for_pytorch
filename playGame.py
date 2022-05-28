@@ -83,7 +83,8 @@ if __name__ == '__main__':
     black = None
     white = None
 
-    input('black stone(0: user, 1: random, 2: alphaO): ')
+    model = input('black stone(0: user, 1: random, 2: alphaO): ')
+    
 
     # while board_size > 19 or board_size < 3:
     #     board_size = input('Board size(3 ~ 19): ')
