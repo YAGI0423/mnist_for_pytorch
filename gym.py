@@ -68,6 +68,7 @@ epoch_count = 0
 train_history = None
 
 for p in range(play_num):
+    print(f'\nTRAIN ROUND: {p}\n\n')
     play_game.play(black=main_agent, white=main_agent, databook=databook, diri_TF=True)
 
     if p % train_turm == 0 or p == (play_num - 1):
