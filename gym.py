@@ -115,8 +115,18 @@ for e in range(COMPETE_NUM):
 
     if main_agent_color := random.randint(0, 1):
         black, white = pre_agent, main_agent
+        print('STONE'.center(50, '='))
+        print(f'BLACK(●): MAIN_AGENT')
+        print(f'WHITE(○): PREVIOUS_AGENT')
+        print('=' * 50)
     else:
         black, white = main_agent, pre_agent
+        print('STONE'.center(50, '='))
+        print(f'BLACK(●): PREVIOUS_AGENT')
+        print(f'WHITE(○): MAIN_AGENT')
+        print('=' * 50)
+
+    
 
     win_code = play_game.play(black=black, white=white, databook=databook, diri_TF=False)
 
