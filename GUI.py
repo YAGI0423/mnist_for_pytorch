@@ -16,17 +16,19 @@ class GUI:
             )
 
             step_size = self.board_wh // (self.board_size - 1)
+            left_pix = self.board_wh % (self.board_size - 1)
+
 
             #draw row, col=============
-            for idx in range(step_size, self.board_wh-1, step_size):
+            for step in range(step_size, self.board_wh-1, step_size):
                 board.create_line(    #row
-                    self.bd['x'], self.bd['y']+idx,
-                    self.bd['x']+self.board_wh, self.bd['y']+idx
+                    self.bd['x'], self.bd['y']+step,
+                    self.bd['x']+self.board_wh, self.bd['y']+step
                 )
-                board.create_line(    #col
-                    self.bd['x']+idx, self.bd['y'],
-                    self.bd['x']+idx, self.bd['y']+self.board_wh
-                )
+                # board.create_line(    #col
+                #     self.bd['x']+step, self.bd['y'],
+                #     self.bd['x']+step, self.bd['y']+self.board_wh
+                # )
             #End=======================
 
             #draw cross dot============
@@ -44,17 +46,14 @@ class GUI:
             board.pack()
 
         def init_state(root):
-            stone_ft = tkinter.font.Font(size=30)
+            stone_ft = tkinter.font.Font(size=20)
 
-            black_stone_txt = Label(root, text='●', font=stone_ft, relief='solid')
-            white_stone_txt = Label(root, text='○', font=stone_ft, relief='solid')
+            black_stone_txt = Label(root, text='●', font=stone_ft)
+            white_stone_txt = Label(root, text='○', font=stone_ft)
     
 
-            black_stone_txt.place(x=self.bd['x'], y=30)
-            white_stone_txt.place(
-                x=self.wd['width']-30-30,
-                y=30
-            )
+            black_stone_txt.place(x=self.bd['x'], y=10)
+            white_stone_txt.place(x=self.wd['width']-self.bd['x'], y=10, anchor='ne')
            
 
         self.board_size = board_size
@@ -93,7 +92,7 @@ if __name__ == '__main__':
     now_board = ((5, 5), (2, 2), (3, 3))
 
     
-    gui = GUI(board_size=5, black_info=2, white_info=0)
+    gui = GUI(board_size=19, black_info=2, white_info=0)
 
     # gui.located()
     gui.print()
