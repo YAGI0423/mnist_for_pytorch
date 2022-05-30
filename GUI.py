@@ -1,4 +1,5 @@
 from tkinter import *
+import tkinter.font
 
 class GUI:
     def __init__(self, board_size, black_info, white_info):
@@ -17,13 +18,22 @@ class GUI:
         
         self.init_window()
 
+        font = tkinter.font.Font(family='Consolas', size=50)
+        
+        label = Label(self.root, text="●", font=font)
+        label.place(x=30, y=10)
 
+        label = Label(self.root, text="○", font=font)
+        label.place(x=700-30-50, y=10)
+        
+        
+        self.window.pack()
 
     def init_window(self):
         self.root.title('board window')
         self.root.geometry(f"{self.wd['width']}x{self.wd['height']}+100+100")
         self.root.resizable(False, False)
-        self.window.pack()
+        # self.window.pack()
 
         self.window.create_rectangle(
             self.bd['x'], self.bd['y'],
@@ -55,6 +65,7 @@ class GUI:
                 fill='gray'
             )
         #End=======================
+
 
 
         # exit()
