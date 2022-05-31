@@ -73,18 +73,12 @@ class GUI:
 
             predict_ft = tkinter.font.Font(size=15)
             black_vnn_txt = Label(root, text='VNN: ', font=predict_ft)
-            black_pnn_txt = Label(root, text='PNN: ', font=predict_ft)
-
-            white_vnn_txt = Label(root, text='VNN: ', font=predict_ft)
-            white_pnn_txt = Label(root, text='PNN: ', font=predict_ft)
+            white_vnn_txt = Label(root, text='VNN: ', font=predict_ft, state='disable')
 
             black_vnn_txt.place(x=self.interval+20, y=70)
-            black_pnn_txt.place(x=self.interval+20, y=100)
-
             white_vnn_txt.place(x=self.wd['width']-self.interval-20, y=70, anchor='ne')
-            white_pnn_txt.place(x=self.wd['width']-self.interval-20, y=100, anchor='ne')
 
-        def show_visual_stone(event):   #포석 위치 체크
+        def wheon_move_mouse(event):   #포석 위치 체크
             def get_is_inner_cross(x, y):
                 x_bd_in_TF = x > self.bd['x'] - TOLERANCE and x < self.bd['x'] + self.board_wh + TOLERANCE
                 y_bd_in_TF = y > self.bd['y'] - TOLERANCE and y < self.bd['y'] + self.board_wh + TOLERANCE
@@ -104,6 +98,19 @@ class GUI:
                     if abs(step - value) <= TOLERANCE:
                         return step
 
+            def show_visual_stone(x, y):
+                if not x:
+                    x = self.wd['width']
+                    y = 0
+                
+                self.board.moveto(self.visual_stone, x, y)
+
+            def get_close_value_idx(value, put_loc_tup):
+                for idx, step in enumerate(put_loc_tup):
+                    if step == value:
+                        return idx
+                return idx
+
             TOLERANCE = 20  #포석 인정 허용 범위
             put_loc_tup = tuple([0] + list(self.step_tuple) + [self.step_tuple[-1] + self.board_step_size])
             
@@ -116,18 +123,13 @@ class GUI:
                 loc_y = get_close_value(b_y, put_loc_tup)
                 
                 half_st = self.stone_size // 2
+                show_visual_stone(loc_x+self.bd['x']-half_st, loc_y+self.bd['y']-half_st)
 
-                self.board.moveto(
-                    self.visual_stone,
-                    loc_x+self.bd['x']-half_st,
-                    loc_y+self.bd['y']-half_st
-                )
-                self.
+                loc_x_idx = get_close_value_idx(loc_x, put_loc_tup)
+                loc_y_idx = get_close_value_idx(loc_y, put_loc_tup)
+                self.board.itemconfig(self.loc_text, text=f'stone location: ({loc_x_idx}, {loc_y_idx})')
             else:
-                self.board.moveto(
-                    self.visual_stone,
-                    self.wd['width'], 0
-                )
+                show_visual_stone(None, None)
 
 
         self.board_size = board_size
@@ -160,24 +162,24 @@ class GUI:
             self.wd['width'], 0, self.wd['width']+self.stone_size, self.stone_size, fill='black'
         )
 
-        self.loc_text = self.board.create_text(
-            self.bd['x'], self.wd['height']-self.interval,
+        self.loc_text = self.board.create_text(   #stone location text
+            self.bd['x']*2, self.wd['height']-self.interval,
             text='stone location: ',
-            font=('', 15)
+            font=('', 12)
         )
 
-        self.root.bind("<Motion>", show_visual_stone)
+        self.root.bind("<Motion>", wheon_move_mouse)
         
 
-    def print(self):
-        self.root.mainloop()
+    def print_canvas(self):
+        self.root.update()
 
 
 if __name__ == '__main__':
     now_board = ((5, 5), (2, 2), (3, 3))
 
     
-    gui = GUI(board_size=5, black_info=2, white_info=0)
+    gui = GUI(board_size=3, black_info=2, white_info=0)
 
-    # gui.located()
-    gui.print()
+    gui.print_canvas()
+
