@@ -16,7 +16,7 @@ class GUI:
 
                 temp += step_size
                 left_pix -= 1
-            step_list.append(temp + step_size)
+            step_list.append(temp)
             return tuple(step_list)
 
         def init_window(root):
@@ -31,7 +31,7 @@ class GUI:
             )
 
             #draw row, col=============
-            for step in step_tuple:
+            for step in step_tuple[1:-1]:
                 canvas.create_line(    #row
                     self.bd['x'], self.bd['y']+step,
                     self.bd['x']+self.board_wh, self.bd['y']+step
@@ -43,8 +43,8 @@ class GUI:
             #End=======================
 
             #draw cross dot============
-            for step_y in step_tuple:
-                for step_x in step_tuple:
+            for step_y in step_tuple[1:-1]:
+                for step_x in step_tuple[1:-1]:
                     canvas.create_oval(
                         self.bd['x'] - 3 + step_x, self.bd['y'] - 3 + step_y,
                         self.bd['x'] + 3 + step_x, self.bd['y'] + 3 + step_y
@@ -81,7 +81,6 @@ class GUI:
 
         def init_visual_stone(stone_color):
             stone_color_txt = 'gainsboro' if stone_color else 'dimgray'
-            print(stone_color_txt)
 
             return self.board.create_oval( #visual stone 초기 위치
                 self.wd['width'], 0, self.wd['width']+self.stone_size, self.stone_size, fill=stone_color_txt
@@ -194,7 +193,6 @@ class GUI:
         self.root.bind("<Motion>", wheon_move_mouse)
         
     def idx_to_pix(self, x, y):
-        print(self.step_tuple)
         x = self.bd['x'] + self.step_tuple[x]
         y = self.bd['y'] + self.step_tuple[y]
         return x, y
@@ -241,24 +239,24 @@ if __name__ == '__main__':
     
     import time
 
-    gui = GUI(board_size=5, black_code=2, white_code=0)
+    gui = GUI(board_size=3, black_code=2, white_code=0)
 
     
-    gui.root.mainloop()
-    # gui.print_canvas()
+    # gui.root.mainloop()
+    gui.print_canvas()
 
-    # for t in range(len(now_board)):
+    for t in range(len(now_board)):
 
-    #     x, y = now_board[t]
-    #     black_vnn, white_vnn = vnn_list[t]
+        x, y = now_board[t]
+        black_vnn, white_vnn = vnn_list[t]
 
-    #     stone_color = 1 if t % 2 else 0
+        stone_color = 1 if t % 2 else 0
 
-    #     gui.update_canvas(
-    #         stone_info={'x': x, 'y': y, 'stone_color': stone_color, 'idx': t},
-    #         vnn_info={'black': black_vnn, 'white': white_vnn}
-    #     )
+        gui.update_canvas(
+            stone_info={'x': x, 'y': y, 'stone_color': stone_color, 'idx': t},
+            vnn_info={'black': black_vnn, 'white': white_vnn}
+        )
 
-    #     gui.print_canvas()
-    #     time.sleep(2)
+        gui.print_canvas()
+        time.sleep(2)
 
