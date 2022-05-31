@@ -1,4 +1,5 @@
-from faulthandler import disable
+import numpy as np
+
 from tkinter import *
 import tkinter.font
 
@@ -115,6 +116,8 @@ class GUI:
         init_state(self.root, self.black_info, self.white_info)
         
         def check_inner_cross(event):   #포석 위치 체크
+            put_loc_tup = tuple([0] + list(self.step_tuple) + [self.step_tuple[-1] + self.board_step_size])
+            
             x, y = event.x, event.y
 
             def get_is_inner_cross(x, y):
@@ -132,7 +135,9 @@ class GUI:
                 return False
 
             if get_is_inner_cross(x, y):
-                self.board.create_line(0,0,x,y, width = 5, fill = "red") 
+                b_x, b_y = x - self.bd['x'], y - self.bd['y']
+                print(b_x, b_y)
+                print(self.step_tuple, end='\n\n')
 
 
         self.root.bind("<Motion>", check_inner_cross)
