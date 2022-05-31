@@ -1,3 +1,4 @@
+from faulthandler import disable
 from tkinter import *
 import tkinter.font
 
@@ -52,7 +53,6 @@ class GUI:
                     )
             #End=======================
 
-
             board.pack()
 
         def init_state(root, black_info, white_info):
@@ -64,18 +64,31 @@ class GUI:
                 return 'USER'
 
             black_text = '● ' + get_player_text(black_info)
-            white_text = '○ ' + get_player_text(white_info)
+            white_text = get_player_text(white_info) + ' ○'
             
             
             stone_ft = tkinter.font.Font(size=20)
 
             black_stone_txt = Label(root, text=black_text, font=stone_ft)
-            white_stone_txt = Label(root, text=white_text, font=stone_ft)
-    
+            white_stone_txt = Label(root, text=white_text, font=stone_ft, state='disable')
 
-            black_stone_txt.place(x=self.interval, y=10)
-            white_stone_txt.place(x=self.wd['width']-self.interval, y=10, anchor='ne')
-           
+            black_stone_txt.place(x=self.interval, y=15)
+            white_stone_txt.place(x=self.wd['width']-self.interval, y=15, anchor='ne')
+
+
+            predict_ft = tkinter.font.Font(size=15)
+            black_vnn_txt = Label(root, text='VNN: ', font=predict_ft)
+            black_pnn_txt = Label(root, text='PNN: ', font=predict_ft)
+
+            white_vnn_txt = Label(root, text='VNN: ', font=predict_ft)
+            white_pnn_txt = Label(root, text='PNN: ', font=predict_ft)
+
+            black_vnn_txt.place(x=self.interval+20, y=70)
+            black_pnn_txt.place(x=self.interval+20, y=100)
+
+            white_vnn_txt.place(x=self.wd['width']-self.interval-20, y=70, anchor='ne')
+            white_pnn_txt.place(x=self.wd['width']-self.interval-20, y=100, anchor='ne')
+
 
         self.board_size = board_size
         self.black_info, self.white_info = black_info, white_info
@@ -96,12 +109,26 @@ class GUI:
 
         self.root = Tk()
         init_window(self.root)
-
         init_board(self.root, self.step_tuple)
-
         init_state(self.root, self.black_info, self.white_info)
         
-        
+        def check_inner_cross(event):   #포석 위치 체크
+            x, y = event.x, event.y
+
+            x_bd_in_TF = x > self.bd['x'] - 15 and x < self.bd['x'] + self.board_wh + 15
+            y_bd_in_TF = y > self.bd['y'] - 15 and y < self.bd['y'] + self.board_wh + 15
+
+            if x_bd_in_TF and y_bd_in_TF:
+                x_cr_in_TF = (x - self.bd['x']) in self.step_tuple
+                if x_cr_in_TF:
+                    print('x:', self.bd['x'])
+                    print('step:', self.board_step_size)
+                    print(x, y)
+
+            
+
+
+        self.root.bind("<Motion>", check_inner_cross)
         
 
     def print(self):
