@@ -65,7 +65,7 @@ class GUI:
             stone_ft = tkinter.font.Font(size=20)
 
             black_stone_txt = Label(root, text=black_text, font=stone_ft)
-            white_stone_txt = Label(root, text=white_text, font=stone_ft, state='disable')
+            white_stone_txt = Label(root, text=white_text, font=stone_ft)
 
             black_stone_txt.place(x=self.interval, y=15)
             white_stone_txt.place(x=self.wd['width']-self.interval, y=15, anchor='ne')
@@ -79,7 +79,8 @@ class GUI:
             white_vnn_txt.place(x=self.wd['width']-self.interval-20, y=70, anchor='ne')
 
         def init_visual_stone(stone_color):
-            stone_color_txt = 'white' if stone_color % 2 else 'black'
+            stone_color_txt = 'whitesmoke' if stone_color else 'dimgray'
+            print(stone_color_txt)
 
             return self.board.create_oval( #visual stone 초기 위치
                 self.wd['width'], 0, self.wd['width']+self.stone_size, self.stone_size, fill=stone_color_txt
@@ -187,6 +188,7 @@ class GUI:
         self.visual_stone = init_visual_stone(stone_color=self.stone_color)
         self.loc_text = init_loc_text()
 
+
         init_board_state(self.board_state)
 
         self.root.bind("<Motion>", wheon_move_mouse)
@@ -210,28 +212,39 @@ class GUI:
         self.root.update()
 
     def update_canvas(
-        self, stone_info
+        self, stone_info, vnn_info
     ):
         x, y, stone_color = stone_info['x'], stone_info['y'], stone_info['stone_color']
-        self.draw_stone(x, y, stone_color)
+        black_vnn, white_vnn = vnn_info['black'] ,vnn_info['white']
+        
+        self.root.children['!label3'].config(text=f'VNN: {black_vnn:.3f}')   #black vnn
+        self.root.children['!label4'].config(text=f'VNN: {white_vnn:.3f}')  #white vnn
 
 
 if __name__ == '__main__':
-    now_board = ((5, 5), (2, 2), (3, 3), (1, 2))
+    now_board = ((5, 5), (2, 2), (3, 3), (1, 2), (1, 3))
+    vnn_list = ((2.5, 3.1), (6.3, 8.88), (2.1, 6.2), (3.7, 2.0), (2.1, 6.2))
     
     import time
 
-    gui = GUI(board_size=10, black_code=2, white_code=0)
-    gui.print_canvas()
+    gui = GUI(board_size=10, black_code=2, white_code=0, board_state=((2, 3), ))
 
-    for t in range(len(now_board)):
+    
+    gui.root.mainloop()
+    # gui.print_canvas()
 
-        x, y = now_board[t]
-        stone_color = 1 if t % 2 else 0
+    # for t in range(len(now_board)):
 
-        gui.update_canvas(stone_info={
-            'x': x, 'y': y, 'stone_color': stone_color
-        })
-        gui.print_canvas()
-        time.sleep(2)
+    #     x, y = now_board[t]
+    #     black_vnn, white_vnn = vnn_list[t]
+
+    #     stone_color = 1 if t % 2 else 0
+
+    #     gui.update_canvas(
+    #         stone_info={'x': x, 'y': y, 'stone_color': stone_color},
+    #         vnn_info={'black': black_vnn, 'white': white_vnn}
+    #     )
+
+    #     gui.print_canvas()
+    #     time.sleep(2)
 
