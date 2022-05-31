@@ -79,7 +79,7 @@ class GUI:
             white_vnn_txt.place(x=self.wd['width']-self.interval-20, y=70, anchor='ne')
 
         def init_visual_stone(stone_color):
-            stone_color_txt = 'whitesmoke' if stone_color else 'dimgray'
+            stone_color_txt = 'gainsboro' if stone_color else 'dimgray'
             print(stone_color_txt)
 
             return self.board.create_oval( #visual stone 초기 위치
@@ -214,8 +214,18 @@ class GUI:
     def update_canvas(
         self, stone_info, vnn_info
     ):
-        x, y, stone_color = stone_info['x'], stone_info['y'], stone_info['stone_color']
+        x, y = stone_info['x'], stone_info['y']
+        stone_color, stone_idx = stone_info['stone_color'], stone_info['idx']
+
         black_vnn, white_vnn = vnn_info['black'] ,vnn_info['white']
+
+
+        self.draw_stone(x, y, stone_color)
+        print(x, y) 
+
+        x = self.bd['x'] + self.step_tuple[x]
+        y = self.bd['y'] + self.step_tuple[y]
+        self.board.create_text(x, y, text=f'{stone_idx}', fill='gray')
         
         self.root.children['!label3'].config(text=f'VNN: {black_vnn:.3f}')   #black vnn
         self.root.children['!label4'].config(text=f'VNN: {white_vnn:.3f}')  #white vnn
@@ -227,24 +237,24 @@ if __name__ == '__main__':
     
     import time
 
-    gui = GUI(board_size=10, black_code=2, white_code=0, board_state=((2, 3), ))
+    gui = GUI(board_size=10, black_code=2, white_code=0)
 
     
-    gui.root.mainloop()
-    # gui.print_canvas()
+    # gui.root.mainloop()
+    gui.print_canvas()
 
-    # for t in range(len(now_board)):
+    for t in range(len(now_board)):
 
-    #     x, y = now_board[t]
-    #     black_vnn, white_vnn = vnn_list[t]
+        x, y = now_board[t]
+        black_vnn, white_vnn = vnn_list[t]
 
-    #     stone_color = 1 if t % 2 else 0
+        stone_color = 1 if t % 2 else 0
 
-    #     gui.update_canvas(
-    #         stone_info={'x': x, 'y': y, 'stone_color': stone_color},
-    #         vnn_info={'black': black_vnn, 'white': white_vnn}
-    #     )
+        gui.update_canvas(
+            stone_info={'x': x, 'y': y, 'stone_color': stone_color, 'idx': t},
+            vnn_info={'black': black_vnn, 'white': white_vnn}
+        )
 
-    #     gui.print_canvas()
-    #     time.sleep(2)
+        gui.print_canvas()
+        time.sleep(2)
 
