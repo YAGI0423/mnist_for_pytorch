@@ -35,160 +35,161 @@ def get_main_agent_dir():
 #End=================
 
 
-board_size = 10
-win_seq = 5
+board_size = 3
+win_seq = 3
 
-round_num = 800
+round_num = 5 #800
 
 batch_size = 4
-buffer_size = 16384
+buffer_size = 4096#16384
 
 play_num = 16
 train_turm = 2
 
 COMPETE_NUM = 7
 
+for t in range(10):
 
-main_agent_dir = get_main_agent_dir()
-
-
-rule = Rule(board_size=board_size, win_seq=win_seq)
-play_game = PlayGame(board_size=board_size, rule=rule)
-main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=round_num)
-
-#load databook===================
-if 'buffer_dataset.pickle' in os.listdir('./dataset/'):
-    databook = DataBook(buffer_size=buffer_size, load_dir='./dataset/buffer_dataset.pickle')
-else:
-    databook = DataBook(buffer_size=buffer_size)
-#End=============================
+    main_agent_dir = get_main_agent_dir()
 
 
-epoch_count = 0
-train_history = None
+    rule = Rule(board_size=board_size, win_seq=win_seq)
+    play_game = PlayGame(board_size=board_size, rule=rule)
+    main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=round_num)
 
-for p in range(play_num):
-    print(f'\nTRAIN ROUND: {p}\n\n')
-    play_game.play(black=main_agent, white=main_agent, databook=databook, diri_TF=True)
+    #load databook===================
+    if 'buffer_dataset.pickle' in os.listdir('./dataset/'):
+        databook = DataBook(buffer_size=buffer_size, load_dir='./dataset/buffer_dataset.pickle')
+    else:
+        databook = DataBook(buffer_size=buffer_size)
+    #End=============================
 
-    if p % train_turm == 0 or p == (play_num - 1):
-        dataset = databook.get_data(shuffle=True, augment_rate=0.8)
+
+    epoch_count = 0
+    train_history = None
+
+    for p in range(play_num):
+        print(f'\nTRAIN ROUND: {p}\n\n')
+        play_game.play(black=main_agent, white=main_agent, databook=databook, diri_TF=True)
+
+        if p % train_turm == 0 or p == (play_num - 1):
+            dataset = databook.get_data(shuffle=True, augment_rate=0.8)
+            
+            if len(dataset['value_y']) >= (buffer_size * 0.5):
+                epoch_count += 1
+                train_history = main_agent.train_model(dataset, batch_size=batch_size)
+
+
+    #save_pickle=====================
+    databook.save_databook(save_dir='./dataset/buffer_dataset.pickle')
+    #End=============================
+
+
+    if main_agent_dir is None:    #has no main agent
+        #save model
+        main_agent.save_model('./model/main_model/', idx=0, start_round=0, end_round=play_num)
+        main_agent.save_model('./model/previous_model/', idx=0, start_round=0, end_round=play_num)
+
+        #create pandas
+        csv = pd.DataFrame({
+            'idx': list(), 'date': list(),
+            'train_round': list(), 'train_epoch': list(), 'train_buffer_size': list(),
+            'PNN_loss': list(), 'VNN_loss': list(), 'train_loss': list(),
+            'val_PNN_loss': list(), 'val_VNN_loss': list(), 'train_val_loss': list(),
+            'win_num': list(), 'lose_num': list(), 'draw_num': list(),
+
+        })
+        csv.to_csv('./train_history.csv', index=False)
+
+        print('has no main agent')
         
-        if len(dataset['value_y']) >= (buffer_size * 0.5):
-            epoch_count += 1
-            train_history = main_agent.train_model(dataset, batch_size=batch_size)
+
+    win_count, lose_count, draw_count = 0, 0, 0
+
+    for e in range(COMPETE_NUM):
+        print(f'\nCOMPETE ROUND: {e}\n\n')
+
+        pre_agent_dir = os.listdir('./model/previous_model/')
+        pre_agent_dir = random.choice(pre_agent_dir)
+        pre_agent_dir = './model/previous_model/' + pre_agent_dir
+
+        pre_agent = model.AlphaO(board_size, rule, model_dir=pre_agent_dir, round_num=round_num)
+
+        if main_agent_color := random.randint(0, 1):
+            black, white = pre_agent, main_agent
+            print('STONE'.center(50, '='))
+            print(f'BLACK(●): MAIN_AGENT')
+            print(f'WHITE(○): PREVIOUS_AGENT')
+            print('=' * 50)
+        else:
+            black, white = main_agent, pre_agent
+            print('STONE'.center(50, '='))
+            print(f'BLACK(●): PREVIOUS_AGENT')
+            print(f'WHITE(○): MAIN_AGENT')
+            print('=' * 50)
+
+        
+
+        win_code = play_game.play(black=black, white=white, databook=databook, diri_TF=False)
+
+        if win_code == main_agent_color:   #when main agent win
+            win_count += 1
+        elif win_code == 2:
+            draw_count += 1
+        else:
+            lose_count += 1
 
 
-#save_pickle=====================
-databook.save_databook(save_dir='./dataset/buffer_dataset.pickle')
-#End=============================
+    print(f'win rate: {win_count / COMPETE_NUM}')
 
 
-if main_agent_dir is None:    #has no main agent
-    #save model
-    main_agent.save_model('./model/main_model/', idx=0, start_round=0, end_round=play_num)
-    main_agent.save_model('./model/previous_model/', idx=0, start_round=0, end_round=play_num)
+    main_agent_dir = get_main_agent_dir()
+    agent_info = main_agent_dir[len('./model/main_model/'):-3]
+    idx, start_round, end_round, month, day, hour, min = agent_info.split('_')
 
-    #create pandas
-    csv = pd.DataFrame({
-        'idx': list(), 'date': list(),
-        'train_round': list(), 'train_epoch': list(), 'train_buffer_size': list(),
-        'PNN_loss': list(), 'VNN_loss': list(), 'train_loss': list(),
-        'val_PNN_loss': list(), 'val_VNN_loss': list(), 'train_val_loss': list(),
-        'win_num': list(), 'lose_num': list(), 'draw_num': list(),
+    now = time.localtime()
+    now = f'{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}'
 
-    })
+    if train_history:
+        tr_PNN_loss, tr_VNN_loss = train_history.history['PNN_loss'][-1], train_history.history['VNN_loss'][-1]
+        tr_val_PNN_loss, tr_val_VNN_loss = train_history.history['val_PNN_loss'][-1], train_history.history['val_VNN_loss'][-1]
+
+        tr_loss, tr_val_loss = train_history.history['loss'][-1], train_history.history['val_loss'][-1]
+    else:
+        tr_PNN_loss, tr_VNN_loss, tr_loss = None, None, None
+        tr_val_PNN_loss, tr_val_VNN_loss, tr_val_loss = None, None, None
+
+    csv =pd.read_csv('./train_history.csv')
+    csv = csv.append({
+        'idx': int(idx) + 1,
+        'date': now,
+        'train_round': play_num,
+        'train_epoch': epoch_count,
+        'train_buffer_size': len(databook.value_y),
+        'PNN_loss': tr_PNN_loss,
+        'VNN_loss': tr_VNN_loss,
+        'train_loss': tr_loss,
+        'val_PNN_loss': tr_val_PNN_loss,
+        'val_VNN_loss': tr_val_VNN_loss,
+        'train_val_loss': tr_val_loss,
+        'win_num': win_count,
+        'lose_num': lose_count,
+        'draw_num': draw_count
+    }, ignore_index=True)
     csv.to_csv('./train_history.csv', index=False)
 
-    print('has no main agent')
-    
+    if (win_count - lose_count) > 0.:   #win
+        main_agent.save_model('./model/main_model/', int(idx)+1, int(end_round), int(end_round)+play_num)
 
-win_count, lose_count, draw_count = 0, 0, 0
-
-for e in range(COMPETE_NUM):
-    print(f'\nCOMPETE ROUND: {e}\n\n')
-
-    pre_agent_dir = os.listdir('./model/previous_model/')
-    pre_agent_dir = random.choice(pre_agent_dir)
-    pre_agent_dir = './model/previous_model/' + pre_agent_dir
-
-    pre_agent = model.AlphaO(board_size, rule, model_dir=pre_agent_dir, round_num=round_num)
-
-    if main_agent_color := random.randint(0, 1):
-        black, white = pre_agent, main_agent
-        print('STONE'.center(50, '='))
-        print(f'BLACK(●): MAIN_AGENT')
-        print(f'WHITE(○): PREVIOUS_AGENT')
-        print('=' * 50)
-    else:
-        black, white = main_agent, pre_agent
-        print('STONE'.center(50, '='))
-        print(f'BLACK(●): PREVIOUS_AGENT')
-        print(f'WHITE(○): MAIN_AGENT')
-        print('=' * 50)
-
-    
-
-    win_code = play_game.play(black=black, white=white, databook=databook, diri_TF=False)
-
-    if win_code == main_agent_color:   #when main agent win
-        win_count += 1
-    elif win_code == 2:
-        draw_count += 1
-    else:
-        lose_count += 1
-
-
-print(f'win rate: {win_count / COMPETE_NUM}')
-
-
-main_agent_dir = get_main_agent_dir()
-agent_info = main_agent_dir[len('./model/main_model/'):-3]
-idx, start_round, end_round, month, day, hour, min = agent_info.split('_')
-
-now = time.localtime()
-now = f'{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}'
-
-if train_history:
-    tr_PNN_loss, tr_VNN_loss = train_history.history['PNN_loss'][-1], train_history.history['VNN_loss'][-1]
-    tr_val_PNN_loss, tr_val_VNN_loss = train_history.history['val_PNN_loss'][-1], train_history.history['val_VNN_loss'][-1]
-
-    tr_loss, tr_val_loss = train_history.history['loss'][-1], train_history.history['val_loss'][-1]
-else:
-    tr_PNN_loss, tr_VNN_loss, tr_loss = None, None, None
-    tr_val_PNN_loss, tr_val_VNN_loss, tr_val_loss = None, None, None
-
-csv =pd.read_csv('./train_history.csv')
-csv = csv.append({
-    'idx': int(idx) + 1,
-    'date': now,
-    'train_round': play_num,
-    'train_epoch': epoch_count,
-    'train_buffer_size': len(databook.value_y),
-    'PNN_loss': tr_PNN_loss,
-    'VNN_loss': tr_VNN_loss,
-    'train_loss': tr_loss,
-    'val_PNN_loss': tr_val_PNN_loss,
-    'val_VNN_loss': tr_val_VNN_loss,
-    'train_val_loss': tr_val_loss,
-    'win_num': win_count,
-    'lose_num': lose_count,
-    'draw_num': draw_count
-}, ignore_index=True)
-csv.to_csv('./train_history.csv', index=False)
-
-if (win_count - lose_count) > 0.:   #win
-    main_agent.save_model('./model/main_model/', int(idx)+1, int(end_round), int(end_round)+play_num)
-
-    if not agent_info + '.h5' in os.listdir('./model/previous_model/'):
+        if not agent_info + '.h5' in os.listdir('./model/previous_model/'):
+            os.rename(main_agent_dir, f'./model/previous_model/{agent_info}.h5')
+        else:
+            os.remove(main_agent_dir)
+    else:   #lose
+        # main_agent.save_model('./model/previous_model/', int(idx)+1, int(end_round), int(end_round)+play_num)
+        main_agent.save_model('./model/main_model/', int(idx)+1, int(end_round), int(end_round)+play_num)
         os.rename(main_agent_dir, f'./model/previous_model/{agent_info}.h5')
-    else:
-        os.remove(main_agent_dir)
-else:   #lose
-    # main_agent.save_model('./model/previous_model/', int(idx)+1, int(end_round), int(end_round)+play_num)
-    main_agent.save_model('./model/main_model/', int(idx)+1, int(end_round), int(end_round)+play_num)
-    os.rename(main_agent_dir, f'./model/previous_model/{agent_info}.h5')
 
-#save_pickle=====================
-databook.save_databook(save_dir='./dataset/buffer_dataset.pickle')
-#End=============================
+    #save_pickle=====================
+    databook.save_databook(save_dir='./dataset/buffer_dataset.pickle')
+    #End=============================
