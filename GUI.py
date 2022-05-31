@@ -50,8 +50,6 @@ class GUI:
                     )
             #End=======================
 
-            
-
         def init_state(root, black_info, white_info):
             def get_player_text(palyer_code):
                 if palyer_code == 1:
@@ -86,6 +84,51 @@ class GUI:
             white_vnn_txt.place(x=self.wd['width']-self.interval-20, y=70, anchor='ne')
             white_pnn_txt.place(x=self.wd['width']-self.interval-20, y=100, anchor='ne')
 
+        def show_visual_stone(event):   #포석 위치 체크
+            def get_is_inner_cross(x, y):
+                x_bd_in_TF = x > self.bd['x'] - TOLERANCE and x < self.bd['x'] + self.board_wh + TOLERANCE
+                y_bd_in_TF = y > self.bd['y'] - TOLERANCE and y < self.bd['y'] + self.board_wh + TOLERANCE
+
+                if x_bd_in_TF and y_bd_in_TF:
+                    x_cr_in_TF = (x - self.bd['x']) % self.board_step_size
+                    x_cr_in_TF = x_cr_in_TF > (self.board_step_size - TOLERANCE) or x_cr_in_TF < TOLERANCE
+
+                    y_cr_in_TF = (y - self.bd['y']) % self.board_step_size
+                    y_cr_in_TF = y_cr_in_TF > (self.board_step_size - TOLERANCE) or y_cr_in_TF < TOLERANCE
+
+                    return x_cr_in_TF and y_cr_in_TF
+                return False
+
+            def get_close_value(value, put_loc_tup):
+                for step in put_loc_tup:
+                    if abs(step - value) <= TOLERANCE:
+                        return step
+
+            TOLERANCE = 20  #포석 인정 허용 범위
+            put_loc_tup = tuple([0] + list(self.step_tuple) + [self.step_tuple[-1] + self.board_step_size])
+            
+            x, y = event.x, event.y
+
+
+            if get_is_inner_cross(x, y):
+                b_x, b_y = x - self.bd['x'], y - self.bd['y']
+                loc_x = get_close_value(b_x, put_loc_tup)
+                loc_y = get_close_value(b_y, put_loc_tup)
+                
+                half_st = self.stone_size // 2
+
+                self.board.moveto(
+                    self.visual_stone,
+                    loc_x+self.bd['x']-half_st,
+                    loc_y+self.bd['y']-half_st
+                )
+                self.
+            else:
+                self.board.moveto(
+                    self.visual_stone,
+                    self.wd['width'], 0
+                )
+
 
         self.board_size = board_size
         self.black_info, self.white_info = black_info, white_info
@@ -112,44 +155,18 @@ class GUI:
         self.board.pack()
 
         init_state(self.root, self.black_info, self.white_info)
-        
-        self.visual_stone = self.board.create_oval(0, 0, 30, 30)
 
-        def check_inner_cross(event):   #포석 위치 체크
-            TOLERANCE = 20  #허용 범위
-            put_loc_tup = tuple([0] + list(self.step_tuple) + [self.step_tuple[-1] + self.board_step_size])
-            
-            x, y = event.x, event.y
+        self.visual_stone = self.board.create_oval( #visual stone 초기 위치
+            self.wd['width'], 0, self.wd['width']+self.stone_size, self.stone_size, fill='black'
+        )
 
-            def get_is_inner_cross(x, y):
-                x_bd_in_TF = x > self.bd['x'] - TOLERANCE and x < self.bd['x'] + self.board_wh + TOLERANCE
-                y_bd_in_TF = y > self.bd['y'] - TOLERANCE and y < self.bd['y'] + self.board_wh + TOLERANCE
+        self.loc_text = self.board.create_text(
+            self.bd['x'], self.wd['height']-self.interval,
+            text='stone location: ',
+            font=('', 15)
+        )
 
-                if x_bd_in_TF and y_bd_in_TF:
-                    x_cr_in_TF = (x - self.bd['x']) % self.board_step_size
-                    x_cr_in_TF = x_cr_in_TF > (self.board_step_size - TOLERANCE) or x_cr_in_TF < TOLERANCE
-
-                    y_cr_in_TF = (y - self.bd['y']) % self.board_step_size
-                    y_cr_in_TF = y_cr_in_TF > (self.board_step_size - TOLERANCE) or y_cr_in_TF < TOLERANCE
-
-                    return x_cr_in_TF and y_cr_in_TF
-                return False
-
-            def get_close_value(value, put_loc_tup):
-                for step in put_loc_tup:
-                    if abs(step - value) <= TOLERANCE:
-                        return step
-
-            if get_is_inner_cross(x, y):
-                b_x, b_y = x - self.bd['x'], y - self.bd['y']
-                loc_x = get_close_value(b_x, put_loc_tup)
-                loc_y = get_close_value(b_y, put_loc_tup)
-                
-                half_st = self.stone_size // 2
-                self.board.move(self.visual_stone, 5, 5)
-
-
-        self.root.bind("<Motion>", check_inner_cross)
+        self.root.bind("<Motion>", show_visual_stone)
         
 
     def print(self):
@@ -160,7 +177,7 @@ if __name__ == '__main__':
     now_board = ((5, 5), (2, 2), (3, 3))
 
     
-    gui = GUI(board_size=6, black_info=2, white_info=0)
+    gui = GUI(board_size=5, black_info=2, white_info=0)
 
     # gui.located()
     gui.print()
