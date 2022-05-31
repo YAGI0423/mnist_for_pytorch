@@ -6,7 +6,7 @@ class GUI:
         def get_step_tuple(step_size):
             left_pix = self.board_wh % step_size
 
-            step_list = list()
+            step_list = [0]
             temp = step_size
             while temp < self.board_wh:
                 if left_pix > 0:
@@ -16,6 +16,7 @@ class GUI:
 
                 temp += step_size
                 left_pix -= 1
+            step_list.append(temp + step_size)
             return tuple(step_list)
 
         def init_window(root):
@@ -128,20 +129,19 @@ class GUI:
 
             TOLERANCE = 20  #포석 인정 허용 범위
             put_loc_tup = tuple([0] + list(self.step_tuple) + [self.step_tuple[-1] + self.board_step_size])
-            
             x, y = event.x, event.y
 
 
             if get_is_inner_cross(x, y):
                 b_x, b_y = x - self.bd['x'], y - self.bd['y']
-                loc_x = get_close_value(b_x, put_loc_tup)
-                loc_y = get_close_value(b_y, put_loc_tup)
+                loc_x = get_close_value(b_x, self.step_tuple)
+                loc_y = get_close_value(b_y, self.step_tuple)
                 
                 half_st = self.stone_size // 2
                 show_visual_stone(loc_x+self.bd['x']-half_st, loc_y+self.bd['y']-half_st)
 
-                loc_x_idx = get_close_value_idx(loc_x, put_loc_tup)
-                loc_y_idx = get_close_value_idx(loc_y, put_loc_tup)
+                loc_x_idx = get_close_value_idx(loc_x, self.step_tuple)
+                loc_y_idx = get_close_value_idx(loc_y, self.step_tuple)
                 self.board.itemconfig(self.loc_text, text=f'stone location: ({loc_x_idx}, {loc_y_idx})')
             else:
                 show_visual_stone(None, None)
@@ -193,14 +193,20 @@ class GUI:
 
         self.root.bind("<Motion>", wheon_move_mouse)
         
+    def idx_to_pix(self, x, y):
+        print(self.step_tuple)
+        x = self.bd['x'] + self.step_tuple[x]
+        y = self.bd['y'] + self.step_tuple[y]
+        return x, y
 
     def draw_stone(self, x, y, stone_color):
         stone_color_txt = 'white' if stone_color else 'black'
         
         half_st = self.stone_size // 2
         
-        x = self.bd['x'] + self.step_tuple[x] - half_st
-        y = self.bd['y'] + self.step_tuple[y] - half_st
+        x, y= self.idx_to_pix(x, y)
+        x -= half_st
+        y -= half_st
 
         stone_ele = self.board.create_oval(
             x, y, x+self.stone_size, y+self.stone_size,
@@ -221,40 +227,38 @@ class GUI:
 
 
         self.draw_stone(x, y, stone_color)
-        print(x, y) 
 
-        x = self.bd['x'] + self.step_tuple[x]
-        y = self.bd['y'] + self.step_tuple[y]
-        self.board.create_text(x, y, text=f'{stone_idx}', fill='gray')
+        pix_x, pix_y = self.idx_to_pix(x, y)
+        self.board.create_text(pix_x, pix_y, text=f'{stone_idx}', fill='gray')  #포석 순서
         
         self.root.children['!label3'].config(text=f'VNN: {black_vnn:.3f}')   #black vnn
         self.root.children['!label4'].config(text=f'VNN: {white_vnn:.3f}')  #white vnn
 
 
 if __name__ == '__main__':
-    now_board = ((5, 5), (2, 2), (3, 3), (1, 2), (1, 3))
+    now_board = ((3, 1), (2, 2), (3, 3), (1, 2), (1, 3))
     vnn_list = ((2.5, 3.1), (6.3, 8.88), (2.1, 6.2), (3.7, 2.0), (2.1, 6.2))
     
     import time
 
-    gui = GUI(board_size=10, black_code=2, white_code=0)
+    gui = GUI(board_size=5, black_code=2, white_code=0)
 
     
-    # gui.root.mainloop()
-    gui.print_canvas()
+    gui.root.mainloop()
+    # gui.print_canvas()
 
-    for t in range(len(now_board)):
+    # for t in range(len(now_board)):
 
-        x, y = now_board[t]
-        black_vnn, white_vnn = vnn_list[t]
+    #     x, y = now_board[t]
+    #     black_vnn, white_vnn = vnn_list[t]
 
-        stone_color = 1 if t % 2 else 0
+    #     stone_color = 1 if t % 2 else 0
 
-        gui.update_canvas(
-            stone_info={'x': x, 'y': y, 'stone_color': stone_color, 'idx': t},
-            vnn_info={'black': black_vnn, 'white': white_vnn}
-        )
+    #     gui.update_canvas(
+    #         stone_info={'x': x, 'y': y, 'stone_color': stone_color, 'idx': t},
+    #         vnn_info={'black': black_vnn, 'white': white_vnn}
+    #     )
 
-        gui.print_canvas()
-        time.sleep(2)
+    #     gui.print_canvas()
+    #     time.sleep(2)
 
