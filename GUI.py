@@ -3,9 +3,8 @@ import tkinter.font
 
 class GUI:
     def __init__(self, board_size, black_info, white_info):
-        def get_step_tuple():
-            step_size = self.board_wh // (self.board_size - 1)
-            left_pix = self.board_wh % (self.board_size - 1)
+        def get_step_tuple(step_size):
+            left_pix = self.board_wh % step_size
 
             step_list = list()
             temp = step_size
@@ -27,7 +26,6 @@ class GUI:
         def init_board(root, step_tuple):
             board = Canvas(root, width=self.wd['width'], height=self.wd['height'])
 
-            
             board.create_rectangle(
                 self.bd['x'], self.bd['y'],
                 self.bd['x']+self.board_wh, self.bd['y']+self.board_wh
@@ -71,29 +69,26 @@ class GUI:
         self.board_size = board_size
         self.black_info, self.white_info = black_info, white_info
 
+
+        self.interval = 30
         self.wd = {'width': 700, 'height': 800} #wd: `window`의 줌말
+        
+        self.board_step_size = (self.wd['width'] - self.interval * 2) // (self.board_size + 2)  #하나의 셀 크기
+        self.stone_size = self.board_step_size // 1.25
+        self.board_wh = self.board_step_size * self.board_size  #board size
 
-        self.bd = {'x': 30}   #bd: `board`의 줌말, 시작 x, y 좌표
+        self.step_tuple = get_step_tuple(step_size=self.board_step_size)
 
-
-        self.step_tuple = get_step_tuple()
-        self.stone_size = self.step_tuple[0] // 1.2
-
-        self.space = self.bd['x'] + (self.stone_size // 2)
-
-        self.board_wh = self.wd['width'] - self.bd['x'] * 2 #board size
-        self.bd['y'] = self.wd['height'] - self.board_wh - self.bd['x'] #get bd_y
-        print(self.stone_size)
-
-
-        print(self.step_tuple)
+        self.bd = {'x': 30 + self.board_step_size}   #bd: `board`의 줌말, 시작 x, y 좌표
+        self.bd['y'] = self.wd['height'] - self.bd['x'] - self.board_wh
 
 
         self.root = Tk()
         init_window(self.root)
+
         init_board(self.root, self.step_tuple)
 
-        init_state(self.root)
+        # init_state(self.root)
         
 
         # font = tkinter.font.Font(family='Consolas', size=50)
