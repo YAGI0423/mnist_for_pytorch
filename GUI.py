@@ -2,7 +2,7 @@ from tkinter import *
 import tkinter.font
 
 class GUI:
-    def __init__(self, board_size, black_info, white_info, board_state):
+    def __init__(self, board_size, black_code, white_code, board_state=tuple()):
         def get_step_tuple(step_size):
             left_pix = self.board_wh % step_size
 
@@ -50,7 +50,7 @@ class GUI:
                     )
             #End=======================
 
-        def init_state(root, black_info, white_info):
+        def init_state(root, black_code, white_code):
             def get_player_text(palyer_code):
                 if palyer_code == 1:
                     return 'RANDOM_CHOICE'
@@ -58,8 +58,8 @@ class GUI:
                     return 'α_O'
                 return 'USER'
 
-            black_text = '● ' + get_player_text(black_info)
-            white_text = get_player_text(white_info) + ' ○'
+            black_text = '● ' + get_player_text(black_code)
+            white_text = get_player_text(white_code) + ' ○'
             
             
             stone_ft = tkinter.font.Font(size=20)
@@ -77,6 +77,20 @@ class GUI:
 
             black_vnn_txt.place(x=self.interval+20, y=70)
             white_vnn_txt.place(x=self.wd['width']-self.interval-20, y=70, anchor='ne')
+
+        def init_visual_stone(stone_color):
+            stone_color_txt = 'white' if stone_color % 2 else 'black'
+
+            return self.board.create_oval( #visual stone 초기 위치
+                self.wd['width'], 0, self.wd['width']+self.stone_size, self.stone_size, fill=stone_color_txt
+            )
+
+        def init_loc_text():
+            return self.board.create_text(   #stone location text
+                self.bd['x']*2, self.wd['height']-self.interval,
+                text='stone location: ',
+                font=('', 12)
+            )
 
         def wheon_move_mouse(event):   #포석 위치 체크
             def get_is_inner_cross(x, y):
@@ -131,11 +145,20 @@ class GUI:
             else:
                 show_visual_stone(None, None)
 
+        def init_board_state(board_state):
+            for idx, loc in enumerate(board_state):
+                x, y = loc
+                stone_color = 1 if idx % 2 else 0
+                
+                stone_ele = self.draw_stone(x, y, stone_color)
+                self.stone_list.append(stone_ele)
+
 
         self.board_size = board_size
-        self.black_info, self.white_info = black_info, white_info
+        self.black_code, self.white_code = black_code, white_code
         self.board_state = board_state
 
+        self.stone_color = 1 if len(board_state) % 2 else 0
 
         self.interval = 30
         self.wd = {'width': 700, 'height': 800} #wd: `window`의 줌말
@@ -149,6 +172,8 @@ class GUI:
         self.bd = {'x': 30 + self.board_step_size}   #bd: `board`의 줌말, 시작 x, y 좌표
         self.bd['y'] = self.wd['height'] - self.bd['x'] - self.board_wh
 
+        self.stone_list= list()
+
 
         self.root = Tk()
         init_window(self.root)
@@ -157,46 +182,56 @@ class GUI:
         init_board(self.board, self.step_tuple)
         self.board.pack()
 
-        init_state(self.root, self.black_info, self.white_info)
+        init_state(self.root, self.black_code, self.white_code)
 
-        self.visual_stone = self.board.create_oval( #visual stone 초기 위치
-            self.wd['width'], 0, self.wd['width']+self.stone_size, self.stone_size, fill='black'
-        )
+        self.visual_stone = init_visual_stone(stone_color=self.stone_color)
+        self.loc_text = init_loc_text()
 
-        self.loc_text = self.board.create_text(   #stone location text
-            self.bd['x']*2, self.wd['height']-self.interval,
-            text='stone location: ',
-            font=('', 12)
-        )
-
-        self.stone_list= list()
-
-        def draw_stone(board_state):
-            for idx, loc in enumerate(board_state):
-                print(idx, loc)
-
-
-        draw_stone(self.board_state)
-
+        init_board_state(self.board_state)
 
         self.root.bind("<Motion>", wheon_move_mouse)
         
 
+    def draw_stone(self, x, y, stone_color):
+        stone_color_txt = 'white' if stone_color else 'black'
+        
+        half_st = self.stone_size // 2
+        
+        x = self.bd['x'] + self.step_tuple[x] - half_st
+        y = self.bd['y'] + self.step_tuple[y] - half_st
+
+        stone_ele = self.board.create_oval(
+            x, y, x+self.stone_size, y+self.stone_size,
+            fill=stone_color_txt
+        )
+        return stone_ele
+
     def print_canvas(self):
         self.root.update()
 
+    def update_canvas(
+        self, stone_info
+    ):
+        x, y, stone_color = stone_info['x'], stone_info['y'], stone_info['stone_color']
+        self.draw_stone(x, y, stone_color)
+
 
 if __name__ == '__main__':
-    now_board = ((5, 5), (2, 2), (3, 3))
+    now_board = ((5, 5), (2, 2), (3, 3), (1, 2))
+    
+    import time
 
+    gui = GUI(board_size=10, black_code=2, white_code=0)
+    gui.print_canvas()
 
-    gui = GUI(board_size=10, black_info=2, white_info=0, board_state=now_board)
+    for t in range(len(now_board)):
 
-    # for i in range(10):
-    #     gui.print_canvas()
+        x, y = now_board[t]
+        stone_color = 1 if t % 2 else 0
 
-    #     gui.board.create_oval(0, 0, 50, 50)
-
-    #     import time
-    #     time.sleep(2)
+        gui.update_canvas(stone_info={
+            'x': x, 'y': y, 'stone_color': stone_color
+        })
+        gui.print_canvas()
+        time.sleep(2)
 
