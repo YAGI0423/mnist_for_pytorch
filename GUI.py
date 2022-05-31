@@ -55,15 +55,26 @@ class GUI:
 
             board.pack()
 
-        def init_state(root):
+        def init_state(root, black_info, white_info):
+            def get_player_text(palyer_code):
+                if palyer_code == 1:
+                    return 'RANDOM_CHOICE'
+                elif palyer_code == 2:
+                    return 'α_O'
+                return 'USER'
+
+            black_text = '● ' + get_player_text(black_info)
+            white_text = '○ ' + get_player_text(white_info)
+            
+            
             stone_ft = tkinter.font.Font(size=20)
 
-            black_stone_txt = Label(root, text='● User', font=stone_ft)
-            white_stone_txt = Label(root, text='AlphaO ○', font=stone_ft)
+            black_stone_txt = Label(root, text=black_text, font=stone_ft)
+            white_stone_txt = Label(root, text=white_text, font=stone_ft)
     
 
-            black_stone_txt.place(x=self.bd['x'], y=10)
-            white_stone_txt.place(x=self.wd['width']-self.bd['x'], y=10, anchor='ne')
+            black_stone_txt.place(x=self.interval, y=10)
+            white_stone_txt.place(x=self.wd['width']-self.interval, y=10, anchor='ne')
            
 
         self.board_size = board_size
@@ -88,16 +99,7 @@ class GUI:
 
         init_board(self.root, self.step_tuple)
 
-        # init_state(self.root)
-        
-
-        # font = tkinter.font.Font(family='Consolas', size=50)
-        
-        # label = Label(self.root, text="●", font=font)
-        # label.place(x=30, y=10)
-
-        # label = Label(self.root, text="○", font=font)
-        # label.place(x=700-30-50, y=10)
+        init_state(self.root, self.black_info, self.white_info)
         
         
         
@@ -110,7 +112,7 @@ if __name__ == '__main__':
     now_board = ((5, 5), (2, 2), (3, 3))
 
     
-    gui = GUI(board_size=10, black_info=2, white_info=0)
+    gui = GUI(board_size=3, black_info=2, white_info=0)
 
     # gui.located()
     gui.print()
