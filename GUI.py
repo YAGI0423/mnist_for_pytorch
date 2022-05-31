@@ -2,7 +2,7 @@ from tkinter import *
 import tkinter.font
 
 class GUI:
-    def __init__(self, board_size, black_info, white_info):
+    def __init__(self, board_size, black_info, white_info, board_state):
         def get_step_tuple(step_size):
             left_pix = self.board_wh % step_size
 
@@ -134,6 +134,7 @@ class GUI:
 
         self.board_size = board_size
         self.black_info, self.white_info = black_info, white_info
+        self.board_state = board_state
 
 
         self.interval = 30
@@ -168,6 +169,16 @@ class GUI:
             font=('', 12)
         )
 
+        self.stone_list= list()
+
+        def draw_stone(board_state):
+            for idx, loc in enumerate(board_state):
+                print(idx, loc)
+
+
+        draw_stone(self.board_state)
+
+
         self.root.bind("<Motion>", wheon_move_mouse)
         
 
@@ -178,8 +189,14 @@ class GUI:
 if __name__ == '__main__':
     now_board = ((5, 5), (2, 2), (3, 3))
 
-    
-    gui = GUI(board_size=3, black_info=2, white_info=0)
 
-    gui.print_canvas()
+    gui = GUI(board_size=10, black_info=2, white_info=0, board_state=now_board)
+
+    # for i in range(10):
+    #     gui.print_canvas()
+
+    #     gui.board.create_oval(0, 0, 50, 50)
+
+    #     import time
+    #     time.sleep(2)
 
