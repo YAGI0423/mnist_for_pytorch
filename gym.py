@@ -185,8 +185,9 @@ if (win_count - lose_count) > 0.:   #win
     else:
         os.remove(main_agent_dir)
 else:   #lose
-    main_agent.save_model('./model/previous_model/', int(idx)+1, int(end_round), int(end_round)+play_num)
-
+    # main_agent.save_model('./model/previous_model/', int(idx)+1, int(end_round), int(end_round)+play_num)
+    main_agent.save_model('./model/main_model/', int(idx)+1, int(end_round), int(end_round)+play_num)
+    os.rename(main_agent_dir, f'./model/previous_model/{agent_info}.h5')
 
 #save_pickle=====================
 databook.save_databook(save_dir='./dataset/buffer_dataset.pickle')

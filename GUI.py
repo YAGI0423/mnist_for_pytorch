@@ -24,21 +24,19 @@ class GUI:
             root.geometry(f"{self.wd['width']}x{self.wd['height']}+100+100")
             root.resizable(False, False)
 
-        def init_board(root, step_tuple):
-            board = Canvas(root, width=self.wd['width'], height=self.wd['height'])
-
-            board.create_rectangle(
+        def init_board(canvas, step_tuple):
+            canvas.create_rectangle(
                 self.bd['x'], self.bd['y'],
                 self.bd['x']+self.board_wh, self.bd['y']+self.board_wh
             )
 
             #draw row, col=============
             for step in step_tuple:
-                board.create_line(    #row
+                canvas.create_line(    #row
                     self.bd['x'], self.bd['y']+step,
                     self.bd['x']+self.board_wh, self.bd['y']+step
                 )
-                board.create_line(    #col
+                canvas.create_line(    #col
                     self.bd['x']+step, self.bd['y'],
                     self.bd['x']+step, self.bd['y']+self.board_wh
                 )
@@ -47,13 +45,13 @@ class GUI:
             #draw cross dot============
             for step_y in step_tuple:
                 for step_x in step_tuple:
-                    board.create_oval(
+                    canvas.create_oval(
                         self.bd['x'] - 3 + step_x, self.bd['y'] - 3 + step_y,
                         self.bd['x'] + 3 + step_x, self.bd['y'] + 3 + step_y
                     )
             #End=======================
 
-            board.pack()
+            
 
         def init_state(root, black_info, white_info):
             def get_player_text(palyer_code):
@@ -109,23 +107,32 @@ class GUI:
 
         self.root = Tk()
         init_window(self.root)
-        init_board(self.root, self.step_tuple)
+
+        self.board = Canvas(self.root, width=self.wd['width'], height=self.wd['height'])
+        init_board(self.board, self.step_tuple)
+        self.board.pack()
+
         init_state(self.root, self.black_info, self.white_info)
         
         def check_inner_cross(event):   #포석 위치 체크
             x, y = event.x, event.y
 
-            x_bd_in_TF = x > self.bd['x'] - 15 and x < self.bd['x'] + self.board_wh + 15
-            y_bd_in_TF = y > self.bd['y'] - 15 and y < self.bd['y'] + self.board_wh + 15
+            def get_is_inner_cross(x, y):
+                x_bd_in_TF = x > self.bd['x'] - 15 and x < self.bd['x'] + self.board_wh + 15
+                y_bd_in_TF = y > self.bd['y'] - 15 and y < self.bd['y'] + self.board_wh + 15
 
-            if x_bd_in_TF and y_bd_in_TF:
-                x_cr_in_TF = (x - self.bd['x']) in self.step_tuple
-                if x_cr_in_TF:
-                    print('x:', self.bd['x'])
-                    print('step:', self.board_step_size)
-                    print(x, y)
+                if x_bd_in_TF and y_bd_in_TF:
+                    x_cr_in_TF = (x - self.bd['x']) % self.board_step_size
+                    x_cr_in_TF = x_cr_in_TF > (self.board_step_size - 20) or x_cr_in_TF < 20
 
-            
+                    y_cr_in_TF = (y - self.bd['y']) % self.board_step_size
+                    y_cr_in_TF = y_cr_in_TF > (self.board_step_size - 20) or y_cr_in_TF < 20
+
+                    return x_cr_in_TF and y_cr_in_TF
+                return False
+
+            if get_is_inner_cross(x, y):
+                self.board.create_line(0,0,x,y, width = 5, fill = "red") 
 
 
         self.root.bind("<Motion>", check_inner_cross)
@@ -139,7 +146,7 @@ if __name__ == '__main__':
     now_board = ((5, 5), (2, 2), (3, 3))
 
     
-    gui = GUI(board_size=3, black_info=2, white_info=0)
+    gui = GUI(board_size=6, black_info=2, white_info=0)
 
     # gui.located()
     gui.print()
