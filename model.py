@@ -253,7 +253,9 @@ class AlphaO:
         return {
             'state': self.get_model_input(root.state),
             'policy_y': get_policy_y(root.branches),
-            'xy_loc': xy_loc
+            'xy_loc': xy_loc,
+            'pnn': {idx: value['pior'] for idx, value in root.branches.items()},
+            'vnn': root.value
         }
 
     def train_model(self, dataset, batch_size=1):

@@ -1,7 +1,7 @@
 from util import Util
-from gameBoard import GameBoard
+from GUI import GUI
 from dataBook import DataBook
-
+from gameBoard import GameBoard
 
 class PlayGame:
     def __init__(self, board_size, rule):
@@ -28,6 +28,9 @@ class PlayGame:
 
         board = GameBoard()
         now_board = board.get_board()
+
+        gui = GUI(board_size=self.board_size, black_code=black, white_code=white)
+        gui.print_canvas()
 
         while self.rule.game_status(now_board)['during']:
             print("=" * 100)
@@ -57,6 +60,17 @@ class PlayGame:
 
                 board.put_stone(*loc[0])
                 now_board = board.get_board()
+
+            #gui====================
+            policy_predict = act['pnn']
+            value_predict = act['vnn']
+
+            gui.update_canvas(
+                stone_info={'x': act_loc[0], 'y': act_loc[1], 'idx': len(now_board)-1},
+                vnn_info=value_predict
+            )
+            gui.print_canvas()
+            #End====================
 
         win_code = self.rule.game_status(now_board)['win']
 

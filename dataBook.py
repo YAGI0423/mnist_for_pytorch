@@ -16,7 +16,7 @@ class DataBook:
     def add_data(self, data_dict):
         check_datas = ('state', 'policy_y', 'value_y')
 
-        for name in check_datas:
+        for name in check_datas:    
             if name in data_dict.keys():
                 if name == 'policy_y':
                     self.__dict__[name].append(data_dict[name])

@@ -163,9 +163,9 @@ class GUI:
         self.interval = 30
         self.wd = {'width': 700, 'height': 800} #wd: `window`의 줌말
         
-        self.board_step_size = (self.wd['width'] - self.interval * 2) // (self.board_size + 2)  #하나의 셀 크기
+        self.board_step_size = (self.wd['width'] - self.interval * 2) // (self.board_size + 1)  #하나의 셀 크기
         self.stone_size = self.board_step_size // 1.25
-        self.board_wh = self.board_step_size * self.board_size  #board size
+        self.board_wh = self.board_step_size * (self.board_size - 1)  #board size
 
         self.step_tuple = get_step_tuple(step_size=self.board_step_size)
 
@@ -218,45 +218,45 @@ class GUI:
     def update_canvas(
         self, stone_info, vnn_info
     ):
-        x, y = stone_info['x'], stone_info['y']
-        stone_color, stone_idx = stone_info['stone_color'], stone_info['idx']
+        x, y, stone_idx = stone_info['x'], stone_info['y'], stone_info['idx']
+        vnn = vnn_info
 
-        black_vnn, white_vnn = vnn_info['black'] ,vnn_info['white']
-
-
+        stone_color = 1 if stone_idx % 2 else 0
         self.draw_stone(x, y, stone_color)
 
         pix_x, pix_y = self.idx_to_pix(x, y)
         self.board.create_text(pix_x, pix_y, text=f'{stone_idx}', fill='gray')  #포석 순서
         
-        self.root.children['!label3'].config(text=f'VNN: {black_vnn:.3f}')   #black vnn
-        self.root.children['!label4'].config(text=f'VNN: {white_vnn:.3f}')  #white vnn
+        if stone_color: #white
+            self.root.children['!label4'].config(text=f'VNN: {vnn:.3f}')  #white vnn
+        else:   #black
+            self.root.children['!label3'].config(text=f'VNN: {vnn:.3f}')   #black vnn
 
 
 if __name__ == '__main__':
     now_board = ((3, 1), (2, 2), (3, 3), (1, 2), (1, 3))
-    vnn_list = ((2.5, 3.1), (6.3, 8.88), (2.1, 6.2), (3.7, 2.0), (2.1, 6.2))
+    vnn_list = (10, 2, 3, 4, 2)
     
     import time
 
     gui = GUI(board_size=3, black_code=2, white_code=0)
 
     
-    # gui.root.mainloop()
-    gui.print_canvas()
+    gui.root.mainloop()
+    # gui.print_canvas()
 
-    for t in range(len(now_board)):
+    # for t in range(len(now_board)):
 
-        x, y = now_board[t]
-        black_vnn, white_vnn = vnn_list[t]
+    #     x, y = now_board[t]
+    #     vnn = vnn_list[t]
 
-        stone_color = 1 if t % 2 else 0
+    #     stone_color = 1 if t % 2 else 0
 
-        gui.update_canvas(
-            stone_info={'x': x, 'y': y, 'stone_color': stone_color, 'idx': t},
-            vnn_info={'black': black_vnn, 'white': white_vnn}
-        )
+    #     gui.update_canvas(
+    #         stone_info={'x': x, 'y': y, 'idx': t},
+    #         vnn_info=vnn
+    #     )
 
-        gui.print_canvas()
-        time.sleep(2)
+    #     gui.print_canvas()
+    #     time.sleep(2)
 
