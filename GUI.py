@@ -74,7 +74,7 @@ class GUI:
 
             predict_ft = tkinter.font.Font(size=15)
             black_vnn_txt = Label(root, text='VNN: ', font=predict_ft)
-            white_vnn_txt = Label(root, text='VNN: ', font=predict_ft, state='disable')
+            white_vnn_txt = Label(root, text='VNN: ', font=predict_ft)
 
             black_vnn_txt.place(x=self.interval+20, y=70)
             white_vnn_txt.place(x=self.wd['width']-self.interval-20, y=70, anchor='ne')
@@ -161,6 +161,8 @@ class GUI:
         self.bd['y'] = self.wd['height'] - self.bd['x'] - self.board_wh
 
         self.pre_idx_txt_ele = None #최근 stone idx `create_txt` 요소
+        self.stone_idx_list = list()    #착수한 stone idx txt element의 집합
+        self.stone_list = list()    #착수한 stone element의 집합
         self.pnn_text_list = list() #pnn text element의 집합
         self.pnn_round_list = list()    #pnn round element의 집합
 
@@ -199,21 +201,21 @@ class GUI:
             x, y, x+self.stone_size, y+self.stone_size,
             fill=stone_color_txt
         )
+        self.stone_list.append(stone_ele)
         return stone_ele
 
     def print_canvas(self):
         self.root.update()
+
+    def delete_element(self, element_list):
+        for ele in element_list:
+            self.board.delete(ele)
 
     def update_canvas(
         self, stone_info, vnn_info, pnn_info
     ):
         def rgb_to_hex(r, g, b):
             return f'#{r:02x}{g:02x}{b:02x}'
-
-        def delete_element(element_list):
-            for ele in element_list:
-                self.board.delete(ele)
-
 
         x, y, stone_idx = stone_info['x'], stone_info['y'], stone_info['idx']
         vnn = vnn_info
@@ -228,8 +230,8 @@ class GUI:
             stone_idx_txt_color = 'white' if stone_color else 'black'
             self.board.itemconfig(self.pre_idx_txt_ele, fill=stone_idx_txt_color)
 
-        # stone_idx_txt_color = 'black' if stone_color else 'white'
         self.pre_idx_txt_ele = self.board.create_text(pix_x, pix_y, text=f'{stone_idx}', fill='red')  #포석 순서
+        self.stone_idx_list.append(self.pre_idx_txt_ele)
         #End====================
 
         #vnn====================
@@ -243,8 +245,8 @@ class GUI:
         pnn_info = {idx: round(pior, 3) for idx, pior in pnn_info.items() if pior >= 0.1}
 
         #remove previous round element
-        delete_element(self.pnn_round_list)
-        delete_element(self.pnn_text_list)
+        self.delete_element(self.pnn_round_list)
+        self.delete_element(self.pnn_text_list)
         #End====================
 
         #create text & round====
@@ -276,11 +278,13 @@ class GUI:
             #End+++++++++++++++
         #End====================
 
-    def close_canvas(self):
-        self.__init__(self, self.board_size, self.black_info, self.white_info)
-        
-        
-        
+    def clear_canvas(self):
+        self.pre_idx_txt_ele = None
+
+        self.delete_element(self.stone_list)
+        self.delete_element(self.pnn_text_list)
+        self.delete_element(self.pnn_round_list)
+        self.delete_element(self.stone_idx_list)
 
 
 if __name__ == '__main__':

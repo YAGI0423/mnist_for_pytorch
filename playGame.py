@@ -1,5 +1,5 @@
 from util import Util
-from GUI import GUI
+
 from dataBook import DataBook
 from gameBoard import GameBoard
 
@@ -8,7 +8,7 @@ class PlayGame:
         self.board_size = board_size
         self.rule = rule
         
-    def play(self, black, white, databook, diri_TF=False):
+    def play(self, black, white, databook, diri_TF=False, gui=None):
         def get_value_y(seq_xy_board, win_code, discount_factor):
             turn_count = len(seq_xy_board)
             value_y = [0.] * turn_count
@@ -29,9 +29,8 @@ class PlayGame:
         board = GameBoard()
         now_board = board.get_board()
 
-        agent_info = 2 if diri_TF else 0
-        gui = GUI(board_size=self.board_size, black_info=agent_info, white_info=agent_info)
-        gui.print_canvas()
+        
+        # gui.print_canvas()
 
         while self.rule.game_status(now_board)['during']:
             print("=" * 100)
@@ -63,16 +62,19 @@ class PlayGame:
                 now_board = board.get_board()
 
             #gui====================
-            policy_predict = act['pnn']
-            value_predict = act['vnn']
+            if gui:
+                policy_predict = act['pnn']
+                value_predict = act['vnn']
 
-            gui.update_canvas(
-                stone_info={'x': act_loc[0], 'y': act_loc[1], 'idx': len(now_board)-1},
-                vnn_info=value_predict, pnn_info=policy_predict
-            )
-            gui.print_canvas()
+                gui.update_canvas(
+                    stone_info={'x': act_loc[0], 'y': act_loc[1], 'idx': len(now_board)-1},
+                    vnn_info=value_predict, pnn_info=policy_predict
+                )
+                gui.print_canvas()
             #End====================
-        gui.close_canvas()
+        if gui:
+            gui.clear_canvas()
+
 
         win_code = self.rule.game_status(now_board)['win']
 

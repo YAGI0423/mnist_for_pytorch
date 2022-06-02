@@ -1,4 +1,5 @@
 import model
+from GUI import GUI
 from rule import Rule
 from util import Util
 from dataBook import DataBook
@@ -57,6 +58,8 @@ for t in range(10):
     play_game = PlayGame(board_size=board_size, rule=rule)
     main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=round_num)
 
+    gui = GUI(board_size=board_size, black_info=2, white_info=2)
+    
     #load databook===================
     if 'buffer_dataset.pickle' in os.listdir('./dataset/'):
         databook = DataBook(buffer_size=buffer_size, load_dir='./dataset/buffer_dataset.pickle')
@@ -70,7 +73,10 @@ for t in range(10):
 
     for p in range(play_num):
         print(f'\nTRAIN ROUND: {p}\n\n')
-        play_game.play(black=main_agent, white=main_agent, databook=databook, diri_TF=True)
+        play_game.play(
+            black=main_agent, white=main_agent,
+            databook=databook, diri_TF=True, gui=gui
+        )
 
         if p % train_turm == 0 or p == (play_num - 1):
             dataset = databook.get_data(shuffle=True, augment_rate=0.8)
@@ -78,7 +84,6 @@ for t in range(10):
             if len(dataset['value_y']) >= (buffer_size * 0.5):
                 epoch_count += 1
                 train_history = main_agent.train_model(dataset, batch_size=batch_size)
-
 
     #save_pickle=====================
     databook.save_databook(save_dir='./dataset/buffer_dataset.pickle')
@@ -127,7 +132,6 @@ for t in range(10):
             print(f'BLACK(●): PREVIOUS_AGENT')
             print(f'WHITE(○): MAIN_AGENT')
             print('=' * 50)
-
         
 
         win_code = play_game.play(black=black, white=white, databook=databook, diri_TF=False)
@@ -197,3 +201,5 @@ for t in range(10):
     #save_pickle=====================
     databook.save_databook(save_dir='./dataset/buffer_dataset.pickle')
     #End=============================
+    
+    gui.root.destroy()
