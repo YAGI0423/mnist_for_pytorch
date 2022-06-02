@@ -41,7 +41,7 @@ win_seq = 3
 
 round_num = 5 #800
 
-learning_rate = 0.000002
+learning_rate = 0.00002
 batch_size = 4
 buffer_size = 4096 #16384
 
@@ -49,6 +49,9 @@ play_num = 16
 train_turm = 2
 
 COMPETE_NUM = 7
+
+def lr_decay():
+    pass
 
 for t in range(10):
 
