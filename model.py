@@ -43,9 +43,11 @@ class RandomChoice:
 
 
 class AlphaO:
-    def __init__(self, board_size, rule, model_dir=None, round_num=1600):
+    def __init__(self, board_size, rule, model_dir=None, lr=0.00002, round_num=1600):
         self.board_size = board_size
         self.rule = rule
+
+        self.lr = lr
 
         self.c = np.sqrt(2)
         self.diri_param = 0.03
@@ -54,9 +56,20 @@ class AlphaO:
         self.model_dir = model_dir
         if self.model_dir is None:
             self.model = self.create_model()
+
+            self.model.compile(
+                optimizer=K.optimizers.SGD(learning_rate=self.lr, momentum=0.9),
+                loss=['categorical_crossentropy', 'mse']
+            )
             print(f'\n\ncreate new model...\n\n')
         else:
             self.model = K.models.load_model(model_dir)
+            
+            self.model.compile(
+                optimizer=K.optimizers.SGD(learning_rate=self.lr, momentum=0.9),
+                loss=['categorical_crossentropy', 'mse']
+            )
+
             print(f'\n\nload model from: {model_dir}\n\n')
 
     def create_model(self):
@@ -90,12 +103,6 @@ class AlphaO:
         value_output = K.layers.Dense(1, activation="tanh", name="VNN")(value_dense2)
 
         model = K.models.Model(inputs=input, outputs=[policy_output, value_output])
-
-        model.compile(
-            optimizer=K.optimizers.SGD(learning_rate=0.00002, momentum=0.9),
-            loss=['categorical_crossentropy', 'mse'],
-            # loss_weights=(1., 1.)
-        )
         return model
 
     def get_model_input(self, seq_xy_board):

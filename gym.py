@@ -41,6 +41,7 @@ win_seq = 3
 
 round_num = 5 #800
 
+learning_rate = 0.000002
 batch_size = 4
 buffer_size = 4096 #16384
 
@@ -56,7 +57,7 @@ for t in range(10):
 
     rule = Rule(board_size=board_size, win_seq=win_seq)
     play_game = PlayGame(board_size=board_size, rule=rule)
-    main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=round_num)
+    main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, lr=learning_rate, round_num=round_num)
 
     gui = GUI(board_size=board_size, black_info=2, white_info=2)
     
@@ -98,7 +99,7 @@ for t in range(10):
         #create pandas
         csv = pd.DataFrame({
             'idx': list(), 'agent_name': list(), 'date': list(),
-            'train_round': list(), 'train_epoch': list(), 'train_buffer_size': list(),
+            'learning_rate': list(), 'train_round': list(), 'train_epoch': list(), 'train_buffer_size': list(),
             'PNN_loss': list(), 'VNN_loss': list(), 'train_loss': list(),
             'val_PNN_loss': list(), 'val_VNN_loss': list(), 'train_val_loss': list(),
             'win_num': list(), 'lose_num': list(), 'draw_num': list(),
@@ -168,6 +169,7 @@ for t in range(10):
         'idx': int(idx) + 1,
         'agent_name': f'{idx}_{start_round}_{end_round}_{now}',
         'date': now,
+        'learning_rate': learning_rate,
         'train_round': play_num,
         'train_epoch': epoch_count,
         'train_buffer_size': len(databook.value_y),
