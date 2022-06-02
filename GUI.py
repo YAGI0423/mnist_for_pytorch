@@ -162,6 +162,7 @@ class GUI:
 
         self.pre_idx_txt_ele = None #최근 stone idx `create_txt` 요소
         self.pnn_text_list = list() #pnn text element의 집합
+        self.pnn_round_list = list()    #pnn round element의 집합
 
 
         self.root = Tk()
@@ -206,6 +207,14 @@ class GUI:
     def update_canvas(
         self, stone_info, vnn_info, pnn_info
     ):
+        def rgb_to_hex(r, g, b):
+            return f'#{r:02x}{g:02x}{b:02x}'
+
+        def delete_element(element_list):
+            for ele in element_list:
+                self.board.delete(ele)
+
+                
         x, y, stone_idx = stone_info['x'], stone_info['y'], stone_info['idx']
         vnn = vnn_info
 
@@ -231,34 +240,41 @@ class GUI:
         #End====================
 
         #pnn====================
-        # pnn_info = {idx: round(pior, 3) for idx, pior in pnn_info.items()}
-        print(pnn_info)
+        pnn_info = {idx: round(pior, 3) for idx, pior in pnn_info.items() if pior >= 0.1}
 
-        #remove previous element
-        for pnn_ele in self.pnn_text_list:
-            print(pnn_ele)
-            self.board.delete(pnn_ele)
+        #remove previous round element
+        delete_element(self.pnn_round_list)
+        delete_element(self.pnn_text_list)
         #End====================
 
-        def rgb_to_hex(r, g, b):
-            return f'#{r:02x}{g:02x}{b:02x}'
-
-        #create text============
+        #create text & round====
         for idx, pior in pnn_info.items():
-            if pior < 0.1: continue;
-            
-            txt_color = rgb_to_hex(0, 0, int(pior * 255))
-            pior = round(pior, 3)
+            round_color = rgb_to_hex(int((1-pior)*200), int((1-pior)*200), 200)
+            txt_color = rgb_to_hex(200, int((1-pior)*200), int((1-pior)*200))
+
+            round_size = int(self.stone_size * pior * 0.5)
+            round_size = max(self.stone_size * 0.2, round_size)
+            rd_half = round_size // 2   #round_half
 
             x = idx % self.board_size
             y = idx // self.board_size
-            
+
             pix_x, pix_y = self.idx_to_pix(x, y)
 
-            ele = self.board.create_text(pix_x, pix_y-10, text=pior, fill=txt_color)
+            #create round++++++
+            ele = self.board.create_oval(pix_x-rd_half, pix_y-rd_half, pix_x+rd_half, pix_y+rd_half, fill=round_color)
+            self.pnn_round_list.append(ele)
+            #End+++++++++++++++
+
+            #create round++++++
+            ele = self.board.create_text(
+                pix_x, pix_y-rd_half-10,
+                text=pior, fill=txt_color, font=("Helvetica", 12, "bold"))
             self.pnn_text_list.append(ele)
+            #End+++++++++++++++
         #End====================
 
+        
         
         
 

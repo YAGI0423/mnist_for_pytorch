@@ -35,10 +35,10 @@ def get_main_agent_dir():
 #End=================
 
 
-board_size = 3
-win_seq = 3
+board_size = 10
+win_seq = 5
 
-round_num = 5 #800
+round_num = 800 #800
 
 batch_size = 4
 buffer_size = 4096#16384
