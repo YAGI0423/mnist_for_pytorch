@@ -134,7 +134,7 @@ for t in range(10):
             print('=' * 50)
         
 
-        win_code = play_game.play(black=black, white=white, databook=databook, diri_TF=False)
+        win_code = play_game.play(black=black, white=white, databook=databook, diri_TF=False, gui=gui)
 
         if win_code == main_agent_color:   #when main agent win
             win_count += 1
