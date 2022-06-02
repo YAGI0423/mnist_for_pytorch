@@ -29,7 +29,8 @@ class PlayGame:
         board = GameBoard()
         now_board = board.get_board()
 
-        gui = GUI(board_size=self.board_size, black_code=black, white_code=white)
+        agent_info = 2 if diri_TF else 0
+        gui = GUI(board_size=self.board_size, black_info=agent_info, white_info=agent_info)
         gui.print_canvas()
 
         while self.rule.game_status(now_board)['during']:

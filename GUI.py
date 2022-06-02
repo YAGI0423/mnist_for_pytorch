@@ -2,7 +2,7 @@ from tkinter import *
 import tkinter.font
 
 class GUI:
-    def __init__(self, board_size, black_code, white_code):
+    def __init__(self, board_size, black_info, white_info):
         def get_step_tuple(step_size):
             left_pix = self.board_wh % step_size
 
@@ -51,7 +51,7 @@ class GUI:
                     )
             #End=======================
 
-        def init_state(root, black_code, white_code):
+        def init_state(root, black_info, white_info):
             def get_player_text(palyer_code):
                 if palyer_code == 1:
                     return 'RANDOM_CHOICE'
@@ -59,8 +59,8 @@ class GUI:
                     return 'α_O'
                 return 'USER'
 
-            black_text = '● ' + get_player_text(black_code)
-            white_text = get_player_text(white_code) + ' ○'
+            black_text = '● ' + get_player_text(black_info)
+            white_text = get_player_text(white_info) + ' ○'
             
             
             stone_ft = tkinter.font.Font(size=20)
@@ -145,7 +145,7 @@ class GUI:
 
 
         self.board_size = board_size
-        self.black_code, self.white_code = black_code, white_code
+        self.black_info, self.white_info = black_info, white_info
 
 
         self.interval = 30
@@ -172,7 +172,7 @@ class GUI:
         init_board(self.board, self.step_tuple)
         self.board.pack()
 
-        init_state(self.root, self.black_code, self.white_code)
+        init_state(self.root, self.black_info, self.white_info)
 
         self.visual_stone = init_visual_stone()
         self.loc_text = init_loc_text()
@@ -277,7 +277,7 @@ class GUI:
         #End====================
 
     def close_canvas(self):
-        self.root.destroy()
+        self.__init__(self, self.board_size, self.black_info, self.white_info)
         
         
         
