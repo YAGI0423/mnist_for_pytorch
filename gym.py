@@ -7,6 +7,7 @@ from gameBoard import GameBoard
 from playGame import PlayGame
 
 import os
+import math
 import time
 import random
 import pandas as pd
@@ -19,6 +20,15 @@ def get_main_agent_dir():
     if model_list:   #Exist
         return main_root + model_list[0]
     return None   #Empty
+
+def lr_decay(learning_rate, total_epochs):
+    t_epoch = 0
+    if 'train_hisotry.csv' in os.listdir('./'):
+        df = pd.read_csv('./train_history.csv')
+        t_epoch = df['train_epoch'].sum()
+
+    lr = 0.5 * learning_rate * (1 + math.cos((8.26 * t_epoch) / total_epochs))
+    return lr
 #End=================
 
 
@@ -41,7 +51,7 @@ win_seq = 3
 
 round_num = 5 #800
 
-learning_rate = 0.00002
+learning_rate = lr_decay(learning_rate=2e-5, total_epochs=1000)
 batch_size = 4
 buffer_size = 4096 #16384
 
@@ -49,9 +59,6 @@ play_num = 16
 train_turm = 2
 
 COMPETE_NUM = 7
-
-def lr_decay():
-    pass
 
 for t in range(10):
 
