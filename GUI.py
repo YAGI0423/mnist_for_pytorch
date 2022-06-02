@@ -214,7 +214,7 @@ class GUI:
             for ele in element_list:
                 self.board.delete(ele)
 
-                
+
         x, y, stone_idx = stone_info['x'], stone_info['y'], stone_info['idx']
         vnn = vnn_info
 
@@ -266,14 +266,18 @@ class GUI:
             self.pnn_round_list.append(ele)
             #End+++++++++++++++
 
-            #create round++++++
+            #create text+++++++
+            font_size = int(-0.32 * self.board_size + 12.9375)
+
             ele = self.board.create_text(
-                pix_x, pix_y-rd_half-10,
-                text=pior, fill=txt_color, font=("Helvetica", 12, "bold"))
+                pix_x, pix_y-round_size-10,
+                text=pior, fill=txt_color, font=("Helvetica", font_size, "bold"))
             self.pnn_text_list.append(ele)
             #End+++++++++++++++
         #End====================
 
+    def close_canvas(self):
+        self.root.destroy()
         
         
         

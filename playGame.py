@@ -71,6 +71,7 @@ class PlayGame:
             )
             gui.print_canvas()
             #End====================
+        gui.close_canvas()
 
         win_code = self.rule.game_status(now_board)['win']
 
