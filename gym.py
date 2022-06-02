@@ -92,7 +92,7 @@ for t in range(10):
 
         #create pandas
         csv = pd.DataFrame({
-            'idx': list(), 'date': list(),
+            'idx': list(), 'agent_name': list(), 'date': list(),
             'train_round': list(), 'train_epoch': list(), 'train_buffer_size': list(),
             'PNN_loss': list(), 'VNN_loss': list(), 'train_loss': list(),
             'val_PNN_loss': list(), 'val_VNN_loss': list(), 'train_val_loss': list(),
@@ -162,6 +162,7 @@ for t in range(10):
     csv =pd.read_csv('./train_history.csv')
     csv = csv.append({
         'idx': int(idx) + 1,
+        'agent_name': f'{idx}_{start_round}_{end_round}_{now}',
         'date': now,
         'train_round': play_num,
         'train_epoch': epoch_count,

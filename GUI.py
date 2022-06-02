@@ -2,7 +2,7 @@ from tkinter import *
 import tkinter.font
 
 class GUI:
-    def __init__(self, board_size, black_code, white_code, board_state=tuple()):
+    def __init__(self, board_size, black_code, white_code):
         def get_step_tuple(step_size):
             left_pix = self.board_wh % step_size
 
@@ -79,11 +79,9 @@ class GUI:
             black_vnn_txt.place(x=self.interval+20, y=70)
             white_vnn_txt.place(x=self.wd['width']-self.interval-20, y=70, anchor='ne')
 
-        def init_visual_stone(stone_color):
-            stone_color_txt = 'gainsboro' if stone_color else 'dimgray'
-
+        def init_visual_stone():
             return self.board.create_oval( #visual stone 초기 위치
-                self.wd['width'], 0, self.wd['width']+self.stone_size, self.stone_size, fill=stone_color_txt
+                self.wd['width'], 0, self.wd['width']+self.stone_size, self.stone_size, fill='dimgray'
             )
 
         def init_loc_text():
@@ -145,20 +143,10 @@ class GUI:
             else:
                 show_visual_stone(None, None)
 
-        def init_board_state(board_state):
-            for idx, loc in enumerate(board_state):
-                x, y = loc
-                stone_color = 1 if idx % 2 else 0
-                
-                stone_ele = self.draw_stone(x, y, stone_color)
-                self.stone_list.append(stone_ele)
-
 
         self.board_size = board_size
         self.black_code, self.white_code = black_code, white_code
-        self.board_state = board_state
 
-        self.stone_color = 1 if len(board_state) % 2 else 0
 
         self.interval = 30
         self.wd = {'width': 700, 'height': 800} #wd: `window`의 줌말
@@ -172,7 +160,8 @@ class GUI:
         self.bd = {'x': 30 + self.board_step_size}   #bd: `board`의 줌말, 시작 x, y 좌표
         self.bd['y'] = self.wd['height'] - self.bd['x'] - self.board_wh
 
-        self.stone_list= list()
+        self.pre_idx_txt_ele = None #최근 stone idx `create_txt` 요소
+        self.pnn_text_list = list() #pnn text element의 집합
 
 
         self.root = Tk()
@@ -184,11 +173,10 @@ class GUI:
 
         init_state(self.root, self.black_code, self.white_code)
 
-        self.visual_stone = init_visual_stone(stone_color=self.stone_color)
+        self.visual_stone = init_visual_stone()
         self.loc_text = init_loc_text()
 
 
-        init_board_state(self.board_state)
 
         self.root.bind("<Motion>", wheon_move_mouse)
         
@@ -216,47 +204,97 @@ class GUI:
         self.root.update()
 
     def update_canvas(
-        self, stone_info, vnn_info
+        self, stone_info, vnn_info, pnn_info
     ):
         x, y, stone_idx = stone_info['x'], stone_info['y'], stone_info['idx']
         vnn = vnn_info
 
         stone_color = 1 if stone_idx % 2 else 0
         self.draw_stone(x, y, stone_color)
-
-        pix_x, pix_y = self.idx_to_pix(x, y)
-        self.board.create_text(pix_x, pix_y, text=f'{stone_idx}', fill='gray')  #포석 순서
         
+        pix_x, pix_y = self.idx_to_pix(x, y)
+
+        #stone_idx==============
+        if self.pre_idx_txt_ele:    #최근 포석 idx txt color 복구
+            stone_idx_txt_color = 'white' if stone_color else 'black'
+            self.board.itemconfig(self.pre_idx_txt_ele, fill=stone_idx_txt_color)
+
+        # stone_idx_txt_color = 'black' if stone_color else 'white'
+        self.pre_idx_txt_ele = self.board.create_text(pix_x, pix_y, text=f'{stone_idx}', fill='red')  #포석 순서
+        #End====================
+
+        #vnn====================
         if stone_color: #white
             self.root.children['!label4'].config(text=f'VNN: {vnn:.3f}')  #white vnn
         else:   #black
             self.root.children['!label3'].config(text=f'VNN: {vnn:.3f}')   #black vnn
+        #End====================
+
+        #pnn====================
+        # pnn_info = {idx: round(pior, 3) for idx, pior in pnn_info.items()}
+        print(pnn_info)
+
+        #remove previous element
+        for pnn_ele in self.pnn_text_list:
+            print(pnn_ele)
+            self.board.delete(pnn_ele)
+        #End====================
+
+        def rgb_to_hex(r, g, b):
+            return f'#{r:02x}{g:02x}{b:02x}'
+
+        #create text============
+        for idx, pior in pnn_info.items():
+            if pior < 0.1: continue;
+            
+            txt_color = rgb_to_hex(0, 0, int(pior * 255))
+            pior = round(pior, 3)
+
+            x = idx % self.board_size
+            y = idx // self.board_size
+            
+            pix_x, pix_y = self.idx_to_pix(x, y)
+
+            ele = self.board.create_text(pix_x, pix_y-10, text=pior, fill=txt_color)
+            self.pnn_text_list.append(ele)
+        #End====================
+
+        
+        
 
 
 if __name__ == '__main__':
-    now_board = ((3, 1), (2, 2), (3, 3), (1, 2), (1, 3))
+    now_board = ((2, 1), (2, 2), (0, 0), (1, 2), (1, 0))
     vnn_list = (10, 2, 3, 4, 2)
+    pnn_list = (
+        {3: 0.037, 7: 0.05, 8: 0.109, 6: 0.05, 2: 0.897, 4: 0.06, 1: 0.024, 5: 0.243, 0: 0.13},
+        {3: 0.037, 7: 0.03, 8: 0.109, 6: 0.05, 2: 0.297, 4: 0.06, 1: 0.024, 5: 0.243, 0: 0.13},
+        {3: 0.037, 7: 0.06, 8: 0.109, 6: 0.05, 2: 0.297, 4: 0.06, 1: 0.024, 5: 0.243, 0: 0.13},
+        {3: 0.037, 7: 0.02, 8: 0.109, 6: 0.05, 2: 0.297, 4: 0.06, 1: 0.024, 5: 0.243, 0: 0.13},
+        {3: 0.037, 7: 0.07, 8: 0.109, 6: 0.05, 2: 0.297, 4: 0.06, 1: 0.024, 5: 0.243, 0: 0.13}
+    )
     
     import time
 
     gui = GUI(board_size=3, black_code=2, white_code=0)
 
     
-    gui.root.mainloop()
-    # gui.print_canvas()
+    # gui.root.mainloop()
+    gui.print_canvas()
 
-    # for t in range(len(now_board)):
+    for t in range(len(now_board)):
 
-    #     x, y = now_board[t]
-    #     vnn = vnn_list[t]
+        x, y = now_board[t]
+        vnn = vnn_list[t]
+        pnn = pnn_list[t]
 
-    #     stone_color = 1 if t % 2 else 0
+        stone_color = 1 if t % 2 else 0
 
-    #     gui.update_canvas(
-    #         stone_info={'x': x, 'y': y, 'idx': t},
-    #         vnn_info=vnn
-    #     )
+        gui.update_canvas(
+            stone_info={'x': x, 'y': y, 'idx': t},
+            vnn_info=vnn, pnn_info=pnn
+        )
 
-    #     gui.print_canvas()
-    #     time.sleep(2)
+        gui.print_canvas()
+        time.sleep(2)
 

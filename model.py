@@ -150,7 +150,12 @@ class AlphaO:
 
             if diri_TF:
                 diri_prob = np.random.dirichlet([self.diri_param] * (self.board_size ** 2))
-                policy_pred = (policy_pred * diri_prob) / np.sum(diri_prob)
+                
+                #previous_diri
+                # policy_pred = (policy_pred * diri_prob) / np.sum(diri_prob)
+                
+                #new_diri
+                policy_pred = (policy_pred + diri_prob) / 2.
 
             #get node's branches
             able_loc = self.rule.get_able_loc(seq_xy_board)

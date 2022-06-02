@@ -67,7 +67,7 @@ class PlayGame:
 
             gui.update_canvas(
                 stone_info={'x': act_loc[0], 'y': act_loc[1], 'idx': len(now_board)-1},
-                vnn_info=value_predict
+                vnn_info=value_predict, pnn_info=policy_predict
             )
             gui.print_canvas()
             #End====================
