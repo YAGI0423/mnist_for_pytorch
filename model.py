@@ -43,7 +43,7 @@ class RandomChoice:
 
 
 class AlphaO:
-    def __init__(self, board_size, rule, model_dir=None, lr=0.00002, round_num=1600):
+    def __init__(self, board_size, rule, model_dir=None, lr=0.00002, round_num=1600):   
         self.board_size = board_size
         self.rule = rule
 
