@@ -23,10 +23,9 @@ def get_main_agent_dir():
 
 def lr_decay(learning_rate, total_epochs):
     t_epoch = 0
-    if 'train_hisotry.csv' in os.listdir('./'):
+    if 'train_history.csv' in os.listdir('./'):
         df = pd.read_csv('./train_history.csv')
         t_epoch = df['train_epoch'].sum()
-
     lr = 0.5 * learning_rate * (1 + math.cos((8.26 * t_epoch) / total_epochs))
     return lr
 #End=================
