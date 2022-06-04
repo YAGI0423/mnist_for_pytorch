@@ -106,7 +106,8 @@ while (now_epoch := get_now_epoch()) < total_epochs:
         #create pandas
         csv = pd.DataFrame({
             'idx': list(), 'agent_name': list(), 'date': list(),
-            'learning_rate': list(), 'train_round': list(), 'train_epoch': list(), 'train_buffer_size': list(),
+            'learning_rate': list(), 'batch_size': list(),
+            'train_round': list(), 'train_epoch': list(), 'train_buffer_size': list(),
             'PNN_loss': list(), 'VNN_loss': list(), 'train_loss': list(),
             'val_PNN_loss': list(), 'val_VNN_loss': list(), 'train_val_loss': list(),
             'win_num': list(), 'lose_num': list(), 'draw_num': list(),
@@ -177,6 +178,7 @@ while (now_epoch := get_now_epoch()) < total_epochs:
         'agent_name': f'{idx}_{start_round}_{end_round}_{now}',
         'date': now,
         'learning_rate': learning_rate,
+        'batch_size': batch_size,
         'train_round': play_num,
         'train_epoch': epoch_count,
         'train_buffer_size': len(databook.value_y),
