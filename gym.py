@@ -21,28 +21,22 @@ def get_main_agent_dir():
         return main_root + model_list[0]
     return None   #Empty
 
-def lr_decay(learning_rate, total_epochs):
-    t_epoch = 0
+def get_now_epoch():
+    epoch = 0
     if 'train_history.csv' in os.listdir('./'):
         df = pd.read_csv('./train_history.csv')
-        t_epoch = df['train_epoch'].sum()
-    lr = 0.5 * learning_rate * (1 + math.cos((8.26 * t_epoch) / total_epochs))
-    return lr
+        epoch = df['train_epoch'].sum()
+    return epoch    
+
+def lr_decay(init_lr, lim_lr, now_epoch, total_epochs):
+    zero_x = -(init_lr * total_epochs)  #cosin이 0이 되는 x값
+    zero_x /= (lim_lr - init_lr)
+    zero_x /= 2.8
+
+    return 0.5 * init_lr * (1. + math.cos(now_epoch/zero_x))
 #End=================
 
 
-#to do list==========
-#1. 이동 가능한 함수는 이동 할 것
-    #(1) save_agent: model로 이동   #완료
-    #(2) data_augment: databook으로 이동   #완료
-    #(3) get_main_agent_dir: model로 이동
-
-#2. 중간 save를 수행하도록 변경하기
-
-#3. 함수화 해야할 것
-    #(1) 데이터셋 불러오기
-    #(2) 데이터셋 저장하기
-#End=================
 
 
 board_size = 3
@@ -50,7 +44,7 @@ win_seq = 3
 
 round_num = 5 #800
 
-learning_rate = lr_decay(learning_rate=2e-5, total_epochs=1000)
+total_epochs = 100
 batch_size = 4
 buffer_size = 4096 #16384
 
@@ -59,7 +53,9 @@ train_turm = 2
 
 COMPETE_NUM = 7
 
-for t in range(10):
+
+while (now_epoch := get_now_epoch()) < total_epochs:
+    learning_rate = lr_decay(init_lr=2e-5, lim_lr=6e-6, now_epoch=now_epoch, total_epochs=total_epochs)
 
     main_agent_dir = get_main_agent_dir()
 
@@ -82,6 +78,8 @@ for t in range(10):
     train_history = None
 
     for p in range(play_num):
+        print(f'\n\n{now_epoch} / {total_epochs}\n\n')
+
         print(f'\nTRAIN ROUND: {p}\n\n')
         play_game.play(
             black=main_agent, white=main_agent,
