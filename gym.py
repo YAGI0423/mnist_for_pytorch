@@ -44,7 +44,7 @@ win_seq = 3
 
 round_num = 5 #800
 
-total_epochs = 100
+total_epochs = 1000
 batch_size = 4
 buffer_size = 4096 #16384
 
