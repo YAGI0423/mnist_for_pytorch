@@ -10,6 +10,7 @@ import os
 import math
 import time
 import random
+import numpy as np
 import pandas as pd
 
 
@@ -164,10 +165,10 @@ while (now_epoch := get_now_epoch()) < total_epochs:
     now = f'{now.tm_mon}_{now.tm_mday}_{now.tm_hour}_{now.tm_min}'
 
     if train_history:
-        tr_PNN_loss, tr_VNN_loss = train_history.history['PNN_loss'].mean(), train_history.history['VNN_loss'].mean()
-        tr_val_PNN_loss, tr_val_VNN_loss = train_history.history['val_PNN_loss'].mean(), train_history.history['val_VNN_loss'].mean()
+        tr_PNN_loss, tr_VNN_loss = np.mean(train_history.history['PNN_loss']), np.mean(train_history.history['VNN_loss'])
+        tr_val_PNN_loss, tr_val_VNN_loss = np.mean(train_history.history['val_PNN_loss']), np.mean(train_history.history['val_VNN_loss'])
 
-        tr_loss, tr_val_loss = train_history.history['loss'].mean(), train_history.history['val_loss'].mean()
+        tr_loss, tr_val_loss = np.mean(train_history.history['loss']), np.mean(train_history.history['val_loss'])
     else:
         tr_PNN_loss, tr_VNN_loss, tr_loss = None, None, None
         tr_val_PNN_loss, tr_val_VNN_loss, tr_val_loss = None, None, None
