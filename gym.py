@@ -37,7 +37,8 @@ def lr_decay(init_lr, lim_lr, now_epoch, total_epochs):
     return 0.5 * init_lr * (1. + math.cos(now_epoch/zero_x))
 #End=================
 
-
+#data_augment에서
+#policy_y도 tilt를 해줘야 한다!!!!!
 
 
 board_size = 10
