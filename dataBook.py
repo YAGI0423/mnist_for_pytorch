@@ -47,30 +47,38 @@ class DataBook:
                 raise
 
         def data_augment(x, policy_y, value_y, rate=0.3):
-            board_size = x[0].shape[:-1]
             data_len = len(value_y)
             augment_num = int(data_len * rate)
+            
+            split_num = augment_num // 4
+            board_size = x[0].shape[:-1]
 
             aug_idx_list = random.choices(range(data_len), k=augment_num)
 
-            #test
-            data_len = 24
-            augment_num = int(data_len * rate)
-            aug_idx_list = range(data_len)
+            policy_y = policy_y.reshape(-1, *board_size)
+
+            print(aug_idx_list)
             
+            split_num1 = split_num
+            split_num2 = split_num * 2
 
-            split_num = data_len // 4
+            print(split_num1)
+            print(split_num2)
+            
+            exit()
+            for idx in range(5):
+                splited_idx = range(split_num*idx, split_num*(idx+1))
+                
+                print(value_y[splited_idx])
 
-            aug_x = x[aug_idx_list].copy()
-            aug_policy_y = policy_y[aug_idx_list].copy()
-            aug_value_y = value_y[aug_idx_list].copy()
-
-            aug_policy_y = aug_policy_y.reshape(-1, *board_size)
+            exit()
 
             for idx in range(5):
-                splited_idx = aug_idx_list[split_num*idx:split_num*(idx+1)]
+                splited_idx = range(split_num*idx, split_num*(idx+1))
                 
                 if splited_idx:
+                    print(splited_idx)
+                    
                     aug_x_ele = aug_x[splited_idx]
                     aug_policy_y_ele = aug_policy_y[splited_idx]
 
