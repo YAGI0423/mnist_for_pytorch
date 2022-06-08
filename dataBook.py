@@ -59,6 +59,12 @@ class DataBook:
             aug_x = np.rot90(aug_x, k=random.randint(1, 4), axes=(1, 2))
             if random.randint(0, 2):
                 aug_x = np.flip(aug_x, axis=2)
+
+            plt.subplot(1, 2, 1)
+            plt.imshow(aug_x[0])
+            plt.show()
+            exit()
+
             
             x = np.concatenate((x, aug_x), axis=0)
             policy_y = np.concatenate((policy_y, aug_policy_y))
@@ -73,6 +79,9 @@ class DataBook:
         policy_y = np.asarray(self.policy_y, dtype=np.float64).reshape(dataset_len, -1)
         value_y = np.asarray(self.value_y, dtype=np.float64).reshape(-1, 1)
 
+        if augment_rate:
+            state, policy_y, value_y = data_augment(state, policy_y, value_y, augment_rate)
+
         if shuffle:
             idx = np.array(range(dataset_len))
             np.random.shuffle(idx)
@@ -80,9 +89,6 @@ class DataBook:
             state = state[idx]
             policy_y = policy_y[idx]
             value_y = value_y[idx]
-
-        if augment_rate:
-            state, policy_y, value_y = data_augment(state, policy_y, value_y, augment_rate)
 
         return {
             'x': state,
@@ -106,3 +112,29 @@ class DataBook:
         self.state = data['state']
         self.policy_y = data['policy_y']
         self.value_y = data['value_y']
+
+
+if __name__ == '__main__':
+    import matplotlib.pyplot as plt
+
+    databook = DataBook(buffer_size=65536, load_dir='./dataset/buffer_dataset.pickle')
+
+    train_data = databook.get_data(shuffle=False, augment_rate=1.)
+    
+    train_x = train_data['x']
+    policy_y = train_data['policy_y']
+    value_y = train_data['value_y']
+
+   
+
+    # print(train_x[0][0])
+    
+    # plt.subplot(1, 2, 1)
+    # plt.imshow(train_x[0])
+    
+    # plt.subplot(1, 2, 2)
+
+    # re_policy_y = policy_y[0].reshape(10, 10)
+    # print(re_policy_y)
+    # plt.imshow(re_policy_y, cmap='gray')
+    # plt.show()
