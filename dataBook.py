@@ -49,7 +49,7 @@ class DataBook:
         def data_augment(x, policy_y, value_y, rate=0.3):
             data_len = len(value_y)
             augment_num = int(data_len * rate)
-            
+
             split_num = augment_num // 4
             board_size = x[0].shape[:-1]
 
@@ -57,48 +57,28 @@ class DataBook:
 
             policy_y = policy_y.reshape(-1, *board_size)
 
-            print(aug_idx_list)
-            
-            split_num1 = split_num
-            split_num2 = split_num * 2
-
-            print(split_num1)
-            print(split_num2)
-            
-            exit()
             for idx in range(5):
-                splited_idx = range(split_num*idx, split_num*(idx+1))
-                
-                print(value_y[splited_idx])
-
-            exit()
-
-            for idx in range(5):
-                splited_idx = range(split_num*idx, split_num*(idx+1))
+                splited_idx = aug_idx_list[split_num*idx: split_num*(idx+1)]
                 
                 if splited_idx:
-                    print(splited_idx)
-                    
-                    aug_x_ele = aug_x[splited_idx]
-                    aug_policy_y_ele = aug_policy_y[splited_idx]
+                    aug_x = x[splited_idx]
+                    aug_policy_y = policy_y[splited_idx]
 
                     rot_rate = random.randint(1, 3)
-
-                    aug_x_ele = np.rot90(aug_x_ele, k=rot_rate, axes=(1, 2))
-                    aug_policy_y_ele = np.rot90(aug_policy_y_ele, k=rot_rate, axes=(1, 2))
+                    aug_x = np.rot90(aug_x, k=rot_rate, axes=(1, 2))
+                    aug_policy_y = np.rot90(aug_policy_y, k=rot_rate, axes=(1, 2))
 
                     if random.randint(0, 2):
-                        aug_x_ele = np.flip(aug_x_ele, axis=2)
-                        aug_policy_y_ele = np.flip(aug_policy_y_ele, axis=2)
-
-                    aug_policy_y_ele = aug_policy_y_ele.reshape(-1, board_size[0] ** 2)
-                    
+                        aug_x = np.flip(aug_x, axis=2)
+                        aug_policy_y = np.flip(aug_policy_y, axis=2)
 
                     #add augment data
-                    x = np.concatenate((x, aug_x_ele), axis=0)
-                    policy_y = np.concatenate((policy_y, aug_policy_y_ele))
+                    x = np.concatenate((x, aug_x), axis=0)
+                    policy_y = np.concatenate((policy_y, aug_policy_y))
             
-            value_y = np.concatenate((value_y, aug_value_y))
+            policy_y = policy_y.reshape(-1, board_size[0] ** 2)
+            value_y = np.concatenate((value_y, value_y[aug_idx_list]))
+            
             return x, policy_y, value_y
 
         update_databook()
