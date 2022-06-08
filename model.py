@@ -63,7 +63,7 @@ class AlphaO:
             )
             print(f'\n\ncreate new model...\n\n')
         else:
-            self.model = K.models.load_model(model_dir)
+            self.model = K.models.load_model(model_dir, custom_objects={'LeakyReLU':K.layers.LeakyReLU()})
             
             self.model.compile(
                 optimizer=K.optimizers.SGD(learning_rate=self.lr, momentum=0.9),

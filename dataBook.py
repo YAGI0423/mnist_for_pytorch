@@ -78,7 +78,6 @@ class DataBook:
             
             policy_y = policy_y.reshape(-1, board_size[0] ** 2)
             value_y = np.concatenate((value_y, value_y[aug_idx_list]))
-            
             return x, policy_y, value_y
 
         update_databook()
@@ -92,6 +91,7 @@ class DataBook:
             state, policy_y, value_y = data_augment(state, policy_y, value_y, augment_rate)
 
         if shuffle:
+            dataset_len = len(state)
             idx = np.array(range(dataset_len))
             np.random.shuffle(idx)
 
