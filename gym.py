@@ -39,8 +39,8 @@ def lr_decay(init_lr, lim_lr, now_epoch, total_epochs):
 
 
 
-board_size = 3
-win_seq = 3
+board_size = 5
+win_seq = 5
 
 round_num = 5
 
@@ -110,7 +110,7 @@ while (now_epoch := get_now_epoch()) < total_epochs:
             'learning_rate': list(), 'batch_size': list(),
             'train_round': list(), 'train_epoch': list(), 'train_buffer_size': list(),
             'PNN_loss': list(), 'VNN_loss': list(), 'train_loss': list(),
-            'val_PNN_loss': list(), 'val_VNN_loss': list(), 'train_val_loss': list(),
+            'val_PNN_loss': list(), 'val_VNN_loss': list(), 'val_loss': list(),
             'win_num': list(), 'lose_num': list(), 'draw_num': list(),
 
         })
@@ -188,7 +188,7 @@ while (now_epoch := get_now_epoch()) < total_epochs:
         'train_loss': tr_loss,
         'val_PNN_loss': tr_val_PNN_loss,
         'val_VNN_loss': tr_val_VNN_loss,
-        'train_val_loss': tr_val_loss,
+        'val_loss': tr_val_loss,
         'win_num': win_count,
         'lose_num': lose_count,
         'draw_num': draw_count
