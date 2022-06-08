@@ -129,6 +129,7 @@ dmypy.json
 .pyre/
 
 #personal
+/dataset/
 /model/main_model/
 /model/previous_model/
 /previous_history/
