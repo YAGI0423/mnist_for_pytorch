@@ -56,61 +56,41 @@ class DataBook:
             #test
             data_len = 24
             augment_num = int(data_len * rate)
-            aug_idx_list = random.choices(range(data_len), k=augment_num)
-            #test
+            aug_idx_list = range(data_len)
+            
 
             split_num = data_len // 4
-
-            print(aug_idx_list)
-            for idx in range(5):
-                splited_idx = aug_idx_list[split_num*idx:split_num*(idx+1)]
-                
-                if splited_idx:
-                    aug_x = x[splited_idx].copy()
-                    aug_policy_y = policy_y[splited_idx].copy()
-
-                    
-
-            print()
-
-
-            exit()
 
             aug_x = x[aug_idx_list].copy()
             aug_policy_y = policy_y[aug_idx_list].copy()
             aug_value_y = value_y[aug_idx_list].copy()
 
-            #reshape policy_y=========
             aug_policy_y = aug_policy_y.reshape(-1, *board_size)
-            #End======================
 
-            rot_rate = random.randint(1, 3)
-            aug_x = np.rot90(aug_x, k=rot_rate, axes=(1, 2))
-            aug_policy_y = np.rot90(aug_policy_y, k=rot_rate, axes=(1, 2))
+            for idx in range(5):
+                splited_idx = aug_idx_list[split_num*idx:split_num*(idx+1)]
+                
+                if splited_idx:
+                    aug_x_ele = aug_x[splited_idx]
+                    aug_policy_y_ele = aug_policy_y[splited_idx]
 
-            #flip
-            # if random.randint(0, 2):
-            #     aug_x = np.flip(aug_x, axis=2)
+                    rot_rate = random.randint(1, 3)
 
-            plt.subplot(2, 2, 1)
-            plt.imshow(x[0])
+                    aug_x_ele = np.rot90(aug_x_ele, k=rot_rate, axes=(1, 2))
+                    aug_policy_y_ele = np.rot90(aug_policy_y_ele, k=rot_rate, axes=(1, 2))
 
-            plt.subplot(2, 2, 2)
-            plt.imshow(aug_x[0])
+                    if random.randint(0, 2):
+                        aug_x_ele = np.flip(aug_x_ele, axis=2)
+                        aug_policy_y_ele = np.flip(aug_policy_y_ele, axis=2)
 
-            plt.subplot(2, 2, 3)
-            plt.imshow(policy_y[0].reshape(*board_size))
+                    aug_policy_y_ele = aug_policy_y_ele.reshape(-1, board_size[0] ** 2)
+                    
 
-            plt.subplot(2, 2, 4)
-            plt.imshow(aug_policy_y[0])
-            plt.show()
-            exit()
-
+                    #add augment data
+                    x = np.concatenate((x, aug_x_ele), axis=0)
+                    policy_y = np.concatenate((policy_y, aug_policy_y_ele))
             
-            x = np.concatenate((x, aug_x), axis=0)
-            policy_y = np.concatenate((policy_y, aug_policy_y))
             value_y = np.concatenate((value_y, aug_value_y))
-
             return x, policy_y, value_y
 
         update_databook()
@@ -160,22 +140,16 @@ if __name__ == '__main__':
 
     databook = DataBook(buffer_size=65536, load_dir='./dataset/buffer_dataset.pickle')
 
-    train_data = databook.get_data(shuffle=False, augment_rate=1.)
+    train_data = databook.get_data(shuffle=True, augment_rate=5.)
     
     train_x = train_data['x']
     policy_y = train_data['policy_y']
     value_y = train_data['value_y']
 
-   
+    plt.subplot(1, 2, 1)
+    plt.imshow(train_x[0])
 
-    # print(train_x[0][0])
-    
-    # plt.subplot(1, 2, 1)
-    # plt.imshow(train_x[0])
-    
-    # plt.subplot(1, 2, 2)
+    plt.subplot(1, 2, 2)
+    plt.imshow(policy_y[0].reshape(10, 10))
 
-    # re_policy_y = policy_y[0].reshape(10, 10)
-    # print(re_policy_y)
-    # plt.imshow(re_policy_y, cmap='gray')
-    # plt.show()
+    plt.show()
