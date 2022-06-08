@@ -44,11 +44,12 @@ def lr_decay(init_lr, lim_lr, now_epoch, total_epochs):
 board_size = 10
 win_seq = 5
 
-round_num = 800
+round_num = 5
 
 total_epochs = 1000
 batch_size = 4
-buffer_size = 16384
+buffer_size = 4096
+augment_rate = 0.8
 
 play_num = 16
 train_turm = 2
@@ -89,7 +90,7 @@ while (now_epoch := get_now_epoch()) < total_epochs:
         )
 
         if p % train_turm == 0 or p == (play_num - 1):
-            dataset = databook.get_data(shuffle=True, augment_rate=0.8)
+            dataset = databook.get_data(shuffle=True, augment_rate=augment_rate)
             
             if len(dataset['value_y']) >= (buffer_size * 0.5):
                 epoch_count += 1
