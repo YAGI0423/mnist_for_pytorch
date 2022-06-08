@@ -1,3 +1,4 @@
+from email import policy
 import pickle
 import random
 import numpy as np
@@ -46,22 +47,62 @@ class DataBook:
                 raise
 
         def data_augment(x, policy_y, value_y, rate=0.3):
-
+            board_size = x[0].shape[:-1]
             data_len = len(value_y)
             augment_num = int(data_len * rate)
 
             aug_idx_list = random.choices(range(data_len), k=augment_num)
 
+            #test
+            data_len = 24
+            augment_num = int(data_len * rate)
+            aug_idx_list = random.choices(range(data_len), k=augment_num)
+            #test
+
+            split_num = data_len // 4
+
+            print(aug_idx_list)
+            for idx in range(5):
+                splited_idx = aug_idx_list[split_num*idx:split_num*(idx+1)]
+                
+                if splited_idx:
+                    aug_x = x[splited_idx].copy()
+                    aug_policy_y = policy_y[splited_idx].copy()
+
+                    
+
+            print()
+
+
+            exit()
+
             aug_x = x[aug_idx_list].copy()
             aug_policy_y = policy_y[aug_idx_list].copy()
             aug_value_y = value_y[aug_idx_list].copy()
 
-            aug_x = np.rot90(aug_x, k=random.randint(1, 4), axes=(1, 2))
-            if random.randint(0, 2):
-                aug_x = np.flip(aug_x, axis=2)
+            #reshape policy_y=========
+            aug_policy_y = aug_policy_y.reshape(-1, *board_size)
+            #End======================
 
-            plt.subplot(1, 2, 1)
+            rot_rate = random.randint(1, 3)
+            aug_x = np.rot90(aug_x, k=rot_rate, axes=(1, 2))
+            aug_policy_y = np.rot90(aug_policy_y, k=rot_rate, axes=(1, 2))
+
+            #flip
+            # if random.randint(0, 2):
+            #     aug_x = np.flip(aug_x, axis=2)
+
+            plt.subplot(2, 2, 1)
+            plt.imshow(x[0])
+
+            plt.subplot(2, 2, 2)
             plt.imshow(aug_x[0])
+
+            plt.subplot(2, 2, 3)
+            plt.imshow(policy_y[0].reshape(*board_size))
+
+            plt.subplot(2, 2, 4)
+            plt.imshow(aug_policy_y[0])
             plt.show()
             exit()
 
