@@ -90,6 +90,7 @@ while (now_epoch := get_now_epoch()) < total_epochs:
         if p % train_turm == 0 or p == (play_num - 1):
             dataset = databook.get_data(shuffle=True, augment_rate=augment_rate)
             
+            
             if len(dataset['value_y']) >= (buffer_size * 0.5):
                 epoch_count += 1
                 train_history = main_agent.train_model(dataset, batch_size=batch_size)

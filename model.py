@@ -74,19 +74,19 @@ class AlphaO:
 
     def create_model(self):
         input = K.layers.Input(shape=(self.board_size, self.board_size, 3))
-        conv1 = K.layers.Conv2D(kernel_size=2, filters=64, activation=K.layers.LeakyReLU(), padding="same")(input)
-        conv2 = K.layers.Conv2D(kernel_size=2, filters=128, activation=K.layers.LeakyReLU(), padding="same")(conv1)
+        conv1 = K.layers.Conv2D(kernel_size=2, filters=64, activation='relu', padding="same")(input)
+        conv2 = K.layers.Conv2D(kernel_size=2, filters=128, activation='relu', padding="same")(conv1)
         
-        conv3 = K.layers.Conv2D(kernel_size=2, filters=256, activation=K.layers.LeakyReLU(), padding="same")(conv2)
+        conv3 = K.layers.Conv2D(kernel_size=2, filters=256, activation='relu', padding="same")(conv2)
         conv3_batch = K.layers.BatchNormalization()(conv3)
 
-        add_conv1 = K.layers.Conv2D(kernel_size=1, filters=256, activation=K.layers.LeakyReLU())(input)
+        add_conv1 = K.layers.Conv2D(kernel_size=1, filters=256, activation='relu')(input)
         add1 = K.layers.Add()([conv3_batch, add_conv1])
         add_dense = K.layers.Dense(256, activation='relu')(add1)
 
         policy_conv = K.layers.Conv2D(kernel_size=2, filters=512, padding="same")(add_dense)
         policy_batch = K.layers.BatchNormalization()(policy_conv)
-        policy_activ = K.layers.LeakyReLU()(policy_batch)
+        policy_activ = K.layers.ReLU()(policy_batch)
         policy_flat = K.layers.GlobalAveragePooling2D()(policy_activ)
 
         policy_dense = K.layers.Dense(128, activation='relu')(policy_flat)
@@ -95,7 +95,7 @@ class AlphaO:
 
         value_conv = K.layers.Conv2D(kernel_size=2, filters=512, padding="same")(add_dense)
         value_batch = K.layers.BatchNormalization()(value_conv)
-        value_activ = K.layers.LeakyReLU()(value_batch)
+        value_activ = K.layers.ReLU()(value_batch)
         value_flat = K.layers.GlobalAveragePooling2D()(value_activ)
         
         value_dense = K.layers.Dense(128, activation='relu')(value_flat)

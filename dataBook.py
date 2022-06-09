@@ -128,16 +128,19 @@ if __name__ == '__main__':
 
     databook = DataBook(buffer_size=65536, load_dir='./dataset/buffer_dataset.pickle')
 
-    train_data = databook.get_data(shuffle=True, augment_rate=5.)
+    train_data = databook.get_data(shuffle=False, augment_rate=1.)
     
     train_x = train_data['x']
     policy_y = train_data['policy_y']
     value_y = train_data['value_y']
 
-    plt.subplot(1, 2, 1)
-    plt.imshow(train_x[0])
+    print(len(databook.state))
 
-    plt.subplot(1, 2, 2)
-    plt.imshow(policy_y[0].reshape(10, 10))
+    for idx in range(16):
+        plt.subplot(16, 2, (idx+1)*2-1)
+        plt.imshow(train_x[idx])
 
+        plt.subplot(16, 2, (idx+1)*2)
+        plt.imshow(policy_y[idx].reshape(3,3))
     plt.show()
+
