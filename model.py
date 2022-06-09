@@ -87,7 +87,7 @@ class AlphaO:
         policy_conv = K.layers.Conv2D(kernel_size=2, filters=512, padding="same")(add_dense)
         policy_batch = K.layers.BatchNormalization()(policy_conv)
         policy_activ = K.layers.LeakyReLU()(policy_batch)
-        policy_flat = K.layers.GlobalAveragePooling2D()(policy_activ)
+        policy_flat = K.layers.GlobalMaxPooling2D()(policy_activ)
 
         policy_dense = K.layers.Dense(128, activation='relu')(policy_flat)
         policy_output = K.layers.Dense(self.board_size ** 2, activation="softmax", name="PNN")(policy_dense)
@@ -96,7 +96,7 @@ class AlphaO:
         value_conv = K.layers.Conv2D(kernel_size=2, filters=512, padding="same")(add_dense)
         value_batch = K.layers.BatchNormalization()(value_conv)
         value_activ = K.layers.LeakyReLU()(value_batch)
-        value_flat = K.layers.GlobalAveragePooling2D()(value_activ)
+        value_flat = K.layers.GlobalMaxPooling2D()(value_activ)
         
         value_dense = K.layers.Dense(128, activation='relu')(value_flat)
         value_dense2 = K.layers.Dense(128, activation='relu')(value_dense)

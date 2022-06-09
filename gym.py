@@ -45,7 +45,7 @@ win_seq = 3
 round_num = 5
 
 total_epochs = 500
-batch_size = 4
+batch_size = 32
 buffer_size = 4096
 augment_rate = 0.8
 
