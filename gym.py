@@ -46,8 +46,8 @@ round_num = 32
 
 total_epochs = 500
 batch_size = 16
-buffer_size = 1024
-augment_rate = 0.8
+buffer_size = 2048
+augment_rate = 0.4
 
 play_num = 16
 train_turm = 2
