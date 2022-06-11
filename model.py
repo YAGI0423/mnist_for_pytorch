@@ -81,14 +81,44 @@ class AlphaO:
     def create_model(self):
         input_layer = K.layers.Input(shape=(self.board_size, self.board_size, 3))
 
-        out = K.layers.Conv2D(kernel_size=3, filters=128, padding='same')(input)
+        ident = K.layers.Conv2D(filters=128, kernel_size=1, padding='same')(input_layer)
+
+        out = K.layers.Conv2D(filters=64, kernel_size=3, padding='same')(input_layer)
         out = K.layers.BatchNormalization()(out)
-        out = K.layers.KeakyReLU()(out)
+        out = K.layers.LeakyReLU()(out)
 
-        out = K.layers.Conv2D(kernel_size=3, filters=256, padding='same')(out)
-        
+        out = K.layers.Conv2D(filters=128, kernel_size=3, padding='same')(out)
+        out = K.layers.BatchNormalization()(out)
 
-        model = K.models.Model(inputs=input_layer, outputs=out)
+        out = K.layers.Add()((out, ident))
+        out1 = K.layers.LeakyReLU()(out)
+
+        out = K.layers.Conv2D(filters=64, kernel_size=3, padding='same')(out1)
+        out = K.layers.BatchNormalization()(out)
+        out = K.layers.LeakyReLU()(out)
+
+        out = K.layers.Conv2D(filters=128, kernel_size=3, padding='same')(out)
+        out = K.layers.BatchNormalization()(out)
+
+        out = K.layers.Add()((out, out1))
+        out = K.layers.LeakyReLU()(out)
+
+        vnn = K.layers.Conv2D(filters=256, kernel_size=2)(out)
+        vnn = K.layers.BatchNormalization()(vnn)
+        vnn = K.layers.LeakyReLU()(vnn)
+        vnn = K.layers.GlobalMaxPooling2D()(vnn)
+        vnn = K.layers.Dense(512)(vnn)
+        vnn = K.layers.LeakyReLU()(vnn)
+        vnn = K.layers.Dense(1, activation='tanh')(vnn)
+
+        pnn = K.layers.Conv2D(filters=256, kernel_size=2)(out)
+        pnn = K.layers.BatchNormalization()(pnn)
+        pnn = K.layers.LeakyReLU()(pnn)
+        pnn = K.layers.GlobalMaxPooling2D()(pnn)
+        pnn = K.layers.Dense(512)(pnn)
+        pnn = K.layers.Dense(self.board_size ** 2, activation='softmax')(pnn)
+
+        model = K.models.Model(inputs=input_layer, outputs=[pnn, vnn])
         return model
 
     def get_model_input(self, seq_xy_board):
