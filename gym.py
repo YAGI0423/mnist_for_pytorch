@@ -19,7 +19,7 @@ def get_main_agent_dir():
     main_root = './model/main_model/'
     model_list = os.listdir(main_root)
     if model_list:   #Exist
-        return main_root + model_list[0]
+        return main_root + model_list[-1]
     return None   #Empty
 
 def get_now_epoch():
