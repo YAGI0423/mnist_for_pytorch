@@ -71,6 +71,11 @@ class AlphaO:
             )
 
             print(f'\n\nload model from: {model_dir}\n\n')
+            
+            from tensorflow.keras.utils import plot_model
+            plot_model(self.model, show_shapes=True, to_file='model.png')
+            exit()
+
 
     def create_model(self):
         input = K.layers.Input(shape=(self.board_size, self.board_size, 3))
