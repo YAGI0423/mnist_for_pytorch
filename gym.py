@@ -1,9 +1,7 @@
 import model
 from GUI import GUI
 from rule import Rule
-# from util import Util
 from dataBook import DataBook
-# from gameBoard import GameBoard
 from playGame import PlayGame
 
 import os
@@ -88,7 +86,6 @@ while (now_epoch := get_now_epoch()) < total_epochs:
 
 
     #train===========================
-    train_history = None
     if len(dataset['value_y']) >= (buffer_size * 0.5):
         train_history = main_agent.train_model(dataset, batch_size=batch_size)
     #End=============================
@@ -211,5 +208,4 @@ while (now_epoch := get_now_epoch()) < total_epochs:
         
     
     gui.root.destroy()
-
     backend.clear_session()
