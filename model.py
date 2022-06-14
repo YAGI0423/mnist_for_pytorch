@@ -3,7 +3,10 @@ from util import Util
 
 import time
 import numpy as np
+
 from tensorflow import keras as K
+from K import regularizers as Reg
+
 
 class User:
     def __init__(self, board_size, rule):
@@ -51,78 +54,76 @@ class AlphaO:
 
         self.c = np.sqrt(2)
         self.diri_param = 0.03
+        self.epsilon = 0.25
         self.round_num = round_num
+
+        self.weight_decay = 0.0001
 
         self.model_dir = model_dir
         if self.model_dir is None:
             self.model = self.create_model()
-
-            self.model.compile(
-                optimizer=K.optimizers.SGD(learning_rate=self.lr, momentum=0.9),
-                loss=['categorical_crossentropy', 'mse']
-            )
             print(f'\n\ncreate new model...\n\n')
         else:
             self.model = K.models.load_model(model_dir)#, custom_objects={'LeakyReLU':K.layers.LeakyReLU()}
-            
-            self.model.compile(
-                optimizer=K.optimizers.SGD(learning_rate=self.lr, momentum=0.9),
-                loss=['categorical_crossentropy', 'mse']
-            )
-
             print(f'\n\nload model from: {model_dir}\n\n')
+        
+        self.model.compile(
+            optimizer=K.optimizers.SGD(learning_rate=self.lr, momentum=0.9),
+            loss=['categorical_crossentropy', 'mse'],
+            loss_weight=(0.5, 0.5)
+        )
 
 
     def create_model(self):
         input_layer = K.layers.Input(shape=(self.board_size, self.board_size, 3))
 
-        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same')(input_layer)
-        out = K.layers.BatchNormalization()(out)
+        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=Reg.l2(self.weight_decay))(input_layer)
+        out = K.layers.BatchNormalization(axis=1)(out)
         out1 = K.layers.LeakyReLU()(out)
 
-        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same')(out1)
-        out = K.layers.BatchNormalization()(out)
+        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=Reg.l2(self.weight_decay))(out1)
+        out = K.layers.BatchNormalization(axis=1)(out)
         out = K.layers.LeakyReLU()(out)
 
-        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same')(out)
-        out = K.layers.BatchNormalization()(out)
+        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=Reg.l2(self.weight_decay))(out)
+        out = K.layers.BatchNormalization(axis=1)(out)
 
         out = K.layers.Add()((out, out1))
         out1 = K.layers.LeakyReLU()(out)
 
-        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same')(out1)
-        out = K.layers.BatchNormalization()(out)
+        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=Reg.l2(self.weight_decay))(out1)
+        out = K.layers.BatchNormalization(axis=1)(out)
         out = K.layers.LeakyReLU()(out)
 
-        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same')(out)
-        out = K.layers.BatchNormalization()(out)
+        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=Reg.l2(self.weight_decay))(out)
+        out = K.layers.BatchNormalization(axis=1)(out)
 
         out = K.layers.Add()((out, out1))
         out1 = K.layers.LeakyReLU()(out)
 
-        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same')(out1)
-        out = K.layers.BatchNormalization()(out)
+        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=Reg.l2(self.weight_decay))(out1)
+        out = K.layers.BatchNormalization(axis=1)(out)
         out = K.layers.LeakyReLU()(out)
 
-        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same')(out)
-        out = K.layers.BatchNormalization()(out)
+        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=Reg.l2(self.weight_decay))(out)
+        out = K.layers.BatchNormalization(axis=1)(out)
 
         out = K.layers.Add()((out, out1))
         out = K.layers.LeakyReLU()(out)
 
-        vnn = K.layers.Conv2D(filters=1, kernel_size=1)(out)
-        vnn = K.layers.BatchNormalization()(vnn)
+        vnn = K.layers.Conv2D(filters=1, kernel_size=1, use_bias=False, kernel_regularizer=Reg.l2(self.weight_decay))(out)
+        vnn = K.layers.BatchNormalization(axis=1)(vnn)
         vnn = K.layers.LeakyReLU()(vnn)
         vnn = K.layers.Flatten()(vnn)
-        vnn = K.layers.Dense(256)(vnn)
+        vnn = K.layers.Dense(128, kernel_regularizer=Reg.l2(self.weight_decay))(vnn)
         vnn = K.layers.LeakyReLU()(vnn)
-        vnn = K.layers.Dense(1, activation='tanh', name='VNN')(vnn)
+        vnn = K.layers.Dense(1, activation='tanh', name='VNN', kernel_regularizer=Reg.l2(self.weight_decay))(vnn)
 
-        pnn = K.layers.Conv2D(filters=2, kernel_size=1)(out)
-        pnn = K.layers.BatchNormalization()(pnn)
+        pnn = K.layers.Conv2D(filters=2, kernel_size=1, use_bias=False, padding='same', kernel_regularizer=Reg.l2(self.weight_decay))(out)
+        pnn = K.layers.BatchNormalization(axis=1)(pnn)
         pnn = K.layers.LeakyReLU()(pnn)
         pnn = K.layers.Flatten()(pnn)
-        pnn = K.layers.Dense(self.board_size ** 2, activation='softmax', name='PNN')(pnn)
+        pnn = K.layers.Dense(self.board_size ** 2, activation='softmax', name='PNN', kernel_regularizer=Reg.l2(self.weight_decay))(pnn)
 
         model = K.models.Model(inputs=input_layer, outputs=(pnn, vnn))
         return model
@@ -178,7 +179,7 @@ class AlphaO:
             policy_pred, value_pred = model_predict(seq_xy_board)
 
             if diri_TF:
-                diri_prob = np.random.dirichlet([self.diri_param] * (self.board_size ** 2))
+                diri_prob = np.random.dirichlet([self.diri_param] * (self.board_size ** 2)) * self.epsilon
                 
                 #previous_diri
                 # policy_pred = (policy_pred * diri_prob) / np.sum(diri_prob)
@@ -204,7 +205,7 @@ class AlphaO:
                 value=value_pred,
                 idx=idx,
                 parent=parent,
-                branches=branches
+            branches=branches
             )
 
             #add child to parent
