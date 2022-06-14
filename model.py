@@ -5,7 +5,7 @@ import time
 import numpy as np
 
 from tensorflow import keras as K
-from K import regularizers as Reg
+from tensorflow.keras import regularizers as Reg
 
 
 class User:
@@ -70,7 +70,7 @@ class AlphaO:
         self.model.compile(
             optimizer=K.optimizers.SGD(learning_rate=self.lr, momentum=0.9),
             loss=['categorical_crossentropy', 'mse'],
-            loss_weight=(0.5, 0.5)
+            loss_weights=(0.5, 0.5)
         )
 
 

@@ -39,18 +39,17 @@ def lr_decay(init_lr, lim_lr, now_epoch, total_epochs):
 
 
 
-board_size = 10
-win_seq = 5
+board_size = 3
+win_seq = 3
 
-round_num = 800
+round_num = 3
 
 total_epochs = 500
 batch_size = 16
 buffer_size = 4096
 augment_rate = 0.6
 
-play_num = 16
-train_turm = 2
+play_num = 10
 
 COMPETE_NUM = 7
 
@@ -75,8 +74,6 @@ while (now_epoch := get_now_epoch()) < total_epochs:
     #End=============================
 
 
-    epoch_count = 0
-    train_history = None
 
     for p in range(play_num):
         print(f'\n\n{now_epoch} / {total_epochs}\n\n')
@@ -86,14 +83,15 @@ while (now_epoch := get_now_epoch()) < total_epochs:
             black=main_agent, white=main_agent,
             databook=databook, diri_TF=True, gui=gui
         )
+        dataset = databook.get_data(shuffle=True, augment_rate=augment_rate)
 
-        if p % train_turm == 0 or p == (play_num - 1):
-            dataset = databook.get_data(shuffle=True, augment_rate=augment_rate)
-            
-            
-            if len(dataset['value_y']) >= (buffer_size * 0.5):
-                epoch_count += 1
-                train_history = main_agent.train_model(dataset, batch_size=batch_size)
+
+    #train===========================
+    train_history = None
+    if len(dataset['value_y']) >= (buffer_size * 0.5):
+        train_history = main_agent.train_model(dataset, batch_size=batch_size)
+    #End=============================
+
 
     #save_pickle=====================
     databook.save_databook(save_dir='./dataset/buffer_dataset.pickle')
@@ -109,7 +107,7 @@ while (now_epoch := get_now_epoch()) < total_epochs:
         csv = pd.DataFrame({
             'idx': list(), 'agent_name': list(), 'date': list(),
             'learning_rate': list(), 'batch_size': list(),
-            'train_round': list(), 'train_epoch': list(), 'train_buffer_size': list(),
+            'play_num': list(), 'train_epoch': list(), 'train_buffer_size': list(),
             'PNN_loss': list(), 'VNN_loss': list(), 'train_loss': list(),
             'val_PNN_loss': list(), 'val_VNN_loss': list(), 'val_loss': list(),
             'win_num': list(), 'lose_num': list(), 'draw_num': list(),
@@ -181,8 +179,8 @@ while (now_epoch := get_now_epoch()) < total_epochs:
         'date': now,
         'learning_rate': learning_rate,
         'batch_size': batch_size,
-        'train_round': play_num,
-        'train_epoch': epoch_count,
+        'play_num': play_num,
+        'train_epoch': 1,
         'train_buffer_size': len(databook.value_y),
         'PNN_loss': tr_PNN_loss,
         'VNN_loss': tr_VNN_loss,
