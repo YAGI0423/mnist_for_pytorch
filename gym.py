@@ -1,9 +1,9 @@
 import model
 from GUI import GUI
 from rule import Rule
-from util import Util
+# from util import Util
 from dataBook import DataBook
-from gameBoard import GameBoard
+# from gameBoard import GameBoard
 from playGame import PlayGame
 
 import os
@@ -12,6 +12,8 @@ import time
 import random
 import numpy as np
 import pandas as pd
+
+from tensorflow.keras import backend
 
 
 #function============
@@ -42,7 +44,7 @@ def lr_decay(init_lr, lim_lr, now_epoch, total_epochs):
 board_size = 3
 win_seq = 3
 
-round_num = 3
+round_num = 5
 
 total_epochs = 500
 batch_size = 16
@@ -55,9 +57,8 @@ COMPETE_NUM = 7
 
 
 while (now_epoch := get_now_epoch()) < total_epochs:
-    learning_rate = lr_decay(init_lr=2e-5, lim_lr=6e-6, now_epoch=now_epoch, total_epochs=total_epochs)
-
     main_agent_dir = get_main_agent_dir()
+    learning_rate = lr_decay(init_lr=2e-5, lim_lr=6e-6, now_epoch=now_epoch, total_epochs=total_epochs)
 
 
     rule = Rule(board_size=board_size, win_seq=win_seq)
@@ -90,11 +91,6 @@ while (now_epoch := get_now_epoch()) < total_epochs:
     train_history = None
     if len(dataset['value_y']) >= (buffer_size * 0.5):
         train_history = main_agent.train_model(dataset, batch_size=batch_size)
-    #End=============================
-
-
-    #save_pickle=====================
-    databook.save_databook(save_dir='./dataset/buffer_dataset.pickle')
     #End=============================
 
 
@@ -152,7 +148,6 @@ while (now_epoch := get_now_epoch()) < total_epochs:
         else:
             lose_count += 1
 
-
     print(f'win rate: {win_count / COMPETE_NUM}')
 
 
@@ -194,23 +189,27 @@ while (now_epoch := get_now_epoch()) < total_epochs:
     }, ignore_index=True)
     csv.to_csv('./train_history.csv', index=False)
 
+    #save_pickle=====================
+    databook.save_databook(save_dir='./dataset/buffer_dataset.pickle')
+    databook = None
+    #End=============================
+
     if (win_count - lose_count) > 0.:   #win
         main_agent.save_model('./model/main_model/', int(idx)+1, int(end_round), int(end_round)+play_num)
 
         if not agent_info + '.h5' in os.listdir('./model/previous_model/'):
+            #previous에 없으면,
+            #optimizer 제거 후 previous로 이동
+            main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, round_num=0)
+            main_agent.model.save(main_agent_dir, include_optimizer=False)
             os.rename(main_agent_dir, f'./model/previous_model/{agent_info}.h5')
         else:
+            #previous에 있으면 main에 있는 모델 삭제
             os.remove(main_agent_dir)
     else:   #lose
-        # main_agent.save_model('./model/previous_model/', int(idx)+1, int(end_round), int(end_round)+play_num)
-        main_agent.save_model('./model/main_model/', int(idx)+1, int(end_round), int(end_round)+play_num)
+        pass
         
-        if not agent_info + '.h5' in os.listdir('./model/previous_model/'):
-            os.rename(main_agent_dir, f'./model/previous_model/{agent_info}.h5')
-        
-
-    #save_pickle=====================
-    databook.save_databook(save_dir='./dataset/buffer_dataset.pickle')
-    #End=============================
     
     gui.root.destroy()
+
+    backend.clear_session()

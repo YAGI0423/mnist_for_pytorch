@@ -242,7 +242,7 @@ class GUI:
         #End====================
 
         #pnn====================
-        pnn_info = {idx: round(pior, 3) for idx, pior in pnn_info.items() if pior >= 0.1}
+        pnn_info = {idx: round(pior, 3) for idx, pior in pnn_info.items() if pior >= 0.05}
 
         #remove previous round element
         self.delete_element(self.pnn_round_list)
