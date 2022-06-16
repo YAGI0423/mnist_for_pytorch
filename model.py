@@ -54,7 +54,7 @@ class AlphaO:
 
         self.c = np.sqrt(2)
         self.diri_param = 0.03
-        self.epsilon = 0.25
+        self.epsilon = 0.5
         self.round_num = round_num
 
         self.weight_decay = 0.0001
