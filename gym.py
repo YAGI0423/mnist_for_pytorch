@@ -49,7 +49,7 @@ batch_size = 16
 buffer_size = 4096
 augment_rate = 0.6
 
-play_num = 40
+play_num = 10
 
 COMPETE_NUM = 7
 
