@@ -85,6 +85,18 @@ class AlphaO:
         out = K.layers.Add()((out, out1))
         out1 = K.layers.LeakyReLU()(out)
 
+        
+
+        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(out1)
+        out = K.layers.BatchNormalization(axis=1)(out)
+        out = K.layers.LeakyReLU()(out)
+
+        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(out)
+        out = K.layers.BatchNormalization(axis=1)(out)
+
+        out = K.layers.Add()((out, out1))
+        out1 = K.layers.LeakyReLU()(out)
+
         out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(out1)
         out = K.layers.BatchNormalization(axis=1)(out)
         out = K.layers.LeakyReLU()(out)
@@ -109,7 +121,7 @@ class AlphaO:
         vnn = K.layers.BatchNormalization(axis=1)(vnn)
         vnn = K.layers.LeakyReLU()(vnn)
         vnn = K.layers.Flatten()(vnn)
-        vnn = K.layers.Dense(128)(vnn)
+        vnn = K.layers.Dense(256)(vnn)
         vnn = K.layers.LeakyReLU()(vnn)
         vnn = K.layers.Dense(1, activation='tanh', name='VNN')(vnn)
 

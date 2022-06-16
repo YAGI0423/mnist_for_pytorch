@@ -39,19 +39,21 @@ def lr_decay(init_lr, lim_lr, now_epoch, total_epochs):
 
 
 
-board_size = 3
-win_seq = 3
+board_size = 10
+win_seq = 5
 
-round_num = 5
+round_num = 32
 
 total_epochs = 500
 batch_size = 16
 buffer_size = 4096
 augment_rate = 0.6
 
-play_num = 10
+play_num = 40
 
 COMPETE_NUM = 7
+
+gui = GUI(board_size=board_size, black_info=2, white_info=2)
 
 
 while (now_epoch := get_now_epoch()) < total_epochs:
@@ -63,7 +65,7 @@ while (now_epoch := get_now_epoch()) < total_epochs:
     play_game = PlayGame(board_size=board_size, rule=rule)
     main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, lr=learning_rate, round_num=round_num)
 
-    gui = GUI(board_size=board_size, black_info=2, white_info=2)
+    gui.clear_canvas()
     
     #load databook===================
     if 'buffer_dataset.pickle' in os.listdir('./dataset/'):
@@ -86,6 +88,7 @@ while (now_epoch := get_now_epoch()) < total_epochs:
 
 
     #train===========================
+    train_history = None
     if len(dataset['value_y']) >= (buffer_size * 0.5):
         train_history = main_agent.train_model(dataset, batch_size=batch_size)
     #End=============================
@@ -207,5 +210,4 @@ while (now_epoch := get_now_epoch()) < total_epochs:
         pass
         
     
-    gui.root.destroy()
     backend.clear_session()

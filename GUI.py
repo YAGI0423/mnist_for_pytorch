@@ -182,6 +182,34 @@ class GUI:
 
 
         self.root.bind("<Motion>", wheon_move_mouse)
+
+    def init_gui(self):
+        def init_board(canvas, step_tuple):
+            canvas.create_rectangle(
+                self.bd['x'], self.bd['y'],
+                self.bd['x']+self.board_wh, self.bd['y']+self.board_wh
+            )
+
+            #draw row, col=============
+            for step in step_tuple[1:-1]:
+                canvas.create_line(    #row
+                    self.bd['x'], self.bd['y']+step,
+                    self.bd['x']+self.board_wh, self.bd['y']+step
+                )
+                canvas.create_line(    #col
+                    self.bd['x']+step, self.bd['y'],
+                    self.bd['x']+step, self.bd['y']+self.board_wh
+                )
+            #End=======================
+
+            #draw cross dot============
+            for step_y in step_tuple[1:-1]:
+                for step_x in step_tuple[1:-1]:
+                    canvas.create_oval(
+                        self.bd['x'] - 3 + step_x, self.bd['y'] - 3 + step_y,
+                        self.bd['x'] + 3 + step_x, self.bd['y'] + 3 + step_y
+                    )
+            #End=======================
         
     def idx_to_pix(self, x, y):
         x = self.bd['x'] + self.step_tuple[x]
@@ -279,12 +307,46 @@ class GUI:
         #End====================
 
     def clear_canvas(self):
+        def init_board(canvas, step_tuple):
+            canvas.create_rectangle(
+                self.bd['x'], self.bd['y'],
+                self.bd['x']+self.board_wh, self.bd['y']+self.board_wh
+            )
+
+            #draw row, col=============
+            for step in step_tuple[1:-1]:
+                canvas.create_line(    #row
+                    self.bd['x'], self.bd['y']+step,
+                    self.bd['x']+self.board_wh, self.bd['y']+step
+                )
+                canvas.create_line(    #col
+                    self.bd['x']+step, self.bd['y'],
+                    self.bd['x']+step, self.bd['y']+self.board_wh
+                )
+            #End=======================
+
+            #draw cross dot============
+            for step_y in step_tuple[1:-1]:
+                for step_x in step_tuple[1:-1]:
+                    canvas.create_oval(
+                        self.bd['x'] - 3 + step_x, self.bd['y'] - 3 + step_y,
+                        self.bd['x'] + 3 + step_x, self.bd['y'] + 3 + step_y
+                    )
+            #End=======================
+
+            
         self.pre_idx_txt_ele = None
 
         self.delete_element(self.stone_list)
         self.delete_element(self.pnn_text_list)
         self.delete_element(self.pnn_round_list)
         self.delete_element(self.stone_idx_list)
+
+        self.root.children['!label4'].config(text=f'VNN:')  #white vnn
+        self.root.children['!label3'].config(text=f'VNN:')   #black vnn
+
+        init_board(self.board, self.step_tuple)
+        self.root.update()
 
 
 if __name__ == '__main__':
