@@ -8,23 +8,50 @@ class PlayGame:
         self.board_size = board_size
         self.discount_factor = 1.
         self.rule = rule
+
+        self.max_stone_num = self.board_size ** 2
+        self.min_stone_num = self.rule.win_seq * 2
+        self.short_game_reward = 0.7
+
         
     def play(self, black, white, databook, diri_TF=False, gui=None):
-        def get_value_y(seq_xy_board, win_code, discount_factor):
-            turn_count = len(seq_xy_board)
-            value_y = [0.] * turn_count
+        def get_value_y(seq_xy_board, win_code, discount_factor, short_game_reward):
+            def calculate_discount(value_y, stone_num, factor):
+                if factor < 1.:
+                    value_y = value_y.copy()
+                    gamma = 1.
 
-            if win_code < 2:
-                for idx in range(turn_count):
-                    value_y[idx] = float(win_code == (idx % 2)) * 2 - 1
+                    for idx in range(stone_num):
+                        value_y[idx] *= gamma
 
-                #discount factor
-                gamma = 1.
-                for idx in range(turn_count):
+                        if idx % 2:
+                            gamma *= factor
+                return value_y
+
+            def calculate_short_reward(value_y, stone_num, short_game_reward):
+                value_y = value_y.copy()
+                lim_stone_num = min(stone_num, self.max_stone_num)
+                lim_stone_num = max(lim_stone_num, self.min_stone_num)
+
+                gamma = (short_game_reward - 1) * (lim_stone_num - self.min_stone_num)
+                gamma /= self.max_stone_num - self.min_stone_num
+                gamma += 1
+
+                for idx in range(stone_num):
                     value_y[idx] *= gamma
 
-                    if idx % 2:
-                        gamma *= discount_factor
+                return value_y
+
+            stone_num = len(seq_xy_board)
+            value_y = [0.] * stone_num
+
+            if win_code < 2:
+                for idx in range(stone_num):
+                    value_y[idx] = float(win_code == (idx % 2)) * 2 - 1
+
+            value_y = calculate_discount(value_y, stone_num, discount_factor)
+            value_y = calculate_short_reward(value_y, stone_num, short_game_reward)
+
             return tuple(value_y)
 
         board = GameBoard()
@@ -81,7 +108,10 @@ class PlayGame:
 
         print('winner:', win_code, end='\n\n')
 
-        value_y = get_value_y(now_board, win_code, discount_factor=self.discount_factor)
+        value_y = get_value_y(
+            now_board, win_code,
+            discount_factor=self.discount_factor, short_game_reward=self.short_game_reward
+        )
         databook.add_data({'value_y': value_y})
 
         return win_code
