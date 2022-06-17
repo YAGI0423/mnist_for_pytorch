@@ -57,7 +57,7 @@ class AlphaO:
         self.epsilon = 0.5
         self.round_num = round_num
 
-        self.weight_decay = 0.00003
+        self.weight_decay = 0.0001
 
         self.model_dir = model_dir
         if self.model_dir is None:
@@ -86,19 +86,8 @@ class AlphaO:
         out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(input_layer)
         out = K.layers.BatchNormalization(axis=1)(out)
         out1 = K.layers.LeakyReLU()(out)
-
-        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(out1)
-        out = K.layers.BatchNormalization(axis=1)(out)
-        out = K.layers.LeakyReLU()(out)
-
-        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(out)
-        out = K.layers.BatchNormalization(axis=1)(out)
-
-        out = K.layers.Add()((out, out1))
-        out1 = K.layers.LeakyReLU()(out)
-
         
-        for i in range(5):
+        for _ in range(3):
             out1 = residual_module(out1)
 
         vnn = K.layers.Conv2D(filters=1, kernel_size=1, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(out1)
@@ -128,7 +117,8 @@ class AlphaO:
 
         # from tensorflow.keras.utils import plot_model
         # plot_model(model, show_shapes=True, to_file='model.png')
-        
+        # exit()
+
         return model
 
     def get_model_input(self, seq_xy_board):
