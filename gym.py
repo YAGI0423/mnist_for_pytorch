@@ -39,13 +39,13 @@ def lr_decay(init_lr, lim_lr, now_epoch, total_epochs):
 
 
 
-board_size = 5
+board_size = 7
 win_seq = 5
 
-round_num = 25
+round_num = 49
 
-total_epochs = 500
-batch_size = 8
+total_epochs = 50
+batch_size = 32
 buffer_size = 1024
 augment_rate = None
 
@@ -53,12 +53,14 @@ play_num = 10
 
 COMPETE_NUM = 7
 
+learning_rate = 2e-5
+
 gui = GUI(board_size=board_size, black_info=2, white_info=2)
 
 
 while (now_epoch := get_now_epoch()) < total_epochs:
     main_agent_dir = get_main_agent_dir()
-    learning_rate = lr_decay(init_lr=2e-5, lim_lr=6e-6, now_epoch=now_epoch, total_epochs=total_epochs)
+    # learning_rate = lr_decay(init_lr=2e-5, lim_lr=6e-6, now_epoch=now_epoch, total_epochs=total_epochs)
 
 
     rule = Rule(board_size=board_size, win_seq=win_seq)

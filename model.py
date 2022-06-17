@@ -57,7 +57,7 @@ class AlphaO:
         self.epsilon = 0.5
         self.round_num = round_num
 
-        self.weight_decay = 0.0001
+        self.weight_decay = 0.00003
 
         self.model_dir = model_dir
         if self.model_dir is None:
@@ -69,6 +69,18 @@ class AlphaO:
         
         
     def create_model(self):
+        def residual_module(x):
+            y = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(x)
+            y = K.layers.BatchNormalization(axis=1)(y)
+            y = K.layers.LeakyReLU()(y)
+
+            y = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(y)
+            y = K.layers.BatchNormalization(axis=1)(y)
+
+            y = K.layers.Add()((y, x))
+            y = K.layers.LeakyReLU()(y)
+            return y
+
         input_layer = K.layers.Input(shape=(self.board_size, self.board_size, 3))
 
         out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(input_layer)
@@ -86,58 +98,10 @@ class AlphaO:
         out1 = K.layers.LeakyReLU()(out)
 
         
+        for i in range(5):
+            out1 = residual_module(out1)
 
-        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(out1)
-        out = K.layers.BatchNormalization(axis=1)(out)
-        out = K.layers.LeakyReLU()(out)
-
-        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(out)
-        out = K.layers.BatchNormalization(axis=1)(out)
-
-        out = K.layers.Add()((out, out1))
-        out1 = K.layers.LeakyReLU()(out)
-
-        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(out1)
-        out = K.layers.BatchNormalization(axis=1)(out)
-        out = K.layers.LeakyReLU()(out)
-
-        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(out)
-        out = K.layers.BatchNormalization(axis=1)(out)
-
-        out = K.layers.Add()((out, out1))
-        out1 = K.layers.LeakyReLU()(out)
-
-        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(out1)
-        out = K.layers.BatchNormalization(axis=1)(out)
-        out = K.layers.LeakyReLU()(out)
-
-        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(out)
-        out = K.layers.BatchNormalization(axis=1)(out)
-
-        out = K.layers.Add()((out, out1))
-        out1 = K.layers.LeakyReLU()(out)
-
-        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(out1)
-        out = K.layers.BatchNormalization(axis=1)(out)
-        out = K.layers.LeakyReLU()(out)
-
-        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(out)
-        out = K.layers.BatchNormalization(axis=1)(out)
-
-        out = K.layers.Add()((out, out1))
-        out1 = K.layers.LeakyReLU()(out)
-
-        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(out1)
-        out = K.layers.BatchNormalization(axis=1)(out)
-        out = K.layers.LeakyReLU()(out)
-
-        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(out)
-        out = K.layers.BatchNormalization(axis=1)(out)
-
-        out = K.layers.Add()((out, out1))
-        out = K.layers.LeakyReLU()(out)
-
-        vnn = K.layers.Conv2D(filters=1, kernel_size=1, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(out)
+        vnn = K.layers.Conv2D(filters=1, kernel_size=1, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(out1)
         vnn = K.layers.BatchNormalization(axis=1)(vnn)
         vnn = K.layers.LeakyReLU()(vnn)
         vnn = K.layers.Flatten()(vnn)
@@ -145,7 +109,7 @@ class AlphaO:
         vnn = K.layers.LeakyReLU()(vnn)
         vnn = K.layers.Dense(1, activation='tanh', name='VNN')(vnn)
 
-        pnn = K.layers.Conv2D(filters=2, kernel_size=1, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(out)
+        pnn = K.layers.Conv2D(filters=2, kernel_size=1, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(out1)
         pnn = K.layers.BatchNormalization(axis=1)(pnn)
         pnn = K.layers.LeakyReLU()(pnn)
         pnn = K.layers.Flatten()(pnn)
@@ -157,7 +121,7 @@ class AlphaO:
         model.compile(
             optimizer=K.optimizers.SGD(learning_rate=self.lr, momentum=0.9),
             loss=['categorical_crossentropy', 'mse'],
-            loss_weights=(0.5, 0.5)
+            # loss_weights=(0.5, 0.5)
         )
         return model
 
