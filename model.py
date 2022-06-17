@@ -123,6 +123,12 @@ class AlphaO:
             loss=['categorical_crossentropy', 'mse'],
             # loss_weights=(0.5, 0.5)
         )
+
+        # print(model.summary())
+
+        # from tensorflow.keras.utils import plot_model
+        # plot_model(model, show_shapes=True, to_file='model.png')
+        
         return model
 
     def get_model_input(self, seq_xy_board):

@@ -6,6 +6,7 @@ from gameBoard import GameBoard
 class PlayGame:
     def __init__(self, board_size, rule):
         self.board_size = board_size
+        self.discount_factor = 1.
         self.rule = rule
         
     def play(self, black, white, databook, diri_TF=False, gui=None):
@@ -80,7 +81,7 @@ class PlayGame:
 
         print('winner:', win_code, end='\n\n')
 
-        value_y = get_value_y(now_board, win_code, discount_factor=1.)
+        value_y = get_value_y(now_board, win_code, discount_factor=self.discount_factor)
         databook.add_data({'value_y': value_y})
 
         return win_code
