@@ -69,11 +69,11 @@ class AlphaO:
         
     def create_model(self):
         def residual_module(x):
-            y = K.layers.Conv2D(filters=256, kernel_size=3, padding='same')(x) #, use_bias=False, kernel_regularizer=l2(self.weight_decay)
+            y = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False)(x) #, use_bias=False, kernel_regularizer=l2(self.weight_decay)
             y = K.layers.BatchNormalization()(y)
             y = K.layers.LeakyReLU()(y)
 
-            y = K.layers.Conv2D(filters=256, kernel_size=3, padding='same')(y)
+            y = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False)(y)
             y = K.layers.BatchNormalization()(y)
 
             y = K.layers.Add()((y, x))
@@ -82,14 +82,14 @@ class AlphaO:
 
         input_layer = K.layers.Input(shape=(self.board_size, self.board_size, 3))
 
-        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same')(input_layer)
+        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False)(input_layer)
         out = K.layers.BatchNormalization()(out)
         out1 = K.layers.LeakyReLU()(out)
         
         for _ in range(3):
             out1 = residual_module(out1)
 
-        vnn = K.layers.Conv2D(filters=1, kernel_size=1, padding='same')(out1)
+        vnn = K.layers.Conv2D(filters=1, kernel_size=1, padding='same', use_bias=False)(out1)
         vnn = K.layers.BatchNormalization()(vnn)
         vnn = K.layers.LeakyReLU()(vnn)
         vnn = K.layers.Flatten()(vnn)
