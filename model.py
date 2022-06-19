@@ -86,7 +86,7 @@ class AlphaO:
         out = K.layers.BatchNormalization()(out)
         out1 = K.layers.LeakyReLU()(out)
         
-        for _ in range(9):
+        for _ in range(6):
             out1 = residual_module(out1)
 
         vnn = K.layers.Conv2D(filters=1, kernel_size=1, padding='same')(out1)
