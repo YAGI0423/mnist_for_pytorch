@@ -6,7 +6,7 @@ from gameBoard import GameBoard
 class PlayGame:
     def __init__(self, board_size, rule):
         self.board_size = board_size
-        self.discount_factor = 0.99
+        self.discount_factor = 1.
         self.rule = rule
 
         self.max_stone_num = self.board_size ** 2
