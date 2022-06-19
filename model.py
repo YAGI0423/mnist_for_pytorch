@@ -53,7 +53,7 @@ class AlphaO:
         self.lr = lr
 
         self.c = np.sqrt(2)
-        self.diri_param = 0.03
+        self.diri_param = 0.8
         self.round_num = round_num
 
         self.weight_decay = 0.0001
@@ -178,6 +178,7 @@ class AlphaO:
                 
                 #new_diri
                 policy_pred = (policy_pred + diri_prob) / 2.
+
 
             #get node's branches
             able_loc = self.rule.get_able_loc(seq_xy_board)

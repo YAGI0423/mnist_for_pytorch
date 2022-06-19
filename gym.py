@@ -53,7 +53,7 @@ play_num = 2
 
 COMPETE_NUM = 1
 
-learning_rate = 2e-6
+learning_rate = 2e-5
 
 gui = GUI(board_size=board_size, black_info=2, white_info=2)
 
