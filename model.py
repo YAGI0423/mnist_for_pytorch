@@ -172,6 +172,8 @@ class AlphaO:
 
             if diri_TF:
                 diri_prob = np.random.dirichlet([self.diri_param] * (self.board_size ** 2))
+                print(diri_prob)
+                exit()
                 
                 #previous_diri
                 # policy_pred = (policy_pred * diri_prob) / np.sum(diri_prob)

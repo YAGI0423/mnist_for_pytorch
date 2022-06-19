@@ -39,8 +39,8 @@ def lr_decay(init_lr, lim_lr, now_epoch, total_epochs):
 
 
 
-board_size = 3
-win_seq = 3
+board_size = 5
+win_seq = 5
 
 round_num = 1
 
