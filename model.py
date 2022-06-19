@@ -86,7 +86,7 @@ class AlphaO:
         out = K.layers.BatchNormalization()(out)
         out1 = K.layers.LeakyReLU()(out)
         
-        for _ in range(3):
+        for _ in range(9):
             out1 = residual_module(out1)
 
         vnn = K.layers.Conv2D(filters=1, kernel_size=1, padding='same')(out1)
@@ -172,8 +172,6 @@ class AlphaO:
 
             if diri_TF:
                 diri_prob = np.random.dirichlet([self.diri_param] * (self.board_size ** 2))
-                print(diri_prob)
-                exit()
                 
                 #previous_diri
                 # policy_pred = (policy_pred * diri_prob) / np.sum(diri_prob)
