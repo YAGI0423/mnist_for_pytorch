@@ -53,7 +53,7 @@ class AlphaO:
         self.lr = lr
 
         self.c = np.sqrt(2)
-        self.diri_param = 0.8
+        self.diri_param = 0.2
         self.round_num = round_num
 
         self.weight_decay = 0.0001
@@ -86,7 +86,7 @@ class AlphaO:
         out = K.layers.BatchNormalization()(out)
         out1 = K.layers.LeakyReLU()(out)
         
-        for _ in range(6):
+        for _ in range(9):
             out1 = residual_module(out1)
 
         vnn = K.layers.Conv2D(filters=1, kernel_size=1, padding='same')(out1)
@@ -172,6 +172,7 @@ class AlphaO:
 
             if diri_TF:
                 diri_prob = np.random.dirichlet([self.diri_param] * (self.board_size ** 2))
+                
                 
                 #previous_diri
                 # policy_pred = (policy_pred * diri_prob) / np.sum(diri_prob)
