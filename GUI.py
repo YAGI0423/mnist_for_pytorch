@@ -345,6 +345,7 @@ class GUI:
         self.root.children['!label4'].config(text=f'VNN:')  #white vnn
         self.root.children['!label3'].config(text=f'VNN:')   #black vnn
 
+        self.board.delete('all')
         init_board(self.board, self.step_tuple)
         self.root.update()
 
@@ -362,7 +363,7 @@ if __name__ == '__main__':
     
     import time
 
-    gui = GUI(board_size=3, black_code=2, white_code=0)
+    gui = GUI(board_size=3, black_info=2, white_info=0)
 
     
     # gui.root.mainloop()
@@ -382,8 +383,5 @@ if __name__ == '__main__':
         )
 
         gui.print_canvas()
-
-        print(gui.board.children)
-        exit()
-        time.sleep(2)
+        time.sleep(0.1)
 
