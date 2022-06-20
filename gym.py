@@ -40,7 +40,7 @@ def lr_decay(init_lr, lim_lr, now_epoch, total_epochs):
 
 
 #해결 문제===========
-#1. 학습이 지속 될 수록 속도가 느려지는 문제(아마 GUI 누적이 원인으로 예상)
+
 #End=================
 
 board_size = 7
@@ -48,9 +48,9 @@ win_seq = 5
 
 round_num = 1
 
-total_epochs = 150
+total_epochs = 500
 batch_size = 8
-buffer_size = 4096
+buffer_size = 1024
 augment_rate = 0.3
 
 play_num = 2
