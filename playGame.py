@@ -50,7 +50,7 @@ class PlayGame:
                     value_y[idx] = float(win_code == (idx % 2)) * 2 - 1
 
             value_y = calculate_discount(value_y, stone_num, discount_factor)
-            value_y = calculate_short_reward(value_y, stone_num, short_game_reward)
+            # value_y = calculate_short_reward(value_y, stone_num, short_game_reward)
 
             return tuple(value_y)
 

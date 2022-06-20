@@ -382,5 +382,8 @@ if __name__ == '__main__':
         )
 
         gui.print_canvas()
+
+        print(gui.board.children)
+        exit()
         time.sleep(2)
 

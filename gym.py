@@ -39,10 +39,14 @@ def lr_decay(init_lr, lim_lr, now_epoch, total_epochs):
 
 
 
+#해결 문제===========
+#1. 학습이 지속 될 수록 속도가 느려지는 문제(아마 GUI 누적이 원인으로 예상)
+#End=================
+
 board_size = 5
 win_seq = 5
 
-round_num = 1
+round_num = 4
 
 total_epochs = 150
 batch_size = 8
@@ -67,6 +71,9 @@ while (now_epoch := get_now_epoch()) < total_epochs:
     play_game = PlayGame(board_size=board_size, rule=rule)
     main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, lr=learning_rate, round_num=round_num)
 
+    if now_epoch % 10 == 0:
+        gui.root.destroy()
+        gui = GUI(board_size=board_size, black_info=2, white_info=2)
     gui.clear_canvas()
     
     #load databook===================
