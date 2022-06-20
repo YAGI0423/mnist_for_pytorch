@@ -53,7 +53,7 @@ class AlphaO:
         self.lr = lr
 
         self.c = np.sqrt(2)
-        self.diri_param = 0.2
+        self.diri_param = 0.03
         self.round_num = round_num
 
         self.weight_decay = 0.0001
@@ -172,7 +172,6 @@ class AlphaO:
 
             if diri_TF:
                 diri_prob = np.random.dirichlet([self.diri_param] * (self.board_size ** 2))
-                
                 
                 #previous_diri
                 # policy_pred = (policy_pred * diri_prob) / np.sum(diri_prob)
