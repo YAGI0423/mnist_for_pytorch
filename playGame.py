@@ -11,7 +11,7 @@ class PlayGame:
 
         self.max_stone_num = self.board_size ** 2
         self.min_stone_num = self.rule.win_seq * 2
-        self.short_game_reward = 0.7
+        self.short_game_reward = 0.8
 
         
     def play(self, black, white, databook, diri_TF=False, gui=None):

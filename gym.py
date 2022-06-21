@@ -46,10 +46,10 @@ def lr_decay(init_lr, lim_lr, now_epoch, total_epochs):
 board_size = 7
 win_seq = 5
 
-round_num = 1
+round_num = 4
 
 total_epochs = 500
-batch_size = 16
+batch_size = 8
 buffer_size = 1024
 augment_rate = 0.3
 
