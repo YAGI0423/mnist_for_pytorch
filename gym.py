@@ -71,9 +71,9 @@ while (now_epoch := get_now_epoch()) < total_epochs:
     play_game = PlayGame(board_size=board_size, rule=rule)
     main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, lr=learning_rate, round_num=round_num)
 
-    # if now_epoch % 10 == 0:
-    #     gui.root.destroy()
-    #     gui = GUI(board_size=board_size, black_info=2, white_info=2)
+    if now_epoch % 100 == 0:
+        gui.root.destroy()
+        gui = GUI(board_size=board_size, black_info=2, white_info=2)
     gui.clear_canvas()
     
     #load databook===================
