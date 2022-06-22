@@ -69,11 +69,11 @@ class AlphaO:
         
     def create_model(self):
         def residual_module(x):
-            y = K.layers.Conv2D(filters=256, kernel_size=3, padding='same')(x) #, use_bias=False, kernel_regularizer=l2(self.weight_decay)
+            y = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', kernel_regularizer=l2(self.weight_decay))(x) #, use_bias=False, kernel_regularizer=l2(self.weight_decay)
             y = K.layers.BatchNormalization()(y)
             y = K.layers.LeakyReLU()(y)
 
-            y = K.layers.Conv2D(filters=256, kernel_size=3, padding='same')(y)
+            y = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', kernel_regularizer=l2(self.weight_decay))(y)
             y = K.layers.BatchNormalization()(y)
 
             y = K.layers.Add()((y, x))
@@ -82,14 +82,14 @@ class AlphaO:
 
         input_layer = K.layers.Input(shape=(self.board_size, self.board_size, 3))
 
-        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same')(input_layer)
+        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', kernel_regularizer=l2(self.weight_decay))(input_layer)
         out = K.layers.BatchNormalization()(out)
         out1 = K.layers.LeakyReLU()(out)
         
         for _ in range(16):
             out1 = residual_module(out1)
 
-        vnn = K.layers.Conv2D(filters=1, kernel_size=1, padding='same')(out1)
+        vnn = K.layers.Conv2D(filters=1, kernel_size=1, padding='same', kernel_regularizer=l2(self.weight_decay))(out1)
         vnn = K.layers.BatchNormalization()(vnn)
         vnn = K.layers.LeakyReLU()(vnn)
         vnn = K.layers.Flatten()(vnn)
@@ -97,7 +97,7 @@ class AlphaO:
         vnn = K.layers.LeakyReLU()(vnn)
         vnn = K.layers.Dense(1, activation='tanh', name='VNN')(vnn)
 
-        pnn = K.layers.Conv2D(filters=2, kernel_size=1, padding='same')(out1)
+        pnn = K.layers.Conv2D(filters=2, kernel_size=1, padding='same', kernel_regularizer=l2(self.weight_decay))(out1)
         pnn = K.layers.BatchNormalization()(pnn)
         pnn = K.layers.LeakyReLU()(pnn)
         pnn = K.layers.Flatten()(pnn)
