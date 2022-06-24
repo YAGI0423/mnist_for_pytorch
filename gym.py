@@ -50,7 +50,7 @@ round_num = 50
 
 total_epochs = 500
 batch_size = 8
-buffer_size = 2048
+buffer_size = 4096
 augment_rate = 0.3
 
 play_num = 2
