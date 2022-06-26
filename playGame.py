@@ -52,7 +52,7 @@ class PlayGame:
             value_y = calculate_discount(value_y, stone_num, discount_factor)
             # value_y = calculate_short_reward(value_y, stone_num, short_game_reward)
 
-            return tuple(value_y)
+            return tuple(value_y)   
 
         board = GameBoard()
         now_board = board.get_board()

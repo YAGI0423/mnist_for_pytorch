@@ -40,17 +40,17 @@ def lr_decay(init_lr, lim_lr, now_epoch, total_epochs):
 
 
 #해결 문제===========
-
+#1. compeat 시, 과거 모델의 수도 databook에 기록 되는 문제가 있음
 #End=================
 
-board_size = 7
-win_seq = 5
+board_size = 3
+win_seq = 3
 
-round_num = 50
+round_num = 1
 
 total_epochs = 500
-batch_size = 16
-buffer_size = 2048
+batch_size = 8
+buffer_size = 512
 augment_rate = 0.3
 
 play_num = 2
@@ -133,6 +133,7 @@ while (now_epoch := get_now_epoch()) < total_epochs:
         pre_agent_dir = './model/previous_model/' + pre_agent_dir
 
         pre_agent = model.AlphaO(board_size, rule, model_dir=pre_agent_dir, round_num=round_num)
+        compete_databook = DataBook(buffer_size=buffer_size)
 
         if main_agent_color := random.randint(0, 1):
             black, white = pre_agent, main_agent
@@ -148,7 +149,9 @@ while (now_epoch := get_now_epoch()) < total_epochs:
             print('=' * 50)
         
 
-        win_code = play_game.play(black=black, white=white, databook=databook, diri_TF=False, gui=gui)
+        win_code = play_game.play(black=black, white=white, databook=compete_databook, diri_TF=False, gui=gui)
+        print(compete_databook.get_data(shuffle=False))
+        exit()
 
         if win_code == main_agent_color:   #when main agent win
             win_count += 1
