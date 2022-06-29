@@ -40,38 +40,37 @@ def lr_decay(init_lr, lim_lr, now_epoch, total_epochs):
 
 
 #해결 문제===========
-#1. compeat 시, 과거 모델의 수도 databook에 기록 되는 문제가 있음
 #End=================
 
-board_size = 3
-win_seq = 3
+board_size = 10
+win_seq = 5
 
-round_num = 1
+round_num = 256
 
 total_epochs = 500
-batch_size = 8
-buffer_size = 512
-augment_rate = 0.3
+batch_size = 64
+buffer_size = 16384
+augment_rate = 0.6
 
-play_num = 2
+play_num = 16
 
-COMPETE_NUM = 1
+COMPETE_NUM = 7
 
-learning_rate = 2e-5
+# learning_rate = 2e-5
 
 gui = GUI(board_size=board_size, black_info=2, white_info=2)
 
 
 while (now_epoch := get_now_epoch()) < total_epochs:
     main_agent_dir = get_main_agent_dir()
-    # learning_rate = lr_decay(init_lr=2e-5, lim_lr=6e-6, now_epoch=now_epoch, total_epochs=total_epochs)
+    learning_rate = lr_decay(init_lr=2e-5, lim_lr=6e-6, now_epoch=now_epoch, total_epochs=total_epochs)
 
 
     rule = Rule(board_size=board_size, win_seq=win_seq)
     play_game = PlayGame(board_size=board_size, rule=rule)
     main_agent = model.AlphaO(board_size, rule, model_dir=main_agent_dir, lr=learning_rate, round_num=round_num)
 
-    if now_epoch % 100 == 0:
+    if now_epoch % 3 == 0:
         gui.root.destroy()
         gui = GUI(board_size=board_size, black_info=2, white_info=2)
     gui.clear_canvas()
@@ -150,8 +149,15 @@ while (now_epoch := get_now_epoch()) < total_epochs:
         
 
         win_code = play_game.play(black=black, white=white, databook=compete_databook, diri_TF=False, gui=gui)
-        print(compete_databook.get_data(shuffle=False))
-        exit()
+        
+        #RECORAD ONLY MAIN AGENT DATA========
+        comp_data = compete_databook.get_data(shuffle=False)
+        state_x, policy_y, value_y = comp_data['x'], comp_data['policy_y'], comp_data['value_y']
+
+        comp_data['x'] = comp_data['x'][main_agent_color::2]
+        comp_data['policy_y'] = comp_data['policy_y'][main_agent_color::2]
+        comp_data['value_y'] = comp_data['value_y'][main_agent_color::2]
+        #End=================================
 
         if win_code == main_agent_color:   #when main agent win
             win_count += 1

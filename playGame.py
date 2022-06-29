@@ -57,8 +57,6 @@ class PlayGame:
         board = GameBoard()
         now_board = board.get_board()
 
-        
-        # gui.print_canvas()
 
         while self.rule.game_status(now_board)['during']:
             print("=" * 100)
