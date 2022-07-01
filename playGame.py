@@ -140,7 +140,7 @@ if __name__ == '__main__':
             return model.RandomChoice(board_size=board_size, rule=rule)
         return model.AlphaO(
             board_size=board_size, rule=rule,
-            model_dir=get_main_agent_dir()
+            model_dir=get_main_agent_dir(), round_num=1600
         )   #alphaO
 
 
