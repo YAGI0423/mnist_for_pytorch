@@ -58,6 +58,8 @@ class AlphaO:
 
         self.weight_decay = 0.0001
 
+        self.root = None
+
         self.model_dir = model_dir
         if self.model_dir is None:
             self.model = self.create_model()
@@ -220,8 +222,10 @@ class AlphaO:
             return max(node.get_branches_keys(), key=score_branch)
         #End=========================================
 
-
-        root = create_node(seq_xy_board, idx=None, parent=None, diri_TF=diri_TF)
+        if self.root is None:
+            root = create_node(seq_xy_board, idx=None, parent=None, diri_TF=diri_TF)
+        else:
+            root = self.root
 
         for round in range(self.round_num):
             node = root
@@ -276,7 +280,7 @@ class AlphaO:
             return policy_y
 
         root, xy_loc = self.predict_stone(seq_xy_board, diri_TF)
-        print(f'value: {root.value:.3f}')
+        self.root = root.childrens[xy_loc[0] + xy_loc[1] * self.board_size]
 
         return {
             'state': self.get_model_input(root.state),
