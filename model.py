@@ -58,7 +58,6 @@ class AlphaO:
 
         self.weight_decay = 0.0001
 
-        self.root = None
 
         self.model_dir = model_dir
         if self.model_dir is None:
@@ -71,11 +70,11 @@ class AlphaO:
         
     def create_model(self):
         def residual_module(x):
-            y = K.layers.Conv2D(filters=256, kernel_size=3, padding='same')(x) #, use_bias=False, kernel_regularizer=l2(self.weight_decay)
+            y = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(x) #, use_bias=False, kernel_regularizer=l2(self.weight_decay)
             y = K.layers.BatchNormalization()(y)
             y = K.layers.LeakyReLU()(y)
 
-            y = K.layers.Conv2D(filters=256, kernel_size=3, padding='same')(y)
+            y = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(y)
             y = K.layers.BatchNormalization()(y)
 
             y = K.layers.Add()((y, x))
@@ -84,22 +83,22 @@ class AlphaO:
 
         input_layer = K.layers.Input(shape=(self.board_size, self.board_size, 3))
 
-        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same')(input_layer)
+        out = K.layers.Conv2D(filters=256, kernel_size=3, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(input_layer)
         out = K.layers.BatchNormalization()(out)
         out1 = K.layers.LeakyReLU()(out)
         
         for _ in range(20):
             out1 = residual_module(out1)
 
-        vnn = K.layers.Conv2D(filters=1, kernel_size=1, padding='same')(out1)
-        vnn = K.layers.BatchNormalization()(vnn)
+        vnn = K.layers.Conv2D(filters=1, kernel_size=1, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(out1)
+        vnn = K.layers.BatchNormalization()(vnn)    
         vnn = K.layers.LeakyReLU()(vnn)
         vnn = K.layers.Flatten()(vnn)
         vnn = K.layers.Dense(256)(vnn)
         vnn = K.layers.LeakyReLU()(vnn)
         vnn = K.layers.Dense(1, activation='tanh', name='VNN')(vnn)
 
-        pnn = K.layers.Conv2D(filters=2, kernel_size=1, padding='same')(out1)
+        pnn = K.layers.Conv2D(filters=2, kernel_size=1, padding='same', use_bias=False, kernel_regularizer=l2(self.weight_decay))(out1)
         pnn = K.layers.BatchNormalization()(pnn)
         pnn = K.layers.LeakyReLU()(pnn)
         pnn = K.layers.Flatten()(pnn)
@@ -222,10 +221,7 @@ class AlphaO:
             return max(node.get_branches_keys(), key=score_branch)
         #End=========================================
 
-        if self.root is None:
-            root = create_node(seq_xy_board, idx=None, parent=None, diri_TF=diri_TF)
-        else:
-            root = self.root
+        root = create_node(seq_xy_board, idx=None, parent=None, diri_TF=diri_TF)
 
         for round in range(self.round_num):
             node = root
@@ -280,8 +276,8 @@ class AlphaO:
             return policy_y
 
         root, xy_loc = self.predict_stone(seq_xy_board, diri_TF)
-        self.root = root.childrens[xy_loc[0] + xy_loc[1] * self.board_size]
-
+        
+        print(f'value: {root.value:.3f}')
         return {
             'state': self.get_model_input(root.state),
             'policy_y': get_policy_y(root.branches),
