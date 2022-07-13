@@ -224,25 +224,26 @@ class AlphaO:
         #End=========================================
 
         
-        if self.root is None:
-            self.root = create_node(seq_xy_board, idx=None, parent=None, diri_TF=diri_TF)
-            print(f'init root')
-        else:
-            #root 이어받기 전, 동기화하기
-            if seq_xy_board != self.root.state:
-                next_move_tup = tuple(
-                    xy[0] + xy[1] * self.board_size for xy in seq_xy_board if xy not in self.root.state
-                )
-                for loc_idx in next_move_tup:
-                    if loc_idx in self.root.childrens:
-                        self.root = self.root.childrens[loc_idx]
-                    else:
-                        print(f'init root')
-                        self.root = create_node(seq_xy_board, idx=None, parent=None, diri_TF=diri_TF)
-                        break
+        # if self.root is None:
+        #     self.root = create_node(seq_xy_board, idx=None, parent=None, diri_TF=diri_TF)
+        #     print(f'init root')
+        # else:
+        #     #root 이어받기 전, 동기화하기
+        #     if seq_xy_board != self.root.state:
+        #         next_move_tup = tuple(
+        #             xy[0] + xy[1] * self.board_size for xy in seq_xy_board if xy not in self.root.state
+        #         )
+        #         for loc_idx in next_move_tup:
+        #             if loc_idx in self.root.childrens:
+        #                 self.root = self.root.childrens[loc_idx]
+        #             else:
+        #                 print(f'init root')
+        #                 self.root = create_node(seq_xy_board, idx=None, parent=None, diri_TF=diri_TF)
+        #                 break
 
 
-        root = self.root
+        # root = self.root
+        root = create_node(seq_xy_board, idx=None, parent=None, diri_TF=diri_TF)
 
         for round in range(self.round_num):
             node = root
