@@ -45,10 +45,10 @@ def lr_decay(init_lr, lim_lr, now_epoch, total_epochs):
 board_size = 3
 win_seq = 3
 
-round_num = 3
+round_num = 2
 
-total_epochs = 500
-batch_size = 8
+total_epochs = 250
+batch_size = 16
 buffer_size = 1024
 augment_rate = 0.6
 
@@ -56,14 +56,14 @@ play_num = 7
 
 COMPETE_NUM = 7
 
-# learning_rate = 2e-5
+learning_rate = 2e-5
 
 gui = GUI(board_size=board_size, black_info=2, white_info=2)
 
 
 while (now_epoch := get_now_epoch()) < total_epochs:
     main_agent_dir = get_main_agent_dir()
-    learning_rate = lr_decay(init_lr=2e-5, lim_lr=6e-6, now_epoch=now_epoch, total_epochs=total_epochs)
+    # learning_rate = lr_decay(init_lr=2e-5, lim_lr=6e-6, now_epoch=now_epoch, total_epochs=total_epochs)
 
 
     rule = Rule(board_size=board_size, win_seq=win_seq)
@@ -90,7 +90,7 @@ while (now_epoch := get_now_epoch()) < total_epochs:
         print(f'\nTRAIN ROUND: {p}\n\n')
         play_game.play(
             black=main_agent, white=main_agent,
-            databook=databook, diri_TF=True, gui=gui
+            databook=databook, diri_TF=True, gui=None
         )
         dataset = databook.get_data(shuffle=True, augment_rate=augment_rate)
 
@@ -146,9 +146,9 @@ while (now_epoch := get_now_epoch()) < total_epochs:
             print(f'BLACK(●): MAIN_AGENT')
             print(f'WHITE(○): PREVIOUS_AGENT')
             print('=' * 50)
-        
 
         win_code = play_game.play(black=black, white=white, databook=compete_databook, diri_TF=False, gui=gui)
+        
         
         #RECORAD ONLY MAIN AGENT DATA========
         comp_data = compete_databook.get_data(shuffle=False)

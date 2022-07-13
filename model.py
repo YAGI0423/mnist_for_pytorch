@@ -58,6 +58,8 @@ class AlphaO:
 
         self.weight_decay = 0.0001
 
+        self.root = None
+
 
         self.model_dir = model_dir
         if self.model_dir is None:
@@ -221,7 +223,26 @@ class AlphaO:
             return max(node.get_branches_keys(), key=score_branch)
         #End=========================================
 
-        root = create_node(seq_xy_board, idx=None, parent=None, diri_TF=diri_TF)
+        
+        if self.root is None:
+            self.root = create_node(seq_xy_board, idx=None, parent=None, diri_TF=diri_TF)
+            print(f'init root')
+        else:
+            #root 이어받기 전, 동기화하기
+            if seq_xy_board != self.root.state:
+                next_move_tup = tuple(
+                    xy[0] + xy[1] * self.board_size for xy in seq_xy_board if xy not in self.root.state
+                )
+                for loc_idx in next_move_tup:
+                    if loc_idx in self.root.childrens:
+                        self.root = self.root.childrens[loc_idx]
+                    else:
+                        print(f'init root')
+                        self.root = create_node(seq_xy_board, idx=None, parent=None, diri_TF=diri_TF)
+                        break
+
+
+        root = self.root
 
         for round in range(self.round_num):
             node = root
@@ -246,6 +267,7 @@ class AlphaO:
                 child_node = create_node(branch_board, idx=branch_idx, parent=node)
                 value = -1. * child_node.value
             else:   #done | is terminal node
+                #착수 했을 때, 지는 경우는 존재하지 않는다
                 #draw: 0, win: -1
                 value = 0. if game_status['win'] == 2 else 1.
 
@@ -260,6 +282,7 @@ class AlphaO:
                 node = node.parent
 
         result_idx = max(root.branches.keys(), key=root.get_visit)
+
         return root, element_idx_to_xy(result_idx)
 
     def act(self, seq_xy_board, diri_TF):

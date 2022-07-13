@@ -57,6 +57,11 @@ class PlayGame:
         board = GameBoard()
         now_board = board.get_board()
 
+        if black.__class__.__name__ == 'AlphaO':
+            black.root = None
+        if white.__class__.__name__ == 'AlphaO':
+            white.root = None
+
 
         while self.rule.game_status(now_board)['during']:
             print("=" * 100)
@@ -64,11 +69,15 @@ class PlayGame:
 
             now_turn = Util.now_turn(now_board)
             now_player = black if now_turn else white
+            next_player = white if now_turn else black
 
             print('\nnow turn: ', end='')
             print('Black') if now_turn else print('White')
 
+            print(f'now board: {now_board}')
+
             act = now_player.act(now_board, diri_TF)
+
             act_loc = act['xy_loc']
 
             board.put_stone(*act_loc)
