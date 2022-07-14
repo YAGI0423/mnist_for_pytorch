@@ -42,17 +42,17 @@ def lr_decay(init_lr, lim_lr, now_epoch, total_epochs):
 #해결 문제===========
 #End=================
 
-board_size = 5
+board_size = 10
 win_seq = 5
 
-round_num = 25
+round_num = 5
 
 total_epochs = 500
 batch_size = 16
 buffer_size = 8192
 augment_rate = 0.6
 
-play_num = 16
+play_num = 8
 
 COMPETE_NUM = 7
 
