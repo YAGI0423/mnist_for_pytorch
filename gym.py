@@ -90,7 +90,7 @@ while (now_epoch := get_now_epoch()) < total_epochs:
         print(f'\nTRAIN ROUND: {p}\n\n')
         play_game.play(
             black=main_agent, white=main_agent,
-            databook=databook, diri_TF=True, gui=None
+            databook=databook, diri_TF=True, gui=gui
         )
         dataset = databook.get_data(shuffle=True, augment_rate=augment_rate)
 
