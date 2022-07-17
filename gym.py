@@ -42,10 +42,10 @@ def lr_decay(init_lr, lim_lr, now_epoch, total_epochs):
 #해결 문제===========
 #End=================
 
-board_size = 10
-win_seq = 5
+board_size = 4
+win_seq = 4
 
-round_num = 128
+round_num = 2
 
 total_epochs = 500
 batch_size = 32
@@ -212,7 +212,7 @@ while (now_epoch := get_now_epoch()) < total_epochs:
     databook = None
     #End=============================
 
-    if (win_count - lose_count) > 0.:   #win
+    if (win_count / COMPETE_NUM) > 0.55:   #win
         main_agent.save_model('./model/main_model/', int(idx)+1, int(end_round), int(end_round)+play_num)
 
         if not agent_info + '.h5' in os.listdir('./model/previous_model/'):

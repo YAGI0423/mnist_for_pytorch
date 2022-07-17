@@ -46,16 +46,14 @@ class DataBook:
             else:
                 raise
 
-        def data_augment(x, policy_y, value_y, rate=0.3):
-            data_len = len(value_y)
-            augment_num = int(data_len * rate)
-
+        def data_rot(x, policy_y, value_y, augment_num):
             split_num = augment_num // 4
             board_size = x[0].shape[:-1]
 
             aug_idx_list = random.choices(range(data_len), k=augment_num)
 
             policy_y = policy_y.reshape(-1, *board_size)
+
 
             for idx in range(5):
                 splited_idx = aug_idx_list[split_num*idx: split_num*(idx+1)]
@@ -80,6 +78,23 @@ class DataBook:
             value_y = np.concatenate((value_y, value_y[aug_idx_list]))
             return x, policy_y, value_y
 
+        def colour_transpose(x, policy_y, value_y, augment_num):
+            aug_idx_list = random.choices(range(data_len), k=augment_num)
+            aug_x = x[aug_idx_list]
+
+            black, white = aug_x[:, :, :, 0].copy(), aug_x[:, :, :, 1].copy()
+            aug_x[:, :, :, 0] = white
+            aug_x[:, :, :, 1] = black
+            
+            aug_x[:, :, :, 2] *= -1.
+            aug_x[:, :, :, 2] += 1.
+
+            x = np.concatenate((x, aug_x))
+            policy_y = np.concatenate((policy_y, policy_y[aug_idx_list]))
+            value_y = np.concatenate((value_y, value_y[aug_idx_list]))
+            
+            return aug_x, policy_y, value_y
+
         update_databook()
         dataset_len = len(self.state)
 
@@ -88,7 +103,15 @@ class DataBook:
         value_y = np.asarray(self.value_y, dtype=np.float64).reshape(-1, 1)
 
         if augment_rate:
-            state, policy_y, value_y = data_augment(state, policy_y, value_y, augment_rate)
+            data_len = len(value_y)
+            augment_num = int(data_len * augment_rate)
+
+            rot_aug_num = int(augment_num / 2)
+            color_trans_aug_num = augment_num - rot_aug_num
+
+            state, policy_y, value_y = data_rot(state, policy_y, value_y, augment_num=rot_aug_num)
+            state, policy_y, value_y = colour_transpose(state, policy_y, value_y, augment_num=color_trans_aug_num)
+
 
         if shuffle:
             dataset_len = len(state)
