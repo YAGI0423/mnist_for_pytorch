@@ -41,21 +41,21 @@ def lr_decay(init_lr, lim_lr, now_epoch, total_epochs):
 #해결 문제===========
 #End=================
 
-board_size = 3
-win_seq = 3
+board_size = 8
+win_seq = 4
 
-round_num = 2
+round_num = 8
 
 total_epochs = 200
-batch_size = 256
+batch_size = 8#2048
 
-buffer_size = 2000#50000 * (board_size ** 2)
-window_size = 500#32768
+buffer_size = 8000 * (board_size ** 2)#50000 * (board_size ** 2)
+window_size = 2000#32768
 augment_rate = 1.
 
-play_num = 5#2500
+play_num = 20#2500
 
-COMPETE_NUM = 7
+COMPETE_NUM = 16
 
 learning_rate = 0.001
 
@@ -78,9 +78,9 @@ while (now_epoch := get_now_epoch()) < total_epochs:
     
     #load databook===================
     if 'buffer_dataset.pickle' in os.listdir('./dataset/'):
-        databook = DataBook(buffer_size=buffer_size, load_dir='./dataset/buffer_dataset.pickle')
+        databook = DataBook(buffer_size=buffer_size, window_size=window_size, load_dir='./dataset/buffer_dataset.pickle')
     else:
-        databook = DataBook(buffer_size=buffer_size)
+        databook = DataBook(buffer_size=buffer_size, window_size=window_size)
     #End=============================
 
 
@@ -93,7 +93,6 @@ while (now_epoch := get_now_epoch()) < total_epochs:
             black=best_agent, white=best_agent,
             databook=databook, diri_TF=True, gui=gui
         )
-        dataset = databook.get_data(shuffle=True, augment_rate=augment_rate)
 
 
     if best_agent_dir is None:    #has no main agent
@@ -120,6 +119,8 @@ while (now_epoch := get_now_epoch()) < total_epochs:
     #train===========================
     train_history = None
 
+    dataset = databook.get_data(shuffle=True, augment_rate=augment_rate)
+
     current_agent_dir = get_agent_dir('./model/current_model/')
     current_agent = model.AlphaO(board_size, rule, model_dir=current_agent_dir, lr=learning_rate, round_num=round_num)
     train_history = current_agent.train_model(dataset, batch_size=batch_size)
@@ -131,7 +132,7 @@ while (now_epoch := get_now_epoch()) < total_epochs:
     for e in range(COMPETE_NUM):
         print(f'\nCOMPETE ROUND: {e}\n\n')
 
-        compete_databook = DataBook(buffer_size=buffer_size)
+        compete_databook = DataBook(buffer_size=buffer_size, window_size=window_size)
 
         if current_agent_color := random.randint(0, 1):
             black, white = current_agent, best_agent
@@ -150,12 +151,12 @@ while (now_epoch := get_now_epoch()) < total_epochs:
         
         
         #RECORAD ONLY MAIN AGENT DATA========
-        comp_data = compete_databook.get_data(shuffle=False)
-        state_x, policy_y, value_y = comp_data['x'], comp_data['policy_y'], comp_data['value_y']
+        # comp_data = compete_databook.get_data(shuffle=False)
+        # state_x, policy_y, value_y = comp_data['x'], comp_data['policy_y'], comp_data['value_y']
 
-        comp_data['x'] = comp_data['x'][current_agent_color::2]
-        comp_data['policy_y'] = comp_data['policy_y'][current_agent_color::2]
-        comp_data['value_y'] = comp_data['value_y'][current_agent_color::2]
+        # comp_data['x'] = comp_data['x'][current_agent_color::2]
+        # comp_data['policy_y'] = comp_data['policy_y'][current_agent_color::2]
+        # comp_data['value_y'] = comp_data['value_y'][current_agent_color::2]
         #End=================================
 
         if win_code == current_agent_color:   #when main agent win

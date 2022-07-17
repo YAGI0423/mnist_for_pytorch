@@ -86,7 +86,7 @@ class DataBook:
             policy_y = np.concatenate((policy_y, policy_y[aug_idx_list]))
             value_y = np.concatenate((value_y, value_y[aug_idx_list]))
             
-            return aug_x, policy_y, value_y
+            return x, policy_y, value_y
 
         update_databook()
         dataset_len = len(self.state)
@@ -104,13 +104,10 @@ class DataBook:
 
         if augment_rate:
             data_len = len(value_y)
-            augment_num = int(data_len * augment_rate)
+            augment_num = int(data_len * augment_rate / 2)
 
-            rot_aug_num = int(augment_num / 2)
-            color_trans_aug_num = augment_num - rot_aug_num
-
-            state, policy_y, value_y = data_rot(state, policy_y, value_y, augment_num=rot_aug_num)
-            state, policy_y, value_y = colour_transpose(state, policy_y, value_y, augment_num=color_trans_aug_num)
+            state, policy_y, value_y = data_rot(state, policy_y, value_y, augment_num=augment_num)
+            state, policy_y, value_y = colour_transpose(state, policy_y, value_y, augment_num=augment_num)
 
         return {
             'x': state,
