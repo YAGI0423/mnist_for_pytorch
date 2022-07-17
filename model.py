@@ -322,7 +322,7 @@ class AlphaO:
         )
         return history
 
-    def save_model(self, root_dir, idx, start_round, end_round):
+    def save_model(self, root_dir, idx, start_round, end_round, include_optimizer=True):
          # #file name rule
         # #IDX_START EPOCH_END EPOCH_TIME.h5
 
@@ -331,4 +331,4 @@ class AlphaO:
 
         info_dir = f'{idx}_{start_round}_{end_round}_'
 
-        self.model.save(root_dir + info_dir + now + '.h5')
+        self.model.save(root_dir + info_dir + now + '.h5', include_optimizer=include_optimizer)

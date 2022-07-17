@@ -1,11 +1,11 @@
-from email import policy
 import pickle
 import random
 import numpy as np
 
 class DataBook:
-    def __init__(self, buffer_size=1024, load_dir=None):
+    def __init__(self, buffer_size=1024, window_size=128, load_dir=None):
         self.buffer_size = buffer_size
+        self.window_size = window_size
 
         self.state = []
         self.policy_y = []
@@ -33,16 +33,9 @@ class DataBook:
                 over_num = len(self.state) - self.buffer_size
 
                 if over_num > 0:
-                    del_idx = np.random.choice(
-                        range(len(self.state)), replace=False, size=over_num
-                    )
-                    
-                    del_idx.sort()
-                    
-                    for idx in del_idx[::-1]:
-                        del self.state[idx]
-                        del self.policy_y[idx]
-                        del self.value_y[idx]
+                    self.state = self.state[over_num:]
+                    self.policy_y = self.policy_y[over_num:]
+                    self.value_y = self.value_y[over_num:]
             else:
                 raise
 
@@ -50,7 +43,7 @@ class DataBook:
             split_num = augment_num // 4
             board_size = x[0].shape[:-1]
 
-            aug_idx_list = random.choices(range(data_len), k=augment_num)
+            aug_idx_list = np.random.choice(range(data_len), size=augment_num, replace=False)
 
             policy_y = policy_y.reshape(-1, *board_size)
 
@@ -79,7 +72,7 @@ class DataBook:
             return x, policy_y, value_y
 
         def colour_transpose(x, policy_y, value_y, augment_num):
-            aug_idx_list = random.choices(range(data_len), k=augment_num)
+            aug_idx_list = np.random.choice(range(data_len), size=augment_num, replace=False)
             aug_x = x[aug_idx_list]
 
             black, white = aug_x[:, :, :, 0].copy(), aug_x[:, :, :, 1].copy()
@@ -98,6 +91,13 @@ class DataBook:
         update_databook()
         dataset_len = len(self.state)
 
+        if dataset_len > self.window_size:
+            return_idx = np.random.choice(range(dataset_len), size=self.window_size, replace=False)
+            state = state[return_idx]
+            policy_y = policy_y[return_idx]
+            value_y = value_y[return_idx]
+
+
         state = np.asarray(self.state, dtype=np.float64)
         policy_y = np.asarray(self.policy_y, dtype=np.float64).reshape(dataset_len, -1)
         value_y = np.asarray(self.value_y, dtype=np.float64).reshape(-1, 1)
@@ -111,16 +111,6 @@ class DataBook:
 
             state, policy_y, value_y = data_rot(state, policy_y, value_y, augment_num=rot_aug_num)
             state, policy_y, value_y = colour_transpose(state, policy_y, value_y, augment_num=color_trans_aug_num)
-
-
-        if shuffle:
-            dataset_len = len(state)
-            idx = np.array(range(dataset_len))
-            np.random.shuffle(idx)
-
-            state = state[idx]
-            policy_y = policy_y[idx]
-            value_y = value_y[idx]
 
         return {
             'x': state,
