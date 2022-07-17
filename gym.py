@@ -100,6 +100,8 @@ while (now_epoch := get_now_epoch()) < total_epochs:
         #save model
         best_agent.save_model('./model/best_model/', idx=0, start_round=0, end_round=play_num)
         best_agent.save_model('./model/current_model/', idx=0, start_round=0, end_round=play_num)
+        
+        best_agent_dir = get_agent_dir('./model/best_model/')
 
 
         #create pandas
@@ -218,7 +220,7 @@ while (now_epoch := get_now_epoch()) < total_epochs:
     if (win_count / COMPETE_NUM) > 0.55:   #wins
 
         #pre best agent move to previous
-        best_agent.model.save(f'/model/previous_model/{best_agent_info}.h5', include_optimizer=False)
+        best_agent.model.save(f'./model/previous_model/{best_agent_info}.h5', include_optimizer=False)
         os.remove(best_agent_dir)
 
         #new best agent add to best dir

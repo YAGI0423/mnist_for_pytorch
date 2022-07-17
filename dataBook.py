@@ -49,7 +49,7 @@ class DataBook:
 
 
             for idx in range(5):
-                splited_idx = aug_idx_list[split_num*idx: split_num*(idx+1)]
+                splited_idx = aug_idx_list[split_num*idx: split_num*(idx+1)].tolist()
                 
                 if splited_idx:
                     aug_x = x[splited_idx]
@@ -91,16 +91,15 @@ class DataBook:
         update_databook()
         dataset_len = len(self.state)
 
-        if dataset_len > self.window_size:
-            return_idx = np.random.choice(range(dataset_len), size=self.window_size, replace=False)
-            state = state[return_idx]
-            policy_y = policy_y[return_idx]
-            value_y = value_y[return_idx]
-
-
         state = np.asarray(self.state, dtype=np.float64)
         policy_y = np.asarray(self.policy_y, dtype=np.float64).reshape(dataset_len, -1)
         value_y = np.asarray(self.value_y, dtype=np.float64).reshape(-1, 1)
+
+        if dataset_len > self.window_size:
+            return_idx = np.random.choice(range(dataset_len), size=self.window_size, replace=False).tolist()
+            state = self.state[return_idx]
+            policy_y = self.policy_y[return_idx]
+            value_y = self.value_y[return_idx]
 
         if augment_rate:
             data_len = len(value_y)

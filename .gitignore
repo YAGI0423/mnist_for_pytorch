@@ -130,6 +130,5 @@ dmypy.json
 
 #personal
 /dataset/
-/model/main_model/
-/model/previous_model/
+/model/
 /previous_history/
