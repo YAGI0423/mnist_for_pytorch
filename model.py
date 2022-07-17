@@ -52,7 +52,7 @@ class AlphaO:
 
         self.lr = lr
 
-        self.c = np.sqrt(2)
+        self.c = 1.
         self.diri_param = 0.03
         self.round_num = round_num
 
@@ -180,7 +180,9 @@ class AlphaO:
                 # policy_pred = (policy_pred * diri_prob) / np.sum(diri_prob)
                 
                 #new_diri
-                policy_pred = (policy_pred + diri_prob) / 2.
+                # policy_pred = (policy_pred + diri_prob) / 2.
+                epsilon = 0.25
+                policy_pred = (1 - epsilon) * policy_pred + (epsilon * diri_prob)
 
 
             #get node's branches
@@ -219,7 +221,7 @@ class AlphaO:
                 q = node.get_expected_value(branch_idx)   #total value / visit
                 p = node.get_prior(branch_idx)
                 n = node.get_visit(branch_idx)
-                return q + self.c * p * np.sqrt(total_n) / (n + 1)
+                return q + self.c * p * (np.sqrt(total_n) / (n + 1))
             return max(node.get_branches_keys(), key=score_branch)
         #End=========================================
 
