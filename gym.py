@@ -46,7 +46,7 @@ win_seq = 3
 
 round_num = 2
 
-total_epochs = 400
+total_epochs = 600
 batch_size = 8#2048
 
 buffer_size = 8000 * (board_size ** 2)#50000 * (board_size ** 2)
@@ -57,7 +57,7 @@ play_num = 20#2500
 
 COMPETE_NUM = 16
 
-learning_rate = 0.001
+learning_rate = 0.0001
 
 gui = GUI(board_size=board_size, black_info=2, white_info=2)
 
