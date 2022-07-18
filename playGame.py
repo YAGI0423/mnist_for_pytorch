@@ -135,9 +135,9 @@ if __name__ == '__main__':
         win_seq_check_TF = win_seq_check_TF or win_seq > board_size
         return win_seq_check_TF
 
-    def get_agent(agent_code, board_size, rule):
+    def get_agent(agent_code, board_size, rule, round_num):
         def get_main_agent_dir():
-            main_root = './model/main_model/'
+            main_root = './model/best_model/'
             model_list = os.listdir(main_root)
             if model_list:   #Exist
                 return main_root + model_list[0]
@@ -149,10 +149,10 @@ if __name__ == '__main__':
             return model.RandomChoice(board_size=board_size, rule=rule)
         return model.AlphaO(
             board_size=board_size, rule=rule,
-            model_dir=get_main_agent_dir(), round_num=1600
+            model_dir=get_main_agent_dir(), round_num=round_num
         )   #alphaO
 
-
+    round_num = 2
     board_size = 0
     win_seq = 0
     
@@ -183,8 +183,8 @@ if __name__ == '__main__':
     play_game = PlayGame(board_size=board_size, rule=rule)
     databook = DataBook()
 
-    black = get_agent(black, board_size, rule)
-    white = get_agent(white, board_size, rule)
+    black = get_agent(black, board_size, rule, round_num)
+    white = get_agent(white, board_size, rule, round_num)
 
     play_game.play(black=black, white=white, databook=databook)
     
