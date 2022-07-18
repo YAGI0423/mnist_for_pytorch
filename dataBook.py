@@ -97,9 +97,9 @@ class DataBook:
 
         if dataset_len > self.window_size:
             return_idx = np.random.choice(range(dataset_len), size=self.window_size, replace=False).tolist()
-            state = self.state[return_idx]
-            policy_y = self.policy_y[return_idx]
-            value_y = self.value_y[return_idx]
+            state = state[return_idx]
+            policy_y = policy_y[return_idx]
+            value_y = value_y[return_idx]
 
         if augment_rate:
             data_len = len(value_y)
