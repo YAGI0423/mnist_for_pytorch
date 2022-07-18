@@ -46,7 +46,7 @@ win_seq = 3
 
 round_num = 2
 
-total_epochs = 600
+total_epochs = 1000
 batch_size = 8#2048
 
 buffer_size = 8000 * (board_size ** 2)#50000 * (board_size ** 2)
