@@ -41,23 +41,23 @@ def lr_decay(init_lr, lim_lr, now_epoch, total_epochs):
 #해결 문제===========
 #End=================
 
-board_size = 3
-win_seq = 3
+board_size = 10
+win_seq = 5
 
-round_num = 2
+round_num = 4#16
 
-total_epochs = 1000
-batch_size = 8#2048
+total_epochs = 200
+batch_size = 32#2048
 
-buffer_size = 8000 * (board_size ** 2)#50000 * (board_size ** 2)
-window_size = 2000#32768
+buffer_size = 32768 * (board_size ** 2)#50000 * (board_size ** 2)
+window_size = 8192#32768
 augment_rate = 1.
 
-play_num = 20#2500
+play_num = 80#2500
 
 COMPETE_NUM = 16
 
-learning_rate = 0.0001
+learning_rate = 0.001
 
 gui = GUI(board_size=board_size, black_info=2, white_info=2)
 
