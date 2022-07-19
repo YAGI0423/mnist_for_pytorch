@@ -152,7 +152,7 @@ if __name__ == '__main__':
             model_dir=get_main_agent_dir(), round_num=round_num
         )   #alphaO
 
-    round_num = 4
+    round_num = 1600
     board_size = 0
     win_seq = 0
     

@@ -107,7 +107,7 @@ while (now_epoch := get_now_epoch()) < total_epochs:
         #create pandas
         csv = pd.DataFrame({
             'idx': list(), 'current_agent_name': list(), 'best_agent_name': list(), 'date': list(),
-            'learning_rate': list(), 'batch_size': list(),
+            'learning_rate': list(), 'batch_size': list(), 'round_num': list(),
             'play_num': list(), 'train_epoch': list(), 'train_buffer_size': list(),
             'PNN_loss': list(), 'VNN_loss': list(), 'train_loss': list(),
             'val_PNN_loss': list(), 'val_VNN_loss': list(), 'val_loss': list(),
@@ -197,6 +197,7 @@ while (now_epoch := get_now_epoch()) < total_epochs:
         'date': now,
         'learning_rate': learning_rate,
         'batch_size': batch_size,
+        'round_num': round_num,
         'play_num': play_num,
         'train_epoch': 1,
         'train_buffer_size': len(databook.value_y),
