@@ -14,7 +14,7 @@ class PlayGame:
         self.short_game_reward = 0.8
 
         
-    def play(self, black, white, databook, diri_TF=False, gui=None):
+    def play(self, black, white, databook, diri_TF=False, gui=None, cli=True):
         def get_value_y(seq_xy_board, win_code, discount_factor, short_game_reward):
             def calculate_discount(value_y, stone_num, factor):
                 if factor < 1.:
@@ -64,17 +64,17 @@ class PlayGame:
 
 
         while self.rule.game_status(now_board)['during']:
-            print("=" * 100)
-            print(Util.seq_to_square(now_board, self.board_size))
+            if cli:
+                print("=" * 100)
+                print(Util.seq_to_square(now_board, self.board_size))
 
             now_turn = Util.now_turn(now_board)
             now_player = black if now_turn else white
             next_player = white if now_turn else black
 
-            print('\nnow turn: ', end='')
-            print('Black') if now_turn else print('White')
-
-            print(f'now board: {now_board}')
+            if cli:
+                print('\nnow turn: ', end='')
+                print('Black') if now_turn else print('White')
 
             act = now_player.act(now_board, diri_TF)
 
@@ -84,7 +84,8 @@ class PlayGame:
 
             databook.add_data(act)
 
-            print(f'\nact loc: {act_loc}\n\n')
+            if cli:
+                print(f'\nact loc: {act_loc}\n\n')
             now_board = board.get_board()
 
             #when repeat pass stone
@@ -113,7 +114,8 @@ class PlayGame:
 
         win_code = self.rule.game_status(now_board)['win']
 
-        print('winner:', win_code, end='\n\n')
+        if cli:
+            print('winner:', win_code, end='\n\n')
 
         value_y = get_value_y(
             now_board, win_code,

@@ -46,7 +46,7 @@ class RandomChoice:
 
 
 class AlphaO:
-    def __init__(self, board_size, rule, model_dir=None, lr=0.00002, round_num=1600):   
+    def __init__(self, board_size, rule, model_dir=None, lr=0.00002, round_num=1600, cli=True):   
         self.board_size = board_size
         self.rule = rule
 
@@ -60,14 +60,19 @@ class AlphaO:
 
         self.root = None
 
+        self.cli = cli
+
 
         self.model_dir = model_dir
         if self.model_dir is None:
             self.model = self.create_model()
-            print(f'\n\ncreate new model...\n\n')
+
+            if self.cli:
+                print(f'\n\ncreate new model...\n\n')
         else:
             self.model = K.models.load_model(model_dir)#, custom_objects={'LeakyReLU':K.layers.LeakyReLU()}
-            print(f'\n\nload model from: {model_dir}\n\n')
+            if self.cli:
+                print(f'\n\nload model from: {model_dir}\n\n')
         
         
     def create_model(self):
@@ -228,7 +233,8 @@ class AlphaO:
         
         if self.root is None:
             self.root = create_node(seq_xy_board, idx=None, parent=None, diri_TF=diri_TF)
-            print(f'init root')
+            if self.cli:
+                print(f'init root')
         else:
             #root 이어받기 전, 동기화하기
             if seq_xy_board != self.root.state:
@@ -239,7 +245,8 @@ class AlphaO:
                     if loc_idx in self.root.childrens:
                         self.root = self.root.childrens[loc_idx]
                     else:
-                        print(f'init root')
+                        if self.cli:
+                            print(f'init root')
                         self.root = create_node(seq_xy_board, idx=None, parent=None, diri_TF=diri_TF)
                         break
 
@@ -303,7 +310,8 @@ class AlphaO:
 
         root, xy_loc = self.predict_stone(seq_xy_board, diri_TF)
         
-        print(f'value: {root.value:.3f}')
+        if self.cli:
+            print(f'value: {root.value:.3f}')
         return {
             'state': self.get_model_input(root.state),
             'policy_y': get_policy_y(root.branches),
