@@ -5,6 +5,8 @@ from dataBook import DataBook
 from playGame import PlayGame
 
 import os
+import shutil
+import json
 import math
 import time
 import random
@@ -59,13 +61,94 @@ COMPETE_NUM = 16
 
 learning_rate = 0.001
 
+
+use_colab_collector = True
+colab_main_dir = 'G:/내 드라이브/alphaO/colab_collector/'
+
+
 gui = GUI(board_size=board_size, black_info=2, white_info=2)
+
+
+def cleaning_folder(dir):
+     for file_name in os.listdir(dir):
+        file_dir = dir + file_name
+        os.remove(file_dir)
+
+def create_init_communication(board_size, win_seq, round_num, best_agent_name):
+    communication_data = {
+        'common_info': {
+            'board_size': board_size,
+        'win_seq': win_seq,
+        'round_num': round_num,
+        'best_agent_name': best_agent_name
+        },
+
+        'local_info': {
+        'status': 0
+        },
+
+        'colab_info': {
+            'status': False,
+            'play_num': 0
+        }
+    }
+    return communication_data
+
+
+best_agent_dir = get_agent_dir('./model/best_model/')
+if best_agent_dir is None:
+    
 
 
 while (now_epoch := get_now_epoch()) < total_epochs:
     best_agent_dir = get_agent_dir('./model/best_model/')
     # learning_rate = lr_decay(init_lr=2e-5, lim_lr=6e-6, now_epoch=now_epoch, total_epochs=total_epochs)
 
+    if best_agent_dir is None:    #has no main agent
+        
+        #save model
+        best_agent.save_model('./model/best_model/', idx=0, start_round=0, end_round=play_num)
+        best_agent.save_model('./model/current_model/', idx=0, start_round=0, end_round=play_num)
+        
+        best_agent_dir = get_agent_dir('./model/best_model/')
+
+
+        #create pandas
+        csv = pd.DataFrame({
+            'idx': list(), 'current_agent_name': list(), 'best_agent_name': list(), 'date': list(),
+            'learning_rate': list(), 'batch_size': list(), 'round_num': list(),
+            'play_num': list(), 'train_epoch': list(), 'train_buffer_size': list(),
+            'PNN_loss': list(), 'VNN_loss': list(), 'train_loss': list(),
+            'val_PNN_loss': list(), 'val_VNN_loss': list(), 'val_loss': list(),
+            'win_num': list(), 'lose_num': list(), 'draw_num': list(),
+
+        })
+        csv.to_csv('./train_history.csv', index=False)
+
+        print('has no main agent')
+
+    if use_colab_collector:
+        local_agent_name = best_agent_dir.split('/')[-1]
+        colab_agent_name = os.listdir(colab_main_dir + 'agent/')[-1]
+
+        print(f'Synchronizing the model...', end='')
+        if local_agent_name != colab_agent_name:
+            cleaning_folder(colab_main_dir + 'agent/')
+            shutil.copy(best_agent_dir, colab_main_dir + 'agent/')
+        print('(OK)')
+
+        print(f'Send the communication context...', end='')
+        cleaning_folder(colab_main_dir + 'communication_window/')
+        commu_context = create_init_communication(
+            board_size=board_size, win_seq=win_seq, round_num=round_num, best_agent_name=local_agent_name
+        )
+
+
+
+
+        
+    
+    exit()
 
     rule = Rule(board_size=board_size, win_seq=win_seq)
     play_game = PlayGame(board_size=board_size, rule=rule)
@@ -93,30 +176,6 @@ while (now_epoch := get_now_epoch()) < total_epochs:
             black=best_agent, white=best_agent,
             databook=databook, diri_TF=True, gui=gui
         )
-
-
-    if best_agent_dir is None:    #has no main agent
-        
-        #save model
-        best_agent.save_model('./model/best_model/', idx=0, start_round=0, end_round=play_num)
-        best_agent.save_model('./model/current_model/', idx=0, start_round=0, end_round=play_num)
-        
-        best_agent_dir = get_agent_dir('./model/best_model/')
-
-
-        #create pandas
-        csv = pd.DataFrame({
-            'idx': list(), 'current_agent_name': list(), 'best_agent_name': list(), 'date': list(),
-            'learning_rate': list(), 'batch_size': list(), 'round_num': list(),
-            'play_num': list(), 'train_epoch': list(), 'train_buffer_size': list(),
-            'PNN_loss': list(), 'VNN_loss': list(), 'train_loss': list(),
-            'val_PNN_loss': list(), 'val_VNN_loss': list(), 'val_loss': list(),
-            'win_num': list(), 'lose_num': list(), 'draw_num': list(),
-
-        })
-        csv.to_csv('./train_history.csv', index=False)
-
-        print('has no main agent')
     
     #train===========================
     train_history = None
