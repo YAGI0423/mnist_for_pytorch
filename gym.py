@@ -36,6 +36,23 @@ def lr_decay(init_lr, lim_lr, now_epoch, total_epochs):
     zero_x /= 2.8
 
     return 0.5 * init_lr * (1. + math.cos(now_epoch/zero_x))
+
+def initial_setting(best_agent):
+    #save model
+    best_agent.save_model('./model/best_model/', idx=0, start_round=0, end_round=0)
+    best_agent.save_model('./model/current_model/', idx=0, start_round=0, end_round=0)
+
+    #create pandas
+    csv = pd.DataFrame({
+        'idx': list(), 'current_agent_name': list(), 'best_agent_name': list(), 'date': list(),
+        'learning_rate': list(), 'batch_size': list(), 'round_num': list(),
+        'play_num': list(), 'train_epoch': list(), 'train_buffer_size': list(),
+        'PNN_loss': list(), 'VNN_loss': list(), 'train_loss': list(),
+        'val_PNN_loss': list(), 'val_VNN_loss': list(), 'val_loss': list(),
+        'win_num': list(), 'lose_num': list(), 'draw_num': list(),
+
+    })
+    csv.to_csv('./train_history.csv', index=False)
 #End=================
 
 
@@ -46,7 +63,7 @@ def lr_decay(init_lr, lim_lr, now_epoch, total_epochs):
 board_size = 10
 win_seq = 5
 
-round_num = 128#16
+round_num = 64#16
 
 total_epochs = 200
 batch_size = 32#2048
@@ -55,7 +72,7 @@ buffer_size = 32768 * (board_size ** 2)#50000 * (board_size ** 2)
 window_size = 8192#32768
 augment_rate = 1.
 
-play_num = 80#2500
+play_num = 10#2500
 
 COMPETE_NUM = 16
 
@@ -66,7 +83,17 @@ use_colab_collector = True
 colab_main_dir = 'G:/내 드라이브/alphaO/colab_collector/'
 
 
+best_agent_dir = get_agent_dir('./model/best_model/')
 gui = GUI(board_size=board_size, black_info=2, white_info=2)
+rule = Rule(board_size=board_size, win_seq=win_seq)
+play_game = PlayGame(board_size=board_size, rule=rule)
+best_agent = model.AlphaO(board_size, rule, model_dir=best_agent_dir, lr=learning_rate, round_num=round_num)
+
+if best_agent_dir is None:
+    initial_setting(best_agent)
+    best_agent_dir = get_agent_dir('./model/best_model/')
+
+
 
 
 def cleaning_folder(dir):
@@ -94,65 +121,75 @@ def create_init_communication(board_size, win_seq, round_num, best_agent_name):
     }
     return communication_data
 
+def load_communication_window(main_dir):
+    with open(main_dir + 'communication_window.json', 'r') as st_json:
+        js_data = json.load(st_json)
+    return js_data
 
-best_agent_dir = get_agent_dir('./model/best_model/')
-if best_agent_dir is None:
-    
+def write_communication_window(main_dir, board_size, win_seq, round_num, best_agent_name, status):
+  commu_data = load_communication_window(main_dir)
+  commu_data['common_info']['board_size'] = board_size
+  commu_data['common_info']['win_seq'] = win_seq
+  commu_data['common_info']['round_num'] = round_num
+  commu_data['common_info']['best_agent_name'] = best_agent_name
+  commu_data['local_info']['status'] = status
+
+  with open(main_dir + 'communication_window.json', 'w') as json_file:
+    json.dump(commu_data, json_file)
+
+def get_colab_data(communication_window):
+  status = communication_window['colab_info']['status']
+  play_num = communication_window['colab_info']['play_num']
+  return status, play_num
+
+
+if use_colab_collector:
+    local_agent_name = best_agent_dir.split('/')[-1]
+    colab_agent_name = os.listdir(colab_main_dir + 'agent/')[-1]
+
+    print(f'Synchronizing the model...', end='')
+    if local_agent_name != colab_agent_name:
+        cleaning_folder(colab_main_dir + 'agent/')
+        shutil.copy(best_agent_dir, colab_main_dir + 'agent/')
+    print('(OK)')
+
+    print(f'Clearning the databook...', end='')
+    cleaning_folder(colab_main_dir + 'databook/')
+    print('(OK)')
+
+    print(f'Send the communication context...', end='')
+    cleaning_folder(colab_main_dir + 'communication_window/')
+    commu_context = create_init_communication(
+        board_size=board_size, win_seq=win_seq, round_num=round_num, best_agent_name=local_agent_name
+    )
+    with open(colab_main_dir + 'communication_window/communication_window.json', 'w') as json_file:
+        json.dump(commu_context, json_file)
+    print('(OK)')
+
+    print(f'Wait for connecting...')
+    while True:
+        loaded_commu = load_communication_window(colab_main_dir + 'communication_window/')
+        if loaded_commu['colab_info']['status']:
+            print('(connecting is successful)')
+            break
+        time.sleep(3)
+    write_communication_window(
+        colab_main_dir + 'communication_window/',
+        board_size = board_size,
+        win_seq=win_seq,
+        round_num=round_num,
+        best_agent_name=local_agent_name,
+        status=1
+    )
+
+
 
 
 while (now_epoch := get_now_epoch()) < total_epochs:
-    best_agent_dir = get_agent_dir('./model/best_model/')
-    # learning_rate = lr_decay(init_lr=2e-5, lim_lr=6e-6, now_epoch=now_epoch, total_epochs=total_epochs)
-
-    if best_agent_dir is None:    #has no main agent
-        
-        #save model
-        best_agent.save_model('./model/best_model/', idx=0, start_round=0, end_round=play_num)
-        best_agent.save_model('./model/current_model/', idx=0, start_round=0, end_round=play_num)
-        
+    if best_agent_dir != get_agent_dir('./model/best_model/'):
+        # learning_rate = lr_decay(init_lr=2e-5, lim_lr=6e-6, now_epoch=now_epoch, total_epochs=total_epochs)
         best_agent_dir = get_agent_dir('./model/best_model/')
-
-
-        #create pandas
-        csv = pd.DataFrame({
-            'idx': list(), 'current_agent_name': list(), 'best_agent_name': list(), 'date': list(),
-            'learning_rate': list(), 'batch_size': list(), 'round_num': list(),
-            'play_num': list(), 'train_epoch': list(), 'train_buffer_size': list(),
-            'PNN_loss': list(), 'VNN_loss': list(), 'train_loss': list(),
-            'val_PNN_loss': list(), 'val_VNN_loss': list(), 'val_loss': list(),
-            'win_num': list(), 'lose_num': list(), 'draw_num': list(),
-
-        })
-        csv.to_csv('./train_history.csv', index=False)
-
-        print('has no main agent')
-
-    if use_colab_collector:
-        local_agent_name = best_agent_dir.split('/')[-1]
-        colab_agent_name = os.listdir(colab_main_dir + 'agent/')[-1]
-
-        print(f'Synchronizing the model...', end='')
-        if local_agent_name != colab_agent_name:
-            cleaning_folder(colab_main_dir + 'agent/')
-            shutil.copy(best_agent_dir, colab_main_dir + 'agent/')
-        print('(OK)')
-
-        print(f'Send the communication context...', end='')
-        cleaning_folder(colab_main_dir + 'communication_window/')
-        commu_context = create_init_communication(
-            board_size=board_size, win_seq=win_seq, round_num=round_num, best_agent_name=local_agent_name
-        )
-
-
-
-
-        
-    
-    exit()
-
-    rule = Rule(board_size=board_size, win_seq=win_seq)
-    play_game = PlayGame(board_size=board_size, rule=rule)
-    best_agent = model.AlphaO(board_size, rule, model_dir=best_agent_dir, lr=learning_rate, round_num=round_num)
+        best_agent = model.AlphaO(board_size, rule, model_dir=best_agent_dir, lr=learning_rate, round_num=round_num)
 
     if now_epoch % 3 == 0:
         gui.root.destroy()
@@ -167,16 +204,63 @@ while (now_epoch := get_now_epoch()) < total_epochs:
     #End=============================
 
 
-
-    for p in range(play_num):
+    local_play_num, colab_play_num = 0, 0
+    while (local_play_num + colab_play_num) < play_num:
         print(f'\n\n{now_epoch} / {total_epochs}\n\n')
+        print(f'TOTAL PLAY: {local_play_num + colab_play_num}', end='\t')
+        print(f'(LOCAL PLAY: {local_play_num}, COLAB PLAY: {colab_play_num})')
 
-        print(f'\nTRAIN ROUND: {p}\n\n')
         play_game.play(
             black=best_agent, white=best_agent,
             databook=databook, diri_TF=True, gui=gui
         )
-    
+
+        local_play_num += 1
+
+        if use_colab_collector:
+            commu_data = load_communication_window(colab_main_dir + 'communication_window/')
+            colab_status, colab_play_num = get_colab_data(commu_data)
+
+            #3 play_num 남았을 경우, colab collector에 데이터셋 적재 요구하기
+            play_num_callsign_limit_TF = ((local_play_num + colab_play_num + 3) >= play_num)   #play_num 3남았을 경우
+            now_local_status_TF = (commu_data['local_info']['status'] != 2)   #이전에 callsign 2를 보내지 않았을 경우
+            if play_num_callsign_limit_TF and now_local_status_TF:
+                write_communication_window(
+                    colab_main_dir + 'communication_window/',
+                    board_size = board_size,
+                    win_seq=win_seq,
+                    round_num=round_num,
+                    best_agent_name=local_agent_name,
+                    status=2
+                )
+
+    if use_colab_collector:
+
+        #communication_window의 colab_info status == False일 경우 업로드 상태
+        print(f'Check databook upload status...', end='')
+        while True:
+            commu_data = load_communication_window(colab_main_dir + 'communication_window/')
+            if not commu_data['colab_info']['status']:
+                print('(OK)')
+                break
+
+        #실제 파일 업로드 확인하기
+        print(f'Check for file existence...', end='')
+        while True:
+            if os.listdir(colab_main_dir + 'databook/'):   #파일 존재 확인
+                uploaded_file_name = os.listdir(colab_main_dir + 'databook/')[-1].split('.')[0]
+
+                commu_data = load_communication_window(colab_main_dir + 'communication_window/')
+                colab_play_num = str(commu_data['colab_info']['play_num'])
+                
+                if uploaded_file_name == colab_play_num:
+                    print('(OK)')
+                    break
+        
+        #colab databook 불러와 통합하기
+
+        #colab databook 지우기
+    exit()
     #train===========================
     train_history = None
 
