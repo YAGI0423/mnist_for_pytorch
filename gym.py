@@ -6,6 +6,7 @@ from playGame import PlayGame
 
 import os
 import shutil
+import pickle
 import json
 import math
 import time
@@ -72,7 +73,7 @@ buffer_size = 32768 * (board_size ** 2)#50000 * (board_size ** 2)
 window_size = 8192#32768
 augment_rate = 1.
 
-play_num = 10#2500
+play_num = 7#2500
 
 COMPETE_NUM = 16
 
@@ -235,6 +236,7 @@ while (now_epoch := get_now_epoch()) < total_epochs:
                 )
 
     if use_colab_collector:
+        local_agent_name = best_agent_dir.split('/')[-1]
 
         #communication_window의 colab_info status == False일 경우 업로드 상태
         print(f'Check databook upload status...', end='')
@@ -258,9 +260,26 @@ while (now_epoch := get_now_epoch()) < total_epochs:
                     break
         
         #colab databook 불러와 통합하기
+        print(f'Combine with colab buffer...', end='')
+        colab_databook_dir = f'{colab_main_dir}/databook/{colab_play_num}.pickle'
+        with open(colab_databook_dir, 'rb') as pick:
+            colab_databook = pickle.load(pick)
+        databook.add_data(colab_databook)
 
         #colab databook 지우기
-    exit()
+        os.remove(colab_databook_dir)
+        print('(OK)')
+
+        #best agent가 변경되지 않을 경우를 대비하여 학습 및 평가 동안 self-play 요청
+        write_communication_window(
+            colab_main_dir + 'communication_window/',
+            board_size = board_size,
+            win_seq=win_seq,
+            round_num=round_num,
+            best_agent_name=local_agent_name,
+            status=3
+        )
+
     #train===========================
     train_history = None
 

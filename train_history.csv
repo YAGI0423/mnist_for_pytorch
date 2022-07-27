@@ -1,1 +1,0 @@
-idx,current_agent_name,best_agent_name,date,learning_rate,batch_size,round_num,play_num,train_epoch,train_buffer_size,PNN_loss,VNN_loss,train_loss,val_PNN_loss,val_VNN_loss,val_loss,win_num,lose_num,draw_num
