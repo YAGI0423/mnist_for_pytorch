@@ -73,7 +73,7 @@ buffer_size = 32768 * (board_size ** 2)#50000 * (board_size ** 2)
 window_size = 8192#32768
 augment_rate = 1.
 
-play_num = 7#2500
+play_num = 5#2500
 
 COMPETE_NUM = 16
 
@@ -127,21 +127,32 @@ def load_communication_window(main_dir):
         js_data = json.load(st_json)
     return js_data
 
-def write_communication_window(main_dir, board_size, win_seq, round_num, best_agent_name, status):
-  commu_data = load_communication_window(main_dir)
-  commu_data['common_info']['board_size'] = board_size
-  commu_data['common_info']['win_seq'] = win_seq
-  commu_data['common_info']['round_num'] = round_num
-  commu_data['common_info']['best_agent_name'] = best_agent_name
-  commu_data['local_info']['status'] = status
+def write_communication_window(main_dir, board_size=None, win_seq=None, round_num=None, best_agent_name=None, status=None):
+    commu_data = load_communication_window(main_dir)
 
-  with open(main_dir + 'communication_window.json', 'w') as json_file:
-    json.dump(commu_data, json_file)
+    if board_size is not None:
+        commu_data['common_info']['board_size'] = board_size
+
+    if win_seq is not None:
+        commu_data['common_info']['win_seq'] = win_seq
+
+    if round_num is not None:
+        commu_data['common_info']['round_num'] = round_num
+
+    if best_agent_name is not None:
+        commu_data['common_info']['best_agent_name'] = best_agent_name
+
+    if status is not None:
+        commu_data['local_info']['status'] = status
+
+    with open(main_dir + 'communication_window.json', 'w') as json_file:
+        json.dump(commu_data, json_file)
 
 def get_colab_data(communication_window):
   status = communication_window['colab_info']['status']
   play_num = communication_window['colab_info']['play_num']
   return status, play_num
+
 
 
 if use_colab_collector:
@@ -167,19 +178,16 @@ if use_colab_collector:
         json.dump(commu_context, json_file)
     print('(OK)')
 
-    print(f'Wait for connecting...')
+    print(f'Wait for connecting...', end='')
     while True:
         loaded_commu = load_communication_window(colab_main_dir + 'communication_window/')
         if loaded_commu['colab_info']['status']:
             print('(connecting is successful)')
             break
         time.sleep(3)
+
     write_communication_window(
         colab_main_dir + 'communication_window/',
-        board_size = board_size,
-        win_seq=win_seq,
-        round_num=round_num,
-        best_agent_name=local_agent_name,
         status=1
     )
 
@@ -228,10 +236,6 @@ while (now_epoch := get_now_epoch()) < total_epochs:
             if play_num_callsign_limit_TF and now_local_status_TF:
                 write_communication_window(
                     colab_main_dir + 'communication_window/',
-                    board_size = board_size,
-                    win_seq=win_seq,
-                    round_num=round_num,
-                    best_agent_name=local_agent_name,
                     status=2
                 )
 
@@ -258,26 +262,40 @@ while (now_epoch := get_now_epoch()) < total_epochs:
                 if uploaded_file_name == colab_play_num:
                     print('(OK)')
                     break
-        
+
         #colab databook 불러와 통합하기
         print(f'Combine with colab buffer...', end='')
         colab_databook_dir = f'{colab_main_dir}/databook/{colab_play_num}.pickle'
         with open(colab_databook_dir, 'rb') as pick:
             colab_databook = pickle.load(pick)
-        databook.add_data(colab_databook)
+        
+        databook.state.extend(colab_databook['state'])
+        databook.policy_y.extend(colab_databook['policy_y'])
+        databook.value_y.extend(colab_databook['value_y'])
 
         #colab databook 지우기
         os.remove(colab_databook_dir)
         print('(OK)')
 
+
         #best agent가 변경되지 않을 경우를 대비하여 학습 및 평가 동안 self-play 요청
         write_communication_window(
             colab_main_dir + 'communication_window/',
-            board_size = board_size,
-            win_seq=win_seq,
-            round_num=round_num,
-            best_agent_name=local_agent_name,
-            status=3
+            status=0
+        )
+
+
+        print(f'Require collect self-play...', end='')
+        while True:
+            loaded_commu = load_communication_window(colab_main_dir + 'communication_window/')
+            if loaded_commu['colab_info']['status']:
+                print('(connecting is successful)')
+                break
+            time.sleep(3)
+
+        write_communication_window(
+            colab_main_dir + 'communication_window/',
+            status=1
         )
 
     #train===========================
@@ -415,3 +433,63 @@ while (now_epoch := get_now_epoch()) < total_epochs:
         os.remove(current_agent_dir)
     
     backend.clear_session()
+
+
+    best_agent_change_TF = (win_count / COMPETE_NUM) > 0.55
+    if use_colab_collector and best_agent_change_TF:
+        #best agent가 교체 되었을 때,
+        #   (1) colab self-play 수집을 중단하고
+        #   (2) 새로운 best agent를 이용하여 self-play 수집 요청하기
+        #best agent가 교체 되지 않았을 때,
+        #   (1) 현재 colab에서 self-play 진행 중이므로 별다른 요청 없이 진행하기 
+
+        print(f'Excute Best Agent substitute procedure...')
+
+        #데이터북 제출 요구
+        write_communication_window(
+            colab_main_dir + 'communication_window/',
+            status=2
+        )
+
+        #새로운 best agent 업로드
+        best_agent_dir = get_agent_dir('./model/best_model/')
+        local_agent_name = best_agent_dir.split('/')[-1]
+
+        print(f'Synchronizing the model...', end='')
+        cleaning_folder(colab_main_dir + 'agent/')
+        shutil.copy(best_agent_dir, colab_main_dir + 'agent/')
+        print('(OK)')
+
+        #데이터북 제출 확인
+        print(f'Check databook upload status...', end='')
+        while True:
+            commu_data = load_communication_window(colab_main_dir + 'communication_window/')
+            if not commu_data['colab_info']['status']:
+                print('(OK)')
+                break
+
+        #실제 파일 업로드 확인하기
+        print(f'Check for file existence...', end='')
+        while True:
+            if os.listdir(colab_main_dir + 'databook/'):   #파일 존재 확인
+                uploaded_file_name = os.listdir(colab_main_dir + 'databook/')[-1].split('.')[0]
+
+                commu_data = load_communication_window(colab_main_dir + 'communication_window/')
+                colab_play_num = str(commu_data['colab_info']['play_num'])
+                
+                if uploaded_file_name == colab_play_num:
+                    print('(OK)')
+                    break
+
+        #데이터북 삭제
+        colab_databook_dir = f'{colab_main_dir}/databook/{colab_play_num}.pickle'
+        os.remove(colab_databook_dir)
+        print('(OK)')
+
+        
+        #신규 best agent를 바탕으로 self-play 수집 요청
+        write_communication_window(
+            colab_main_dir + 'communication_window/',
+            best_agent_name=local_agent_name,
+            status=0
+        )
