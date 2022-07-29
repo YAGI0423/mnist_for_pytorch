@@ -64,20 +64,21 @@ def initial_setting(best_agent):
 board_size = 10
 win_seq = 5
 
-round_num = 64#16
+round_num = 128#16   #약 42회 당 1초 소요
 
-total_epochs = 200
+total_epochs = 50
 batch_size = 32#2048
 
-buffer_size = 32768 * (board_size ** 2)#50000 * (board_size ** 2)
+buffer_size = 1024 * (board_size ** 2)#50000 * (board_size ** 2)
 window_size = 8192#32768
 augment_rate = 1.
 
-play_num = 5#2500
+play_num = 40#2500
 
 COMPETE_NUM = 16
 
-learning_rate = 0.001
+learning_rate = 0.0001
+
 
 
 use_colab_collector = True
@@ -93,7 +94,6 @@ best_agent = model.AlphaO(board_size, rule, model_dir=best_agent_dir, lr=learnin
 if best_agent_dir is None:
     initial_setting(best_agent)
     best_agent_dir = get_agent_dir('./model/best_model/')
-
 
 
 
@@ -156,6 +156,11 @@ def get_colab_data(communication_window):
 
 
 if use_colab_collector:
+    print(f'Set The wait SEC...', end='')
+    WAIT_SEC = (round_num / 42) * board_size ** 2   #응답 대기 시간
+    print(f'(Wait SEC: {WAIT_SEC:.3f})')
+
+
     local_agent_name = best_agent_dir.split('/')[-1]
     colab_agent_name = os.listdir(colab_main_dir + 'agent/')[-1]
 
@@ -178,12 +183,19 @@ if use_colab_collector:
         json.dump(commu_context, json_file)
     print('(OK)')
 
-    print(f'Wait for connecting...', end='')
+    print(f'Wait for connecting...')
+    start_time = time.time()
     while True:
         loaded_commu = load_communication_window(colab_main_dir + 'communication_window/')
         if loaded_commu['colab_info']['status']:
             print('(connecting is successful)')
             break
+
+        if (time.time() - start_time) > WAIT_SEC:
+            use_colab_collector = False
+            print(f'(Connection failure due to timeout)')
+            break
+
         time.sleep(3)
 
     write_communication_window(
@@ -244,24 +256,38 @@ while (now_epoch := get_now_epoch()) < total_epochs:
 
         #communication_window의 colab_info status == False일 경우 업로드 상태
         print(f'Check databook upload status...', end='')
+        start_time = time.time()
         while True:
             commu_data = load_communication_window(colab_main_dir + 'communication_window/')
             if not commu_data['colab_info']['status']:
                 print('(OK)')
                 break
 
+            if (time.time() - start_time) > WAIT_SEC:
+                use_colab_collector = False
+                print(f'(Connection failure due to timeout)')
+                break
+            time.sleep(3)
+
         #실제 파일 업로드 확인하기
         print(f'Check for file existence...', end='')
+        start_time = time.time()
         while True:
             if os.listdir(colab_main_dir + 'databook/'):   #파일 존재 확인
                 uploaded_file_name = os.listdir(colab_main_dir + 'databook/')[-1].split('.')[0]
 
                 commu_data = load_communication_window(colab_main_dir + 'communication_window/')
-                colab_play_num = str(commu_data['colab_info']['play_num'])
+                colab_play_num = commu_data['colab_info']['play_num']
                 
-                if uploaded_file_name == colab_play_num:
+                if uploaded_file_name == str(colab_play_num):
                     print('(OK)')
                     break
+
+            if (time.time() - start_time) > WAIT_SEC:
+                use_colab_collector = False
+                print(f'(Connection failure due to timeout)')
+                break
+            time.sleep(3)
 
         #colab databook 불러와 통합하기
         print(f'Combine with colab buffer...', end='')
@@ -279,17 +305,21 @@ while (now_epoch := get_now_epoch()) < total_epochs:
 
 
         #best agent가 변경되지 않을 경우를 대비하여 학습 및 평가 동안 self-play 요청
+        print(f'Require collect self-play...')
         write_communication_window(
             colab_main_dir + 'communication_window/',
             status=0
         )
-
-
-        print(f'Require collect self-play...', end='')
+        start_time = time.time()
         while True:
             loaded_commu = load_communication_window(colab_main_dir + 'communication_window/')
             if loaded_commu['colab_info']['status']:
                 print('(connecting is successful)')
+                break
+
+            if (time.time() - start_time) > WAIT_SEC:
+                use_colab_collector = False
+                print(f'(Connection failure due to timeout)')
                 break
             time.sleep(3)
 
@@ -333,12 +363,16 @@ while (now_epoch := get_now_epoch()) < total_epochs:
         
         
         #RECORAD ONLY MAIN AGENT DATA========
-        # comp_data = compete_databook.get_data(shuffle=False)
-        # state_x, policy_y, value_y = comp_data['x'], comp_data['policy_y'], comp_data['value_y']
+        comp_data = compete_databook.get_data(shuffle=False, augment_rate=None)
+        state_x, policy_y, value_y = comp_data['x'], comp_data['policy_y'], comp_data['value_y']
 
-        # comp_data['x'] = comp_data['x'][current_agent_color::2]
-        # comp_data['policy_y'] = comp_data['policy_y'][current_agent_color::2]
-        # comp_data['value_y'] = comp_data['value_y'][current_agent_color::2]
+        comp_data['x'] = comp_data['x'][current_agent_color::2]
+        comp_data['policy_y'] = comp_data['policy_y'][current_agent_color::2]
+        comp_data['value_y'] = comp_data['value_y'][current_agent_color::2]
+
+        databook.state.extend(comp_data['x'])
+        databook.policy_y.extend(comp_data['policy_y'])
+        databook.value_y.extend(comp_data['value_y'])
         #End=================================
 
         if win_code == current_agent_color:   #when main agent win
@@ -378,7 +412,7 @@ while (now_epoch := get_now_epoch()) < total_epochs:
         'learning_rate': learning_rate,
         'batch_size': batch_size,
         'round_num': round_num,
-        'play_num': play_num,
+        'play_num': local_play_num + colab_play_num,
         'train_epoch': 1,
         'train_buffer_size': len(databook.value_y),
         'PNN_loss': tr_PNN_loss,
@@ -409,7 +443,7 @@ while (now_epoch := get_now_epoch()) < total_epochs:
             root_dir='./model/best_model/',
             idx=int(idx) + 1,
             start_round=int(end_round),
-            end_round=int(end_round) + play_num,
+            end_round=int(end_round) + local_play_num + colab_play_num,
             include_optimizer=False
         )
 
@@ -418,7 +452,7 @@ while (now_epoch := get_now_epoch()) < total_epochs:
             root_dir='./model/current_model/',
             idx=int(idx) + 1,
             start_round=int(end_round),
-            end_round=int(end_round) + play_num,
+            end_round=int(end_round) + local_play_num + colab_play_num,
             include_optimizer=True
         )
         os.remove(current_agent_dir)
@@ -427,7 +461,7 @@ while (now_epoch := get_now_epoch()) < total_epochs:
             root_dir='./model/current_model/',
             idx=int(idx) + 1,
             start_round=start_round,
-            end_round=int(end_round) + play_num,
+            end_round=int(end_round) + local_play_num + colab_play_num,
             include_optimizer=True
         )
         os.remove(current_agent_dir)
@@ -462,14 +496,22 @@ while (now_epoch := get_now_epoch()) < total_epochs:
 
         #데이터북 제출 확인
         print(f'Check databook upload status...', end='')
+        start_time = time.time()
         while True:
             commu_data = load_communication_window(colab_main_dir + 'communication_window/')
             if not commu_data['colab_info']['status']:
                 print('(OK)')
                 break
 
+            if (time.time() - start_time) > WAIT_SEC:
+                use_colab_collector = False
+                print(f'(Connection failure due to timeout)')
+                break
+            time.sleep(3)
+
         #실제 파일 업로드 확인하기
         print(f'Check for file existence...', end='')
+        start_time = time.time()
         while True:
             if os.listdir(colab_main_dir + 'databook/'):   #파일 존재 확인
                 uploaded_file_name = os.listdir(colab_main_dir + 'databook/')[-1].split('.')[0]
@@ -481,6 +523,12 @@ while (now_epoch := get_now_epoch()) < total_epochs:
                     print('(OK)')
                     break
 
+            if (time.time() - start_time) > WAIT_SEC:
+                use_colab_collector = False
+                print(f'(Connection failure due to timeout)')
+                break
+            time.sleep(3)
+
         #데이터북 삭제
         colab_databook_dir = f'{colab_main_dir}/databook/{colab_play_num}.pickle'
         os.remove(colab_databook_dir)
@@ -488,8 +536,26 @@ while (now_epoch := get_now_epoch()) < total_epochs:
 
         
         #신규 best agent를 바탕으로 self-play 수집 요청
+        print(f'Require collect self-play...')
         write_communication_window(
             colab_main_dir + 'communication_window/',
             best_agent_name=local_agent_name,
             status=0
+        )
+        start_time = time.time()
+        while True:
+            loaded_commu = load_communication_window(colab_main_dir + 'communication_window/')
+            if loaded_commu['colab_info']['status']:
+                print('(connecting is successful)')
+                break
+
+            if (time.time() - start_time) > WAIT_SEC:
+                use_colab_collector = False
+                print(f'(Connection failure due to timeout)')
+                break
+            time.sleep(3)
+
+        write_communication_window(
+            colab_main_dir + 'communication_window/',
+            status=1
         )
