@@ -59,12 +59,17 @@ def initial_setting(best_agent):
 
 
 #해결 문제===========
+! git add .
+! git commit -m "train model"
+! git push
+
+exit()
 #End=================
 
 board_size = 10
 win_seq = 5
 
-round_num = 128#16   #약 42회 당 1초 소요
+round_num = 256#16   #약 42회 당 1초 소요
 
 total_epochs = 50
 batch_size = 32#2048
@@ -207,15 +212,14 @@ if use_colab_collector:
 
 
 while (now_epoch := get_now_epoch()) < total_epochs:
-    if best_agent_dir != get_agent_dir('./model/best_model/'):
-        # learning_rate = lr_decay(init_lr=2e-5, lim_lr=6e-6, now_epoch=now_epoch, total_epochs=total_epochs)
-        best_agent_dir = get_agent_dir('./model/best_model/')
-        best_agent = model.AlphaO(board_size, rule, model_dir=best_agent_dir, lr=learning_rate, round_num=round_num)
+    # learning_rate = lr_decay(init_lr=2e-5, lim_lr=6e-6, now_epoch=now_epoch, total_epochs=total_epochs)
+    best_agent_dir = get_agent_dir('./model/best_model/')
+    best_agent = model.AlphaO(board_size, rule, model_dir=best_agent_dir, lr=learning_rate, round_num=round_num)
 
-    if now_epoch % 3 == 0:
-        gui.root.destroy()
-        gui = GUI(board_size=board_size, black_info=2, white_info=2)
-    gui.clear_canvas()
+    # if now_epoch % 3 == 0:
+        # gui.root.destroy()
+        # gui = GUI(board_size=board_size, black_info=2, white_info=2)
+    # gui.clear_canvas()
     
     #load databook===================
     if 'buffer_dataset.pickle' in os.listdir('./dataset/'):
@@ -233,7 +237,7 @@ while (now_epoch := get_now_epoch()) < total_epochs:
 
         play_game.play(
             black=best_agent, white=best_agent,
-            databook=databook, diri_TF=True, gui=gui
+            databook=databook, diri_TF=True, gui=None
         )
 
         local_play_num += 1
@@ -330,13 +334,17 @@ while (now_epoch := get_now_epoch()) < total_epochs:
 
     #train===========================
     train_history = None
+    compeat_round_num = 16
 
     dataset = databook.get_data(shuffle=True, augment_rate=augment_rate)
 
     current_agent_dir = get_agent_dir('./model/current_model/')
-    current_agent = model.AlphaO(board_size, rule, model_dir=current_agent_dir, lr=learning_rate, round_num=round_num)
+    current_agent = model.AlphaO(board_size, rule, model_dir=current_agent_dir, lr=learning_rate, round_num=compeat_round_num)
     train_history = current_agent.train_model(dataset, batch_size=batch_size)
+
+
     #End=============================
+    best_agent = model.AlphaO(board_size, rule, model_dir=best_agent_dir, lr=learning_rate, round_num=compeat_round_num)
         
 
     win_count, lose_count, draw_count = 0, 0, 0
@@ -359,7 +367,7 @@ while (now_epoch := get_now_epoch()) < total_epochs:
             print(f'WHITE(○): CURRENT_AGENT')
             print('=' * 50)
 
-        win_code = play_game.play(black=black, white=white, databook=compete_databook, diri_TF=False, gui=gui)
+        win_code = play_game.play(black=black, white=white, databook=compete_databook, diri_TF=False, gui=None)
         
         
         #RECORAD ONLY MAIN AGENT DATA========
