@@ -59,11 +59,6 @@ def initial_setting(best_agent):
 
 
 #해결 문제===========
-! git add .
-! git commit -m "train model"
-! git push
-
-exit()
 #End=================
 
 board_size = 10
@@ -71,7 +66,7 @@ win_seq = 5
 
 round_num = 256#16   #약 42회 당 1초 소요
 
-total_epochs = 50
+total_epochs = 100
 batch_size = 32#2048
 
 buffer_size = 1024 * (board_size ** 2)#50000 * (board_size ** 2)
@@ -86,7 +81,7 @@ learning_rate = 0.0001
 
 
 
-use_colab_collector = True
+use_colab_collector = False
 colab_main_dir = 'G:/내 드라이브/alphaO/colab_collector/'
 
 
@@ -212,6 +207,11 @@ if use_colab_collector:
 
 
 while (now_epoch := get_now_epoch()) < total_epochs:
+    
+    os.system('git add .')
+    os.system(f'git commit -m "train model(Epoch: {now_epoch})"')
+    os.system('git push')
+
     # learning_rate = lr_decay(init_lr=2e-5, lim_lr=6e-6, now_epoch=now_epoch, total_epochs=total_epochs)
     best_agent_dir = get_agent_dir('./model/best_model/')
     best_agent = model.AlphaO(board_size, rule, model_dir=best_agent_dir, lr=learning_rate, round_num=round_num)
