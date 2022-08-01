@@ -207,10 +207,10 @@ if use_colab_collector:
 
 
 while (now_epoch := get_now_epoch()) < total_epochs:
-    
-    os.system('git add .')
-    os.system(f'git commit -m "train model(Epoch: {now_epoch})"')
-    os.system('git push')
+    if now_epoch % 5 == 0:
+        os.system('git add .')
+        os.system(f'git commit -m "train model(Epoch: {now_epoch})"')
+        os.system('git push')
 
     # learning_rate = lr_decay(init_lr=2e-5, lim_lr=6e-6, now_epoch=now_epoch, total_epochs=total_epochs)
     best_agent_dir = get_agent_dir('./model/best_model/')
