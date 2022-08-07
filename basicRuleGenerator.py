@@ -1,4 +1,5 @@
 import math
+import random
 import numpy as np
 
 
@@ -21,26 +22,38 @@ class Generator:
         center_loc = int(seq_num / 2)
 
         if rotate_degree == 0:   #회전 없을 시 그대로 반환
-            seq_yx_list = [(0, x) for x in range(seq_num)]   #회전되지 않은 yx 리스트
+            seq_yx_list = [[0, x] for x in range(-1, seq_num)]   #회전되지 않은 yx 리스트
             side_yx_list = list(seq_yx_list.pop(pop_idx) for pop_idx in (0, -1))   #양 끝 yx 추출
             return seq_yx_list, side_yx_list
 
         #중심을 기준으로 회전하기 위해 y,x에서 [center_loc] 만큼 차감한 돌의 위치 yx 리스트
-        seq_yx = [(center_loc-center_loc, x-center_loc) for x in range(seq_num)]
+        seq_yx = [(0, x) for x in range(seq_num)]
 
         rot_radian = math.radians(rotate_degree)
-        R = ((round(math.cos(rot_radian)), -round(math.sin(rot_radian))), #회전 변환 행렬
-            (round(math.sin(rot_radian)), round(math.cos(rot_radian)))
-        )
+        sin, cos = round(math.sin(rot_radian)), round(math.cos(rot_radian))
+        R = ((cos, sin), (-sin, cos))   #회전 변환 행렬
 
-        rot_seq_yx_list = [list(np.dot(R, yx) + center_loc) for yx in seq_yx]   #회전된 yx 리스트
+        rot_seq_yx_list = [list(np.dot(R, yx)) for yx in seq_yx]   #회전된 yx 리스트
         
-        min = np.min(rot_seq_yx_list, axis=0)   #y와 x 각각의 최소값을 튜플로 반환 e.g. (y_min, x_min)
-        rot_seq_yx_list -= min  #회전된 yx의 좌표 범위가 0 ~ max가 되도록 수정
+        #회전한 yx 좌표를 원점(0, 0) 기준에 맞추어 정렬
+        rot_seq_yx_list -= np.min(rot_seq_yx_list, axis=0)   #y와 x 각각의 최소값을 튜플로 반환 e.g. (y_min, x_min)
+        rot_seq_yx_list -= (abs(sin), abs(cos)) #회전된 yx의 좌표 범위가 -1 ~ [seq_num]이 되도록 수정
         rot_seq_yx_list = rot_seq_yx_list.tolist()
 
         side_yx_list = list(rot_seq_yx_list.pop(pop_idx) for pop_idx in (0, -1))   #양 끝 yx 추출
         return rot_seq_yx_list, side_yx_list
+
+    def get_limit_loc(self, rotate_degree: int, sequence_num: int):
+        '''
+        * 게임 보드에서 sequance YX 필터가 위치 가능한 최대 Y, X 좌표를 반환
+        '''
+        rot_radian = math.radians(rotate_degree)
+        seq_filter_height = abs(round(math.sin(rot_radian))) * (sequence_num - 1)
+        seq_filter_width = abs(round(math.cos(rot_radian))) * (sequence_num - 1)
+
+        y_limit = self.board_size - seq_filter_height - 1   #위치 가능한 최대 x 좌표
+        x_limit = self.board_size - seq_filter_width - 1    #위치 가능한 최대 y 좌표
+        return y_limit, x_limit
 
     def attack_four(self, noise_rate: float, size: int):
         '''
@@ -50,17 +63,34 @@ class Generator:
         '''
         SEQUENCE_NUM = 4
 
-        rot_degree = 45
+        rot_degree = 135
+        print(f'degree: {rot_degree}')
         seq_yx_tup, side_yx_tup = self.get_seq_yx_list(seq_num=SEQUENCE_NUM, rotate_degree=rot_degree)
-        
-        #위치 가능한 좌표 범위 얻기
-        
-        rot_radian = math.radians(135)
 
-        seq_filter_height = abs(round(math.sin(rot_radian))) * SEQUENCE_NUM
-        seq_filter_width = abs(round(math.cos(rot_radian))) * SEQUENCE_NUM
-        print(seq_filter_height)
-        print(seq_filter_width)
+
+
+        #게임 보드에 위치 가능한 좌표 범위 얻기
+        #0 <= able_loc <= yx_limit
+        y_limit, x_limit = self.get_limit_loc(rotate_degree=rot_degree, sequence_num=SEQUENCE_NUM)
+        
+        move_y = random.randint(0, y_limit + 1)
+        move_x = random.randint(0, x_limit + 1)
+        move_yx = (move_y, move_x)
+
+
+        print(seq_yx_tup)
+        print(side_yx_tup)
+        print(move_yx)
+
+
+        print(np.add(seq_yx_tup, move_yx).tolist())
+        print(np.add(side_yx_tup, move_yx).tolist())
+
+
+
+        #선택된 y, x만큼 filter 좌표 이동하기
+
+
         #degree: 0
         #degree: 45
         #degree: 90
