@@ -1,5 +1,4 @@
 import math
-import random
 import numpy as np
 
 
@@ -43,17 +42,25 @@ class Generator:
         side_yx_list = list(rot_seq_yx_list.pop(pop_idx) for pop_idx in (0, -1))   #양 끝 yx 추출
         return rot_seq_yx_list, side_yx_list
 
-    def get_limit_loc(self, rotate_degree: int, sequence_num: int):
+    def get_limit_loc(self, seq_yx_list):
         '''
-        * 게임 보드에서 sequance YX 필터가 위치 가능한 최대 Y, X 좌표를 반환
+        * 게임 보드에서 sequance YX 필터가 이동 가능한 최대 Y, X 좌표를 반환
         '''
-        rot_radian = math.radians(rotate_degree)
-        seq_filter_height = abs(round(math.sin(rot_radian))) * (sequence_num - 1)
-        seq_filter_width = abs(round(math.cos(rot_radian))) * (sequence_num - 1)
-
-        y_limit = self.board_size - seq_filter_height - 1   #위치 가능한 최대 x 좌표
-        x_limit = self.board_size - seq_filter_width - 1    #위치 가능한 최대 y 좌표
+        height, width =  np.max(seq_yx_list, axis=0)
+        y_limit = self.board_size - height - 1  #이동 가능한 최대 x 좌표
+        x_limit = self.board_size - width - 1   #이동 가능한 최대 y 좌표
         return y_limit, x_limit
+
+    def is_out_loc(self, yx):
+        '''
+        * [yx] 좌표가 게임 보드 내에 위치 하였는지 boolean 형태로 반환
+        * True: 게임 보드 외부에 위치
+        * False: 게임 보드 내부에 위치
+        '''
+        for loc in yx:
+            if loc < 0: return True;
+            if loc >= self.board_size: return True;
+        return False
 
     def attack_four(self, noise_rate: float, size: int):
         '''
@@ -62,29 +69,52 @@ class Generator:
         z = 1
         '''
         SEQUENCE_NUM = 4
+        LIMIT_SIDE_NUM = 1  #최소 side space
 
-        rot_degree = 135
+        rot_degree = np.random.choice((0, 45, 90, 135))
         print(f'degree: {rot_degree}')
-        seq_yx_tup, side_yx_tup = self.get_seq_yx_list(seq_num=SEQUENCE_NUM, rotate_degree=rot_degree)
+        seq_yx_list, side_yx_list = self.get_seq_yx_list(seq_num=SEQUENCE_NUM, rotate_degree=rot_degree)
+        y_limit, x_limit = self.get_limit_loc(seq_yx_list=seq_yx_list)  #이동 가능한 최대 yx 좌표
 
+        move_yx = (np.random.randint(0, y_limit + 1), np.random.randint(0, x_limit + 1))  #위치 좌표 뮈작위 선택
 
+        seq_yx_list = np.add(seq_yx_list, move_yx).tolist() #seq 필터 및 사이드 yx 좌표 이동하기
+        side_yx_list = np.add(side_yx_list, move_yx).tolist()
 
-        #게임 보드에 위치 가능한 좌표 범위 얻기
-        #0 <= able_loc <= yx_limit
-        y_limit, x_limit = self.get_limit_loc(rotate_degree=rot_degree, sequence_num=SEQUENCE_NUM)
-        
-        move_y = random.randint(0, y_limit + 1)
-        move_x = random.randint(0, x_limit + 1)
-        move_yx = (move_y, move_x)
+        side_yx_list = list(yx for yx in side_yx_list if not self.is_out_loc(yx))  #보드에 위치한 yx 필터링
 
+        if len(side_yx_list) < LIMIT_SIDE_NUM: #최소 side space 개수가 확보되지 않으면 continue
+            print('CONTINUE')
+    
+        print(seq_yx_list)
+        print(side_yx_list)
 
-        print(seq_yx_tup)
-        print(side_yx_tup)
-        print(move_yx)
+        #착수 가능한 좌표 리스트를 바탕으로 noise 수 두기
+        #1. current player 선정
+        #2. nose 개수 정의
+        #3. win_seq 만큼 상호 착수 수행
+        #4. 착수 전, 체크
+        disable_yx_list = seq_yx_list + side_yx_list
 
+        able_yx_list = list(
+            [y, x] for x in range(self.board_size) for y in range(self.board_size) if not [y, x] in disable_yx_list
+        )
 
-        print(np.add(seq_yx_tup, move_yx).tolist())
-        print(np.add(side_yx_tup, move_yx).tolist())
+        board = list()
+        # print(able_yx_board)
+        exit()
+
+        # able_yx_board = []
+        # for y in range(self.board_size):
+        #     for x in range(self.board_size):
+        #         if not (y, x) in seq_yx_list:
+        #             if not (y, x) in side_yx_list:
+        #                 able_yx_board.append((y, x))
+        # print(seq_yx_list)
+        # print(side_yx_list)
+
+        # print(empty_yx_board)
+        exit()
 
 
 
