@@ -1,5 +1,6 @@
 from util import Util
 
+import math
 import numpy as np
 
 class Rule:
@@ -49,13 +50,55 @@ class Rule:
             ] = cropped_board
 
             return tensor_board
+        
+        def crop_yx_board(yx_board, origin_yx, cut_size: int):
+            '''
+            * [yx_board]를 특정 좌표[origin_yx]를 기준으로 [cut_size] 만큼 크롭하여 반환
+            '''
+
+            def is_in_crop_range(yx, min_y: int, max_y: int, min_x: int, max_x: int):
+                '''
+                * (y, x) 좌표[yx]가 크롭 범위인 [min_y], ~ [max_x] 내부에 있는지 여부 반환
+                * True: 해당 좌표[yx]가 크롭 범위 내에 있음,
+                * False: 크롭 범위 외부에 있음
+                '''
+                y, x = yx
+                if y < min_y or max_y < y: return False;
+                if x < min_x or max_x < x: return False;
+                return True
+            
+            ori_y, ori_x = origin_yx
+            crop_range_args = {
+                'min_y': max(0, ori_y - cut_size),
+                'max_y': min(self.board_size - 1, ori_y + cut_size),
+                'min_x': max(0, ori_x - cut_size),
+                'max_x': min(self.board_size - 1, ori_x + cut_size)
+            }
+
+            cropped_yx_board = list(    #크롭 범위 내 좌표만 필터링한 리스트
+                yx for yx in yx_board if is_in_crop_range(yx, **crop_range_args)
+            )
+            return cropped_yx_board
         #End==================================
 
         #전체 돌 수가 게임 종료 가능 착수 수보다 작을 때
         if len(yx_board) < self.win_seq * 2 - 1:
             return 0
 
-        print(yx_board)
+        #yx board를 크롭할 경우, 흑, 백에 대한 정보가 소실 된다
+        #따라서, 크롭 작업 이전에 마지막 수에 해당하는 돌의 색만 필터링할 필요가 있다
+
+        cropped_board = crop_yx_board(
+            yx_board=yx_board,
+            cut_size=self.win_seq - 1,
+            origin_yx = yx_board[-1]
+        )
+        print(cropped_board)
+
+        rotate_radian = math.radians(45)
+        print(Util.rotate_yx_list(
+            yx_list=cropped_board, rotate_radian=rotate_radian, origin_yx=yx_board[-1]
+        ))
         exit()
 
         square_board = Util.yx_to_square_board(yx_board=yx_board, board_size=self.board_size)
@@ -76,6 +119,7 @@ class Rule:
         '''
         print(f'yx_board: {yx_board}')
         print(f'yx: {yx}')
+        #기존 보드에 평가하고자 하는 수의 좌표를 추가하여 평가
         moved_yx_board = yx_board.copy()
         moved_yx_board.append(yx)
 

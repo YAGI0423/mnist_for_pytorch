@@ -1,3 +1,4 @@
+import math
 import numpy as np
 
 class Util:
@@ -10,15 +11,29 @@ class Util:
         return len(yx_board) % 2
 
     @staticmethod
-    def yx_to_square_board(yx_board, board_size):
+    def rotate_yx_list(yx_list: list, rotate_radian: float, origin_yx=(0, 0)):
         '''
-        * yx 보드를 square_board로 변환하여 반환
-        * -1: black, 0: empty, +1: white
+        * 좌표 리스트[yx_list]를 원점[origin_yx]를 기준으로,
+        * 특정 각도[rotate_radian] 만큼 회전한 리스트를 반환
         '''
-        square_board = np.zeros(shape=(board_size, board_size), dtype=np.float32)
+        
+        #좌표 yx의 type 저장 및 체크
+        if type(yx_list[0]) is list:
+            return_type = list
+        elif type(yx_list[0]) is tuple:
+            return_type = tuple
+        else:
+            raise Exception(f'yx type must be `list` or `tuple`')
 
-        for idx, yx in enumerate(yx_board):
-            current_color = (idx % 2) * 2 - 1 #-1:흑, 1: 백
-            square_board[yx] = current_color
-        return square_board
+        sin, cos = round(math.sin(rotate_radian)), round(math.cos(rotate_radian))
+        R = ((cos, sin), (-sin, cos))   #회전 변환 행렬
+
+        yx_list_moved_origin = list(    #설정한 좌표를 원점으로 설정
+            [y-origin_yx[0], x-origin_yx[1]] for y, x in yx_list
+        )
+       
+        rotated_yx_list = list( #회전된 yx 리스트
+            return_type(np.dot(R, yx) + origin_yx) for yx in yx_list_moved_origin
+        )
+        return rotated_yx_list
             
