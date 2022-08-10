@@ -9,32 +9,6 @@ class Generator:
     def __init__(self, board_size: int):
         self.board_size = board_size
 
-    def rotate_yx_list(self, yx_list: list, rotate_radian: float, origin_yx=(0, 0)):
-        '''
-        * 좌표 리스트[yx_list]를 원점[origin_yx]를 기준으로,
-        * 특정 각도[rotate_radian] 만큼 회전한 리스트를 반환
-        '''
-        
-        #좌표 yx의 type 저장 및 체크
-        if type(yx_list[0]) is list:
-            return_type = list
-        elif type(yx_list[0]) is tuple:
-            return_type = tuple
-        else:
-            raise Exception(f'yx type must be `list` or `tuple`')
-
-        sin, cos = round(math.sin(rotate_radian)), round(math.cos(rotate_radian))
-        R = ((cos, sin), (-sin, cos))   #회전 변환 행렬
-
-        yx_list_moved_origin = list(    #설정한 좌표를 원점으로 설정
-            [y-origin_yx[0], x-origin_yx[1]] for y, x in yx_list
-        )
-       
-        rotated_yx_list = list( #회전된 yx 리스트
-            return_type(np.dot(R, yx) + origin_yx) for yx in yx_list_moved_origin
-        )
-        return rotated_yx_list
-
     def get_seq_yx_list(self, seq_num: int, rotate_degree: int=0):
         '''
         * [rotate_degree]만큼 회전된 [seq_num]개가 한 줄인 돌의 위치 yx 리스트 반환
@@ -43,8 +17,6 @@ class Generator:
         * [rotate_degree] = 0: oooo
         '''
         
-        if rotate_degree % 45 or rotate_degree > 135:   #회전 각이 45º 단위가 아니면 예외
-            raise Exception('[rotate_degree] must be 45º ~ 135º')
 
         seq_num += 2   #양 쪽 위치를 함께 반환하기 위해 +2
 
@@ -57,10 +29,11 @@ class Generator:
         seq_yx = list([0, x] for x in range(seq_num))
 
         rotate_radian = math.radians(rotate_degree)
-        sin, cos = round(math.sin(rotate_radian)), round(math.cos(rotate_radian))
 
-        rot_seq_yx_list = self.rotate_yx_list(yx_list=seq_yx, rotate_radian=rotate_radian)
+        rot_seq_yx_list = Util.rotate_yx_list(yx_list=seq_yx, rotate_degree=rotate_degree)
         rot_seq_yx_list -= np.min(rot_seq_yx_list, axis=0)   #y와 x 각각의 최소값을 튜플로 반환 e.g. (y_min, x_min)
+        
+        sin, cos = round(math.sin(rotate_radian)), round(math.cos(rotate_radian))
         rot_seq_yx_list -= (abs(sin), abs(cos)) #회전된 yx의 좌표 범위가 -1 ~ [seq_num]이 되도록 수정
         rot_seq_yx_list = rot_seq_yx_list.tolist()
 
@@ -166,7 +139,7 @@ class Generator:
         
         #basic rule 착수하기
         while seq_yx_list:  #seq_yx_list의 yx를 소진할때 까지 반복
-            current_turn = Util.get_current_turn(yx_board)  #현재 플레이어 돌 색 얻기
+            current_turn = Util.get_current_color(yx_board)  #현재 플레이어 돌 색 얻기
             current_yx_list = self.return_current_player(  #현재 플레이어 yx_list 반환
                 current_turn=current_turn,
                 black=black_yx_list,
