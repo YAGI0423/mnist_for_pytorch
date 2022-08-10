@@ -95,15 +95,43 @@ class Generator:
         5개가 되는 위치에 각각 0.5 할당, 
         z = 1
         '''
+        
+        test = [(0, 0), (0, 1), (0, 2)]
+        print(test)
+
+        rotated_test = Util.rotate_yx_list(yx_list=test, rotate_degree=45, origin_yx=(0, 0))
+        
+        print(rotated_test)
+
+        print()
+        test = [(0, 0), (1, 1), (2, 2)]
+        print(test)
+
+        rotated_test = Util.rotate_yx_list(yx_list=test, rotate_degree=45, origin_yx=(0, 0))
+        print(rotated_test)
+
+        print()
+        test = [(0, 0), (1, 0), (2, 0)]
+        print(test)
+
+        rotated_test = Util.rotate_yx_list(yx_list=test, rotate_degree=45, origin_yx=(0, 0))
+        print(rotated_test)
+
+        print()
+        test = [(0, 0), (1, -1), (2, -2)]
+        print(test)
+
+        rotated_test = Util.rotate_yx_list(yx_list=test, rotate_degree=45, origin_yx=(0, 0))
+        print(rotated_test)
+        exit()
 
         if noise_rate < 0 or 0.8 < noise_rate:  #[noise_rate] 제한 0 ~ 0.8
             raise Exception(f'[noise_rate] must be 0 ~ 0.8')
 
-        rule = Rule(board_size=self.board_size, win_sequence=3) #noise 수 생성 시, 데이터셋에 영향을 주는 수를 제외하기 위해 사용
-
         SEQUENCE_NUM = 4
         LIMIT_SIDE_NUM = 1  #최소 side space
-
+        NOISE_SEQ_LIMIT = 3 #노이즈 수의 연속성 제한
+        
         main_color = np.random.randint(0, 2) #흑: 0, 백: 1
         rot_degree = np.random.choice((0, 45, 90, 135))
 
@@ -123,6 +151,7 @@ class Generator:
 
         if len(side_yx_list) < LIMIT_SIDE_NUM: #최소 side space 개수가 확보되지 않으면 continue
             print('CONTINUE')
+            exit()
 
         
         yx_board = list()  #state로 데이터셋에 추가될 보드
@@ -147,10 +176,25 @@ class Generator:
             )
             move_yx = current_yx_list.pop() #좌표 yx 추출
 
-            #착수 가능 수인지 확인 필요
-            rule.evaluate_move(yx_board=yx_board, yx=move_yx)
+            #착수 가능 수인지 확인 필요   
+            # if current_turn != main_color:
+
+            concat_yx_board = yx_board.copy()
+            concat_yx_board.append(move_yx)
+
+            is_consecutive = Util.check_consecutive_is_N(
+                yx_board=concat_yx_board, origin_yx=move_yx, N=NOISE_SEQ_LIMIT
+            )
+            print(is_consecutive)
+                # if seq_num >= NOISE_SEQ_LIMIT:
+                #     print('NONO')
+                #     exit()
+                #     continue
+            
 
             yx_board.append(move_yx)
+        print(yx_board)
+        exit()
         
         
         print(f'now board: {yx_board}')
