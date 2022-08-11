@@ -95,33 +95,39 @@ class Generator:
         5개가 되는 위치에 각각 0.5 할당, 
         z = 1
         '''
-        
+
+        degree = 90
+        origin_yx = (0, 0)
+
         test = [(0, 0), (0, 1), (0, 2)]
+        print(f'degree: {degree}, origin_yx: {origin_yx}')
         print(test)
 
-        rotated_test = Util.rotate_yx_list(yx_list=test, rotate_degree=45, origin_yx=(0, 0))
-        
+        rotated_test = Util.rotate_yx_list(yx_list=test, rotate_degree=degree, origin_yx=origin_yx)
         print(rotated_test)
 
         print()
         test = [(0, 0), (1, 1), (2, 2)]
         print(test)
-
-        rotated_test = Util.rotate_yx_list(yx_list=test, rotate_degree=45, origin_yx=(0, 0))
+        rotated_test = Util.rotate_yx_list(yx_list=test, rotate_degree=degree, origin_yx=origin_yx)
         print(rotated_test)
 
         print()
         test = [(0, 0), (1, 0), (2, 0)]
         print(test)
-
-        rotated_test = Util.rotate_yx_list(yx_list=test, rotate_degree=45, origin_yx=(0, 0))
+        rotated_test = Util.rotate_yx_list(yx_list=test, rotate_degree=degree, origin_yx=origin_yx)
         print(rotated_test)
 
         print()
         test = [(0, 0), (1, -1), (2, -2)]
         print(test)
+        rotated_test = Util.rotate_yx_list(yx_list=test, rotate_degree=degree, origin_yx=origin_yx)
+        print(rotated_test)
 
-        rotated_test = Util.rotate_yx_list(yx_list=test, rotate_degree=45, origin_yx=(0, 0))
+        print()
+        test = [(1, -1), (2, 0), (3, 1)]
+        print(test)
+        rotated_test = Util.rotate_yx_list(yx_list=test, rotate_degree=degree, origin_yx=origin_yx)
         print(rotated_test)
         exit()
 
@@ -134,7 +140,6 @@ class Generator:
         
         main_color = np.random.randint(0, 2) #흑: 0, 백: 1
         rot_degree = np.random.choice((0, 45, 90, 135))
-
 
         print(f'degree: {rot_degree}')
         seq_yx_list, side_yx_list = self.get_seq_yx_list(seq_num=SEQUENCE_NUM, rotate_degree=rot_degree)

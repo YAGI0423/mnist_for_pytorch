@@ -36,17 +36,30 @@ class Util:
         * 특정 각도[rotate_radian] 만큼 회전한 리스트를 반환
         '''
 
-        def scaling_rotated_yx(rotated_yx):
+        def translate_matrix(yx_list, origin_yx):
             '''
-            *회전 후, 행렬 스케일링
+            * yx 좌표 리스트[yx_list]의 원점을 특정 좌표[origin_yx]로 행렬이동
             '''
-            y, x = rotated_yx
-            if abs(y) == abs(x):
-                y, x = math.ceil(y), math.ceil(x)
-                return (y, x)
+            ori_y, ori_x = origin_yx
+            return list((y-ori_y, x-ori_x) for y, x in yx_list)
 
-            y, x = math.trunc(y), math.trunc(x)
-            return (y, x)
+        def rotate_matrix(yx_list, degree):
+            '''
+            * 원점 (0, 0)을 기준으로 각도[degree]만큼 시계 반향으로 회전
+            '''
+            def dot_product(A, B):
+                '''
+                * A와 B를 행렬곱한 후, 정수로 변환하여 반환한다
+                '''
+                X = np.dot(A, B)
+                X = np.round(X).astype(int)
+                return tuple(X)
+
+            rotate_radian = math.radians(degree)
+            sin, cos = math.sin(rotate_radian), math.cos(rotate_radian)
+            R = ((cos, sin), (-sin, cos))   #회전 변환 행렬
+
+            return list(dot_product(R, yx) for yx in yx_list)
         
         #좌표 yx의 type 저장 및 체크
         if type(yx_list[0]) is list:
@@ -57,29 +70,14 @@ class Util:
             raise Exception(f'yx type must be `list` or `tuple`')
 
         #회전각[rotate_degree] 체크
-        if rotate_degree % 45 or rotate_degree > 135:   #회전 각이 45º 단위가 아니면 예외
-            raise Exception('[rotate_degree] must be 45º ~ 135º')
+        if not rotate_degree in (0, 90, 180, 270):   #회전 각이 45º 단위가 아니면 예외
+            raise Exception('[rotate_degree] must be 0º, 90º, 180º, 270º')
 
         ori_y, ori_x = origin_yx
-
-        print(f'degree: {rotate_degree}')
-        rotate_radian = math.radians(rotate_degree)
-        sin, cos = (math.sin(rotate_radian)), (math.cos(rotate_radian))
-        R = ((cos, sin), (-sin, cos))   #회전 변환 행렬
-
-        #설정한 좌표를 원점으로 설정
-        yx_list_moved_origin = list([y-ori_y, x-ori_x] for y, x in yx_list)
-
-        rotated_yx_list = list( #회전된 yx 리스트
-            np.dot(R, yx) + origin_yx for yx in yx_list_moved_origin
-        )
-        print(f'rotated_yx_list: {rotated_yx_list}')
-        #회전 후, 행렬 스케일링
-        scaled_yx_list = list(scaling_rotated_yx(yx) for yx in rotated_yx_list)
-
-        #입력 type으로 변환
-        type_yx_list = list(return_type(yx) for yx in scaled_yx_list)
-        return type_yx_list
+        return_yx = translate_matrix(yx_list=yx_list, origin_yx=origin_yx)   #좌표 원점 이동
+        return_yx = rotate_matrix(yx_list=return_yx, degree=rotate_degree)    #원점 기준 회전
+        return_yx = translate_matrix(yx_list=return_yx, origin_yx=(-ori_y, -ori_x))
+        return list(return_type(yx) for yx in return_yx)
     
     @staticmethod
     def check_consecutive_is_N(yx_board, origin_yx, N: int):
