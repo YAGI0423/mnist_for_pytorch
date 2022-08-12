@@ -16,29 +16,20 @@ class Generator:
 
         * [rotate_degree] = 0: oooo
         '''
+        if rotate_degree in (0, 90):
+            seq_yx_list = [[0, x] for x in range(-1, seq_num+1)]
         
+        if rotate_degree == 90:
+            seq_yx_list = Util.rotate_yx_list(yx_list=seq_yx_list, rotate_degree=rotate_degree, origin_yx=(0, 0))
 
-        seq_num += 2   #양 쪽 위치를 함께 반환하기 위해 +2
+        if rotate_degree == 45:
+            seq_yx_list = [[loc, loc] for loc in range(-1, seq_num+1)]
 
-        if rotate_degree == 0:   #회전 없을 시 그대로 반환
-            seq_yx_list = [[0, x] for x in range(-1, seq_num-1)]   #회전되지 않은 yx 리스트
-            side_yx_list = list(seq_yx_list.pop(pop_idx) for pop_idx in (0, -1))   #양 끝 yx 추출
-            return seq_yx_list, side_yx_list
-
-        #중심을 기준으로 회전하기 위한 돌의 위치 yx 리스트
-        seq_yx = list([0, x] for x in range(seq_num))
-
-        rotate_radian = math.radians(rotate_degree)
-
-        rot_seq_yx_list = Util.rotate_yx_list(yx_list=seq_yx, rotate_degree=rotate_degree)
-        rot_seq_yx_list -= np.min(rot_seq_yx_list, axis=0)   #y와 x 각각의 최소값을 튜플로 반환 e.g. (y_min, x_min)
+        if rotate_degree == 135:
+            seq_yx_list = [[seq_num-loc-1, loc] for loc in range(-1, seq_num+1)]
         
-        sin, cos = round(math.sin(rotate_radian)), round(math.cos(rotate_radian))
-        rot_seq_yx_list -= (abs(sin), abs(cos)) #회전된 yx의 좌표 범위가 -1 ~ [seq_num]이 되도록 수정
-        rot_seq_yx_list = rot_seq_yx_list.tolist()
-
-        side_yx_list = list(rot_seq_yx_list.pop(pop_idx) for pop_idx in (0, -1))   #양 끝 yx 추출
-        return rot_seq_yx_list, side_yx_list
+        side_yx_list = list(seq_yx_list.pop(pop_idx) for pop_idx in (0, -1))   #양 끝 yx 추출
+        return seq_yx_list, side_yx_list
 
     def get_limit_loc(self, seq_yx_list):
         '''
@@ -96,41 +87,6 @@ class Generator:
         z = 1
         '''
 
-        degree = 90
-        origin_yx = (0, 0)
-
-        test = [(0, 0), (0, 1), (0, 2)]
-        print(f'degree: {degree}, origin_yx: {origin_yx}')
-        print(test)
-
-        rotated_test = Util.rotate_yx_list(yx_list=test, rotate_degree=degree, origin_yx=origin_yx)
-        print(rotated_test)
-
-        print()
-        test = [(0, 0), (1, 1), (2, 2)]
-        print(test)
-        rotated_test = Util.rotate_yx_list(yx_list=test, rotate_degree=degree, origin_yx=origin_yx)
-        print(rotated_test)
-
-        print()
-        test = [(0, 0), (1, 0), (2, 0)]
-        print(test)
-        rotated_test = Util.rotate_yx_list(yx_list=test, rotate_degree=degree, origin_yx=origin_yx)
-        print(rotated_test)
-
-        print()
-        test = [(0, 0), (1, -1), (2, -2)]
-        print(test)
-        rotated_test = Util.rotate_yx_list(yx_list=test, rotate_degree=degree, origin_yx=origin_yx)
-        print(rotated_test)
-
-        print()
-        test = [(1, -1), (2, 0), (3, 1)]
-        print(test)
-        rotated_test = Util.rotate_yx_list(yx_list=test, rotate_degree=degree, origin_yx=origin_yx)
-        print(rotated_test)
-        exit()
-
         if noise_rate < 0 or 0.8 < noise_rate:  #[noise_rate] 제한 0 ~ 0.8
             raise Exception(f'[noise_rate] must be 0 ~ 0.8')
 
@@ -141,9 +97,12 @@ class Generator:
         main_color = np.random.randint(0, 2) #흑: 0, 백: 1
         rot_degree = np.random.choice((0, 45, 90, 135))
 
+
+        rot_degree = 135
         print(f'degree: {rot_degree}')
         seq_yx_list, side_yx_list = self.get_seq_yx_list(seq_num=SEQUENCE_NUM, rotate_degree=rot_degree)
         y_limit, x_limit = self.get_limit_loc(seq_yx_list=seq_yx_list)  #이동 가능한 최대 yx 좌표
+        
         move_yx = (np.random.randint(0, y_limit + 1), np.random.randint(0, x_limit + 1))  #이동 좌표 무작위 선택
 
         #seq 필터 및 사이드 yx 좌표 이동하기
@@ -166,6 +125,7 @@ class Generator:
         np.random.shuffle(able_yx_list)   #착수 가능 좌표 섞기
 
         print(f'current_color: {main_color}')
+        exit()
 
         #main_color에 따른 흑, 백 플레이어 좌표 리스트 할당하기
         black_yx_list = self.return_current_player(current_turn=main_color, black=seq_yx_list, white=able_yx_list)
