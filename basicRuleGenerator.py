@@ -1,11 +1,8 @@
-from tkinter import LAST
 from util import Util
-from rule import Rule
 
-import math
 import numpy as np
 
-import matplotlib.pyplot as plt
+
 
 class Generator:
     def __init__(self, board_size: int):
@@ -145,24 +142,24 @@ class Generator:
                 noise_num -= noise_num % 2    #노이즈 돌 개수는 반드시 짝수여야함
                 return noise_num
             #End========================
-            consecutive_yx_list = consecutive_yx_list.copy()   #pop 과정이 있으므로 원본 유지를 위해 복사
+            seq_yx_list = consecutive_yx_list.copy()   #pop 과정이 있으므로 원본 유지를 위해 복사
 
             yx_board = list()
 
             #착수 가능한 yx 좌표 리스트
             able_yx_list = get_able_move_yx_list(
-                disable_yx_list=consecutive_yx_list + side_yx_list,
+                disable_yx_list=seq_yx_list + side_yx_list,
                 board_size=self.board_size,
                 shuffle=True
             )
 
             #main_color에 따른 흑, 백 플레이어 좌표 리스트 할당하기
             black_yx_list, white_yx_list = self.distribe_player(
-                main_color=main_color, alpha_player=consecutive_yx_list, beta_player=able_yx_list
+                main_color=main_color, alpha_player=seq_yx_list, beta_player=able_yx_list
             )
 
             #basic rule 착수하기
-            while consecutive_yx_list:  #seq_yx_list의 yx를 소진할때 까지 반복
+            while seq_yx_list:  #seq_yx_list의 yx를 소진할때 까지 반복
                 current_turn = Util.get_current_color(yx_board)  #현재 플레이어 돌 색 얻기
                 current_yx_list = self.return_current_player(  #현재 플레이어 yx_list 반환
                     current_turn=current_turn,
@@ -241,9 +238,15 @@ class Generator:
         }
         
         yx_board = self.get_random_consecutive_yx_board(**args)
-        state = Util.yx_to_state(yx_board=yx_board, main_color=main_color, board_size=self.board_size)
+        state = Util.yx_board_to_state(yx_board=yx_board, main_color=main_color, board_size=self.board_size)
 
+        policy_per_move = 1. / len(side_yx_list)
+        
+
+        import matplotlib.pyplot as plt
         print(yx_board)
+        print(consecutive_yx_list)
+        print(side_yx_list)
         plt.imshow(state)
         plt.show()
         
@@ -269,7 +272,7 @@ class Generator:
 
 if __name__ == '__main__':
     gen = Generator(board_size=15)
-    gen.attack_four(noise_rate=0., size=10)
+    gen.attack_four(noise_rate=0.5, size=10)
 
     #현재 플레이어 돌이 막히지 않고 4개 연속 이어져있음. 5개가 되는 위치에 각각 0.5 할당. 승률 1
     # print(gen.generate_live_4_attack(1).get_sample(1.))

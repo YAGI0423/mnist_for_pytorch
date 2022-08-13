@@ -182,7 +182,7 @@ class Util:
         return False
 
     @staticmethod
-    def yx_to_state(yx_board, main_color: int, board_size: int):
+    def yx_board_to_state(yx_board, main_color: int, board_size: int):
         '''
         * yx 좌표로 이루어진 보드[yx_board]를 모델에 입력 가능한 형태[state]로 변환하여 반환
         '''
@@ -201,12 +201,3 @@ class Util:
         
         square_board[last_y][last_x][2] = 1.
         return square_board
-
-    @staticmethod
-    def idx_to_yx(idx, board_size: int):
-        '''
-        * 수의 인덱스 위치[idx]를 좌표[yx]로 변환하여 반환
-        '''
-        y = (idx // board_size)
-        x = (idx % board_size)
-        return (y, x)
