@@ -10,18 +10,8 @@ class Util:
         '''
         return len(yx_board) % 2
 
-    @classmethod
-    def get_last_color(cls, yx_board):
-        '''
-        * 좌표 보드를 입력받아 마지막 수의 플레이어 돌 색을 반환한다.
-        * 0: black, 1: white
-        ※ `get_current_color` 메소드와 구분할 것
-        '''
-        current_color = cls.get_current_color(yx_board)
-        return (current_color + 1) % 2
-
     @staticmethod
-    def get_idx_color(move_idx):
+    def get_move_idx_to_color(move_idx):
         '''
         * 착수 순서[move_idx]를 입력받아 해당 플레이어 돌 색을 반환한다.
         * 0: black, 1: white
@@ -171,7 +161,7 @@ class Util:
             yx_board = yx_board.copy()  #존재하지 않을 경우, 마지막 수로 추가
             yx_board.append(origin_yx)
         
-        check_yx_color = Util.get_idx_color(yx_board.index(origin_yx))
+        check_yx_color = Util.get_move_idx_to_color(yx_board.index(origin_yx))
         check_yx_board = yx_board[check_yx_color::2]    #체크할 플레이어 색의 돌만 추출
 
         cropped_yx_board = crop_yx_board(
@@ -190,3 +180,33 @@ class Util:
             if seq_num >= N:
                 return True #N만큼 연속된 돌 존재
         return False
+
+    @staticmethod
+    def yx_to_state(yx_board, main_color: int, board_size: int):
+        '''
+        * yx 좌표로 이루어진 보드[yx_board]를 모델에 입력 가능한 형태[state]로 변환하여 반환
+        '''
+        black_yx_list = yx_board[::2]   #흑돌 좌표만 필터링
+        white_yx_list = yx_board[1::2]  #백돌 좌표만 필터링
+        last_y, last_x = yx_board[-1]  #마지막 수의 좌표
+
+        square_board = np.zeros(shape=(board_size, board_size, 3), dtype=np.float32)
+        
+
+        for y, x in black_yx_list:
+            square_board[y][x][main_color] = 1.
+        
+        for y, x in white_yx_list:
+            square_board[y][x][int(not main_color)] = 1.
+        
+        square_board[last_y][last_x][2] = 1.
+        return square_board
+
+    @staticmethod
+    def idx_to_yx(idx, board_size: int):
+        '''
+        * 수의 인덱스 위치[idx]를 좌표[yx]로 변환하여 반환
+        '''
+        y = (idx // board_size)
+        x = (idx % board_size)
+        return (y, x)
