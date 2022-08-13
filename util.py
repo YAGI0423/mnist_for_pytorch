@@ -1,5 +1,4 @@
 import math
-import statistics
 import numpy as np
 
 class Util:
@@ -30,18 +29,19 @@ class Util:
         return move_idx % 2
 
     @staticmethod
+    def translate_matrix(yx_list, origin_yx):
+        '''
+        * yx 좌표 리스트[yx_list]의 원점을 특정 좌표[origin_yx]로 행렬이동
+        '''
+        ori_y, ori_x = origin_yx
+        return list((y-ori_y, x-ori_x) for y, x in yx_list)
+
+    @staticmethod
     def rotate_yx_list(yx_list: list, rotate_degree: int, origin_yx=(0, 0)):
         '''
         * 좌표 리스트[yx_list]를 원점[origin_yx]를 기준으로,
         * 특정 각도[rotate_radian] 만큼 회전한 리스트를 반환
         '''
-
-        def translate_matrix(yx_list, origin_yx):
-            '''
-            * yx 좌표 리스트[yx_list]의 원점을 특정 좌표[origin_yx]로 행렬이동
-            '''
-            ori_y, ori_x = origin_yx
-            return list((y-ori_y, x-ori_x) for y, x in yx_list)
 
         def rotate_matrix(yx_list, degree):
             '''
@@ -74,9 +74,9 @@ class Util:
             raise Exception('[rotate_degree] must be 0º, 90º, 180º, 270º')
 
         ori_y, ori_x = origin_yx
-        return_yx = translate_matrix(yx_list=yx_list, origin_yx=origin_yx)   #좌표 원점 이동
+        return_yx = Util.translate_matrix(yx_list=yx_list, origin_yx=origin_yx)   #좌표 원점 이동
         return_yx = rotate_matrix(yx_list=return_yx, degree=rotate_degree)    #원점 기준 회전
-        return_yx = translate_matrix(yx_list=return_yx, origin_yx=(-ori_y, -ori_x))
+        return_yx = Util.translate_matrix(yx_list=return_yx, origin_yx=(-ori_y, -ori_x))
         return list(return_type(yx) for yx in return_yx)
     
     @staticmethod
@@ -85,7 +85,6 @@ class Util:
         * yx 좌표 보드[yx_board]에서 특정 yx 좌표[origin_yx] 기준,
         [N]개 또는 그 이상의 연속된 돌의 존재 여부를 반환
         *True: 존재, False: 존재하지 않음
-        ※ [yx_board]에는 [origin_yx]의 좌표가 존재해야함
         '''
 
         #자체 함수=============================
@@ -147,34 +146,41 @@ class Util:
 
             total_consecutive_num = left_seq_num + 1 + right_seq_num    #원점 포함 전체 연속 돌 수
             return total_consecutive_num
+        
+        def count_diagonal_consecutive(cropped_yx_board, origin_yx):
+            '''
+            * `크롭된 좌표 리스트`[cropped_yx_board]에서 특정 좌표[origin_yx]를 기준으로 45º 대각선 연속된 돌의 수 반환
+            * [origin_yx] 기준, `45º 대각선 방향의 연속성만 판별`
+            * True: 연속적, False: 비연속적
+
+            ※ 반드시 `크롭된 좌표 리스트`만을 입력으로 하여야 함
+            '''
+            # 특정 좌표[origin_yx]를 원점(0, 0)으로 행렬 이동
+            return_yx = Util.translate_matrix(yx_list=cropped_yx_board, origin_yx=origin_yx)
+            
+            #y를 모두 0으로 통일하여 같은 행으로 위치
+            return_yx = list((0, x) for y, x in return_yx if abs(y) == abs(x))
+            seq_num = count_row_consecutive(cropped_yx_board=return_yx, origin_yx=(0, 0))
+            return seq_num
         #End===================================
 
-        print(yx_board)
-        print(origin_yx)
-        
-
-        #[origin_yx] 존재 여부 확인
-        if not origin_yx in yx_board:
-            raise Exception(f'must [origin_yx] in [yx_board]')
         
         check_yx_color = Util.get_idx_color(yx_board.index(origin_yx))
         check_yx_board = yx_board[check_yx_color::2]    #체크할 플레이어 색의 돌만 추출
 
         cropped_yx_board = crop_yx_board(
-            yx_board=check_yx_board,
-            cut_size=N - 1,
-            origin_yx=origin_yx
+            yx_board=check_yx_board, cut_size=N - 1, origin_yx=origin_yx
         )
-        print(cropped_yx_board)
 
-        for degree in (0, 45, 90, 135):
-            print(f'degree: {degree}')
+        for degree in (0, 90):
             rotated_yx_board = Util.rotate_yx_list(
                 yx_list=cropped_yx_board, rotate_degree=degree, origin_yx=origin_yx
             )
-            print(f'\trotated_yx_board: {rotated_yx_board}')
             seq_num = count_row_consecutive(cropped_yx_board=rotated_yx_board, origin_yx=origin_yx)
-            
             if seq_num >= N:
-                return True
+                return True #N만큼 연속된 돌 존재
+
+            seq_num = count_diagonal_consecutive(cropped_yx_board=rotated_yx_board, origin_yx=origin_yx)
+            if seq_num >= N:
+                return True #N만큼 연속된 돌 존재
         return False

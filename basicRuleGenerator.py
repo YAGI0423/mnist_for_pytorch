@@ -69,6 +69,15 @@ class Generator:
         '''
         return white if current_turn else black
 
+    def distribe_player(self, main_color, alpha_player, beta_player):
+        '''
+        [main_color]가 흑(0)이면, [alpha_player]가 흑을 잡고
+        백(1)이면, [alpha_player]가 백을 잡는다
+        '''
+        black = self.return_current_player(current_turn=main_color, black=alpha_player, white=beta_player)
+        white = self.return_current_player(current_turn=not main_color, black=alpha_player, white=beta_player)
+        return black, white
+
     def noise_rate_to_num(self, noise_rate: float, disable_num: int=0):
         '''
         * [noise_rate]에 해당하는 noise 돌의 수를 반환
@@ -97,8 +106,6 @@ class Generator:
         main_color = np.random.randint(0, 2) #흑: 0, 백: 1
         rot_degree = np.random.choice((0, 45, 90, 135))
 
-
-        rot_degree = 135
         print(f'degree: {rot_degree}')
         seq_yx_list, side_yx_list = self.get_seq_yx_list(seq_num=SEQUENCE_NUM, rotate_degree=rot_degree)
         y_limit, x_limit = self.get_limit_loc(seq_yx_list=seq_yx_list)  #이동 가능한 최대 yx 좌표
@@ -125,11 +132,11 @@ class Generator:
         np.random.shuffle(able_yx_list)   #착수 가능 좌표 섞기
 
         print(f'current_color: {main_color}')
-        exit()
 
         #main_color에 따른 흑, 백 플레이어 좌표 리스트 할당하기
-        black_yx_list = self.return_current_player(current_turn=main_color, black=seq_yx_list, white=able_yx_list)
-        white_yx_list = self.return_current_player(current_turn=not main_color, black=seq_yx_list, white=able_yx_list)
+        black_yx_list, white_yx_list = self.distribe_player(
+            main_color=main_color, alpha_player=seq_yx_list, beta_player=able_yx_list
+        )
         
         #basic rule 착수하기
         while seq_yx_list:  #seq_yx_list의 yx를 소진할때 까지 반복
@@ -141,31 +148,23 @@ class Generator:
             )
             move_yx = current_yx_list.pop() #좌표 yx 추출
 
-            #착수 가능 수인지 확인 필요   
-            # if current_turn != main_color:
+            #적의 수가 착수 가능한지 확인 필요   
+            if current_turn != main_color:
+                concat_yx_board = yx_board.copy()
+                concat_yx_board.append(move_yx)
 
-            concat_yx_board = yx_board.copy()
-            concat_yx_board.append(move_yx)
-
-            is_consecutive = Util.check_consecutive_is_N(
-                yx_board=concat_yx_board, origin_yx=move_yx, N=NOISE_SEQ_LIMIT
-            )
-            print(is_consecutive)
-                # if seq_num >= NOISE_SEQ_LIMIT:
-                #     print('NONO')
-                #     exit()
-                #     continue
+                is_consecutive = Util.check_consecutive_is_N(   #3개 이상 연속될 경우 continue
+                    yx_board=concat_yx_board, origin_yx=move_yx, N=NOISE_SEQ_LIMIT
+                )
+                if is_consecutive:
+                    continue
             
-
             yx_board.append(move_yx)
-        print(yx_board)
-        exit()
-        
         
         print(f'now board: {yx_board}')
         noise_num = self.noise_rate_to_num(  #[noise_rate]에 따른 noise 돌 수
             noise_rate=noise_rate,
-            disable_num=len(yx_board) + len(side_yx_list)   #사전에 예약된 수(move)
+            disable_num=len(yx_board + side_yx_list)   #사전에 예약된 수(move)
         )
         
         #noise stone 착수하기
@@ -174,9 +173,15 @@ class Generator:
             move_yx = able_yx_list.pop()
 
             #착수 가능 수인지 확인 필요
-            #---
-            yx_board.append(move_yx)
-            noise_stone_num += 1
+            concat_yx_board = yx_board.copy()
+            concat_yx_board.append(move_yx)
+            
+            is_consecutive = Util.check_consecutive_is_N(   #[NOISE_SEQ_LIMIT]개 이상 연속될 경우 continue
+                yx_board=concat_yx_board, origin_yx=move_yx, N=NOISE_SEQ_LIMIT
+            )
+            if not is_consecutive:
+                yx_board.append(move_yx)
+                noise_stone_num += 1
         
         print(yx_board)
         # print(able_yx_board)
