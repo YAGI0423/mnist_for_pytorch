@@ -85,6 +85,8 @@ class Util:
         * yx 좌표 보드[yx_board]에서 특정 yx 좌표[origin_yx] 기준,
         [N]개 또는 그 이상의 연속된 돌의 존재 여부를 반환
         *True: 존재, False: 존재하지 않음
+
+        *만약 [yx_board] 내부에 [origin_yx] 위치의 수가 없으면, 마지막 수로 가정함
         '''
 
         #자체 함수=============================
@@ -163,7 +165,11 @@ class Util:
             seq_num = count_row_consecutive(cropped_yx_board=return_yx, origin_yx=(0, 0))
             return seq_num
         #End===================================
-
+        
+        #[origin_yx] 존재 여부 확인
+        if not origin_yx in yx_board:
+            yx_board = yx_board.copy()  #존재하지 않을 경우, 마지막 수로 추가
+            yx_board.append(origin_yx)
         
         check_yx_color = Util.get_idx_color(yx_board.index(origin_yx))
         check_yx_board = yx_board[check_yx_color::2]    #체크할 플레이어 색의 돌만 추출
