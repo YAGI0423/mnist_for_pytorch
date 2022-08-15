@@ -70,13 +70,14 @@ class Util:
         return list(return_type(yx) for yx in return_yx)
     
     @staticmethod
-    def check_consecutive_is_N(yx_board, origin_yx, N: int):
+    def check_consecutive_is_N(yx_board, origin_yx, N: int, yx_color=None):
         '''
         * yx 좌표 보드[yx_board]에서 특정 yx 좌표[origin_yx] 기준,
         [N]개 또는 그 이상의 연속된 돌의 존재 여부를 반환
         *True: 존재, False: 존재하지 않음
 
-        *만약 [yx_board] 내부에 [origin_yx] 위치의 수가 없으면, 마지막 수로 가정함
+        *만약 [yx_board] 내부에 [origin_yx] 위치의 수가 없으면,
+        [origin_yx] 수의 플레이어 색[yx_color]에 따라 연속성 확인
         '''
 
         #자체 함수=============================
@@ -113,7 +114,6 @@ class Util:
             '''
             * `크롭된 좌표 리스트`[cropped_yx_board]에서 특정 좌표[origin_yx]를 기준으로 연속된 돌의 수 반환
             * [origin_yx] 기준, `가로 방향의 연속성만 판별`
-            * True: 연속적, False: 비연속적
 
             ※ 반드시 `크롭된 좌표 리스트`만을 입력으로 하여야 함
             '''
@@ -127,7 +127,7 @@ class Util:
                     num += 1
                 return num - 1
 
-            ori_y, ori_x = origin_yx[0], origin_yx[1]
+            ori_y, ori_x = origin_yx
             
             #y 좌표가 동일한 x좌표를 기준으로 하는(같은 행에 존재하는) x 좌표 값만 추출
             horizon_x_list = list(x-ori_x for y, x in cropped_yx_board if y==ori_y)
@@ -151,18 +151,25 @@ class Util:
             return_yx = Util.translate_matrix(yx_list=cropped_yx_board, origin_yx=origin_yx)
             
             #y를 모두 0으로 통일하여 같은 행으로 위치
-            return_yx = list((0, x) for y, x in return_yx if abs(y) == abs(x))
+            return_yx = list((0, x) for y, x in return_yx if -y == x)
             seq_num = count_row_consecutive(cropped_yx_board=return_yx, origin_yx=(0, 0))
             return seq_num
         #End===================================
-        
+
+        check_yx_board = yx_board.copy()
+
         #[origin_yx] 존재 여부 확인
-        if not origin_yx in yx_board:
-            yx_board = yx_board.copy()  #존재하지 않을 경우, 마지막 수로 추가
-            yx_board.append(origin_yx)
+        if not origin_yx in check_yx_board:
+            if yx_color is None:
+                raise Exception(f'If [origin_yx] not in [yx_board], must input [yx_color]')
+            current_color = Util.get_current_color(check_yx_board)
+            if yx_color == current_color:
+                check_yx_board.append(origin_yx)
+            else:
+                check_yx_board.extend(((999, 999), origin_yx))
         
-        check_yx_color = Util.get_move_idx_to_color(yx_board.index(origin_yx))
-        check_yx_board = yx_board[check_yx_color::2]    #체크할 플레이어 색의 돌만 추출
+        check_yx_color = Util.get_move_idx_to_color(check_yx_board.index(origin_yx))
+        check_yx_board = check_yx_board[check_yx_color::2]    #체크할 플레이어 색의 돌만 추출
 
         cropped_yx_board = crop_yx_board(
             yx_board=check_yx_board, cut_size=N - 1, origin_yx=origin_yx
@@ -201,3 +208,11 @@ class Util:
         
         square_board[last_y][last_x][2] = 1.
         return square_board
+
+    @staticmethod
+    def yx_to_idx(yx, board_size: int):
+        '''
+        *좌표 보드[yx_board]를 입력받아 1차원 좌표 idx로 반환
+        '''
+        y, x = yx
+        return y * board_size + x
