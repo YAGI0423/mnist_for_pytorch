@@ -1,4 +1,5 @@
 from util import Util
+from databook import Databook
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -251,11 +252,11 @@ class Generator:
         NOISE_SEQ_LIMIT = 2 #노이즈 수의 연속 개수 제한
         Z_VALUE = 1.    #가치 값 z
         
-        state_list = np.empty(shape=(size, self.board_size, self.board_size, 3))
-        policy_y_list = np.empty(shape=(size, self.board_size**2))
-        value_y_list = np.empty(shape=(size))
+        state_list = list()
+        policy_y_list = list()
+        value_y_list = list()
 
-        for data_idx in range(size):
+        for _ in range(size):
             seq_color = np.random.randint(0, 2) #흑: 0, 백: 1
             main_color = seq_color
             rot_degree = np.random.choice((0, 45, 90, 135))
@@ -280,10 +281,10 @@ class Generator:
                 yx_board=yx_board, main_color=main_color, board_size=self.board_size
             )
             policy_y = self.get_policy_y(policy_value=1., side_yx_list=side_yx_list)
-            
-            state_list[data_idx] = state
-            policy_y_list[data_idx] = policy_y
-            value_y_list[data_idx] = Z_VALUE
+
+            state_list.append(list(state))
+            policy_y_list.append(list(policy_y))
+            value_y_list.append([Z_VALUE])
 
             dataset = {
                 'state': state_list,
@@ -296,7 +297,7 @@ class Generator:
         '''
         * 상대 플레이어 돌이 막히지 않고 4개 연속 이어져있음, 
         * 5개가 되는 위치에 각각 0.5 할당, 
-        * z = 0
+        * z = -1
         '''
         
         if noise_rate < 0 or 0.8 < noise_rate:  #[noise_rate] 제한 0 ~ 0.8
@@ -305,13 +306,13 @@ class Generator:
         SEQUENCE_NUM = 4
         LIMIT_SIDE_NUM = 2  #최소 side space
         NOISE_SEQ_LIMIT = 2 #노이즈 수의 연속 개수 제한
-        Z_VALUE = 0.    #가치 값 z
+        Z_VALUE = -1.0    #가치 값 z
         
-        state_list = np.empty(shape=(size, self.board_size, self.board_size, 3))
-        policy_y_list = np.empty(shape=(size, self.board_size**2))
-        value_y_list = np.empty(shape=(size))
+        state_list = list()
+        policy_y_list = list()
+        value_y_list = list()
 
-        for data_idx in range(size):
+        for _ in range(size):
             seq_color = np.random.randint(0, 2) #흑: 0, 백: 1
             main_color = int(not seq_color)
             rot_degree = np.random.choice((0, 45, 90, 135))
@@ -346,10 +347,9 @@ class Generator:
             )
             policy_y = self.get_policy_y(policy_value=1., side_yx_list=side_yx_list)
             
-            state_list[data_idx] = state
-            policy_y_list[data_idx] = policy_y
-            value_y_list[data_idx] = Z_VALUE
-
+            state_list.append(list(state))
+            policy_y_list.append(list(policy_y))
+            value_y_list.append([Z_VALUE])
             dataset = {
                 'state': state_list,
                 'policy_y': policy_y_list,
@@ -372,11 +372,11 @@ class Generator:
         NOISE_SEQ_LIMIT = 2 #노이즈 수의 연속 개수 제한
         Z_VALUE = 1.    #가치 값 z
         
-        state_list = np.empty(shape=(size, self.board_size, self.board_size, 3))
-        policy_y_list = np.empty(shape=(size, self.board_size**2))
-        value_y_list = np.empty(shape=(size))
+        state_list = list()
+        policy_y_list = list()
+        value_y_list = list()
 
-        for data_idx in range(size):
+        for _ in range(size):
             seq_color = np.random.randint(0, 2) #흑: 0, 백: 1
             main_color = seq_color
             rot_degree = np.random.choice((0, 45, 90, 135))
@@ -402,9 +402,9 @@ class Generator:
             )
             policy_y = self.get_policy_y(policy_value=1., side_yx_list=side_yx_list)
             
-            state_list[data_idx] = state
-            policy_y_list[data_idx] = policy_y
-            value_y_list[data_idx] = Z_VALUE
+            state_list.append(list(state))
+            policy_y_list.append(list(policy_y))
+            value_y_list.append([Z_VALUE])
 
             dataset = {
                 'state': state_list,
@@ -428,11 +428,11 @@ class Generator:
         NOISE_SEQ_LIMIT = 2 #노이즈 수의 연속 개수 제한
         Z_VALUE = 0.    #가치 값 z
         
-        state_list = np.empty(shape=(size, self.board_size, self.board_size, 3))
-        policy_y_list = np.empty(shape=(size, self.board_size**2))
-        value_y_list = np.empty(shape=(size))
+        state_list = list()
+        policy_y_list = list()
+        value_y_list = list()
 
-        for data_idx in range(size):
+        for _ in range(size):
             seq_color = np.random.randint(0, 2) #흑: 0, 백: 1
             main_color = int(not seq_color)
             rot_degree = np.random.choice((0, 45, 90, 135))
@@ -467,9 +467,9 @@ class Generator:
             )
             policy_y = self.get_policy_y(policy_value=1., side_yx_list=side_yx_list)
             
-            state_list[data_idx] = state
-            policy_y_list[data_idx] = policy_y
-            value_y_list[data_idx] = Z_VALUE
+            state_list.append(list(state))
+            policy_y_list.append(list(policy_y))
+            value_y_list.append([Z_VALUE])
 
             dataset = {
                 'state': state_list,
@@ -493,11 +493,11 @@ class Generator:
         NOISE_SEQ_LIMIT = 2 #노이즈 수의 연속 개수 제한
         Z_VALUE = 1.    #가치 값 z
         
-        state_list = np.empty(shape=(size, self.board_size, self.board_size, 3))
-        policy_y_list = np.empty(shape=(size, self.board_size**2))
-        value_y_list = np.empty(shape=(size))
+        state_list = list()
+        policy_y_list = list()
+        value_y_list = list()
 
-        for data_idx in range(size):
+        for _ in range(size):
             seq_color = np.random.randint(0, 2) #흑: 0, 백: 1
             main_color = seq_color
             rot_degree = np.random.choice((0, 45, 90, 135))
@@ -533,10 +533,10 @@ class Generator:
                 yx_board=yx_board, main_color=main_color, board_size=self.board_size
             )
             policy_y = self.get_policy_y(policy_value=1., side_yx_list=(delete_seq_yx, ))
-            print(f'new: {delete_seq_yx}')
-            state_list[data_idx] = state
-            policy_y_list[data_idx] = policy_y
-            value_y_list[data_idx] = Z_VALUE
+            
+            state_list.append(list(state))
+            policy_y_list.append(list(policy_y))
+            value_y_list.append([Z_VALUE])
 
             dataset = {
                 'state': state_list,
@@ -558,13 +558,13 @@ class Generator:
         SEQUENCE_NUM = 4
         LIMIT_SIDE_NUM = 2  #최소 side space
         NOISE_SEQ_LIMIT = 2 #노이즈 수의 연속 개수 제한
-        Z_VALUE = 1.    #가치 값 z
+        Z_VALUE = 0.    #가치 값 z
         
-        state_list = np.empty(shape=(size, self.board_size, self.board_size, 3))
-        policy_y_list = np.empty(shape=(size, self.board_size**2))
-        value_y_list = np.empty(shape=(size))
+        state_list = list()
+        policy_y_list = list()
+        value_y_list = list()
 
-        for data_idx in range(size):
+        for _ in range(size):
             seq_color = np.random.randint(0, 2) #흑: 0, 백: 1
             main_color = int(not seq_color)
             rot_degree = np.random.choice((0, 45, 90, 135))
@@ -614,9 +614,9 @@ class Generator:
             center_idx = Util.yx_to_idx(yx=delete_seq_yx, board_size=self.board_size)
             policy_y[center_idx] = 0.5
             
-            state_list[data_idx] = state
-            policy_y_list[data_idx] = policy_y
-            value_y_list[data_idx] = Z_VALUE
+            state_list.append(list(state))
+            policy_y_list.append(list(policy_y))
+            value_y_list.append([Z_VALUE])
 
             dataset = {
                 'state': state_list,
@@ -626,53 +626,35 @@ class Generator:
         return dataset
     
 
-
-
 if __name__ == '__main__':
-    gen = Generator(board_size=10)
-    dataset = gen.defend_space_three(noise_rate=0.1, size=2)
-    print(dataset)
+    gen = Generator(board_size=15)
+    databook = Databook()
 
-    plt.imshow(dataset['state'][1])
-    plt.show()
-    #현재 플레이어 돌이 막히지 않고 4개 연속 이어져있음. 5개가 되는 위치에 각각 0.5 할당. 승률 1
-    # print(gen.generate_live_4_attack(1).get_sample(1.))   
+    def generate():
+        pass
+
+    gen_func_tup = (
+        'attack_four', 'defend_four',
+        'attack_three', 'defend_three',
+        'attack_space_three', 'defend_space_three'
+    )
+
+    limit_dataset_size = 15000
     
+    dataset_size = 0
+    print(f'DATASET SIZE'.center(50, '='))
+    while dataset_size <= limit_dataset_size:    
+        for func in gen_func_tup:
+            noise_rate = np.random.uniform(0.1, 0.8)
+            noise_rate = round(noise_rate, 1)
 
-    #적 플레이어 돌이 막히지 않고 4개 연속 이어져있음. 5개가 되는 위치에 각각 0.5 할당. 승률 -1
-    # obs, color, last_move, pi, z = gen.generate_live_4_defend(1).get_sample(1.)
-    # print(obs, color, last_move, np.array(pi).reshape(15, 15), z)
+            dataset = getattr(gen, func)(noise_rate=noise_rate, size=1000)
+            databook.add_data(dataset=dataset)
+        dataset_size = databook.size()
 
+        
+        if not dataset_size % (1000 * 6):
+            print(f'Dataset size: {dataset_size:,}')
+    print(f'=' * 50)
 
-    #현재 플레이어 돌이 막히지 않고 3개 연속 이어져있음. 4개가 되는 위치에 각각 0.5 할당. 승률 1
-    # obs, color, last_move, pi, z = gen.generate_live_3_ooo_attack(1).get_sample(1.)
-    # print(obs, end='\n\n')
-    # print(np.array(pi).reshape(15, 15), end='\n\n')
-    # print(color, end='\n\n')
-    # print(last_move, end='\n\n')
-    # print(z, end='\n\n')
-
-
-    #적 플레이어 돌이 막히지 않고 3개 연속 이어져있음. 4개가 되는 위치에 각각 0.5 할당. 승률 0
-    # obs, color, last_move, pi, z = gen.generate_live_3_ooo_defend(1).get_sample(1.)
-    # print(obs, end='\n\n')
-    # print(np.array(pi).reshape(15, 15), end='\n\n')
-    # print(color, end='\n\n')
-    # print(last_move, end='\n\n')
-    # print(z, end='\n\n')
-   
-    #현재 플레이어 돌이 00_0 형태로 되어있음. 4개가 되는 위치에 각각 1 할당. 승률 1
-    # obs, color, last_move, pi, z = gen.generate_live_3_oo_o_attack(1).get_sample(1.)
-    # print(obs, end='\n\n')
-    # print(np.array(pi).reshape(15, 15), end='\n\n')
-    # print(color, end='\n\n')
-    # print(last_move, end='\n\n')
-    # print(z, end='\n\n')
-
-    #적 플레이어 돌이 00_0 형태로 되어있음. 비어있는 중앙 0.5, 양쪽 0.25 할당. 승률 0
-    # obs, color, last_move, pi, z = gen.generate_live_3_oo_o_defend(1).get_sample(1.)
-    # print(obs, end='\n\n')
-    # print(np.array(pi).reshape(15, 15), end='\n\n')
-    # print(color, end='\n\n')
-    # print(last_move, end='\n\n')
-    # print(z, end='\n\n')
+    databook.print_dataset_shape()
