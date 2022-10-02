@@ -648,7 +648,7 @@ if __name__ == '__main__':
             noise_rate = np.random.uniform(0.1, 0.8)
             noise_rate = round(noise_rate, 1)
 
-            dataset = getattr(gen, func)(noise_rate=noise_rate, size=10)
+            dataset = getattr(gen, func)(noise_rate=noise_rate, size=1000)
             databook.add_data(dataset=dataset)
         dataset_size = databook.size()
 

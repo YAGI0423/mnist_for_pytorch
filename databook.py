@@ -45,3 +45,6 @@ class Databook:
             shape = np.shape(self.__dict__[key])
             print(f'{key:>10} shape: {shape}')
         print('=' * 50, end='\n\n\n')
+
+    def save_databook(self):
+        pass
