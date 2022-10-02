@@ -658,3 +658,4 @@ if __name__ == '__main__':
     # print(f'=' * 50)
 
     databook.print_dataset_shape()
+    databook.save_databook()

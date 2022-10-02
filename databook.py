@@ -1,3 +1,4 @@
+import json
 import numpy as np
 
 class Databook:
@@ -47,4 +48,10 @@ class Databook:
         print('=' * 50, end='\n\n\n')
 
     def save_databook(self):
-        pass
+        databook = {
+            'state': self.state,
+            'policy_y': self.policy_y,
+            'value_y': self.value_y,
+        }
+        with open('./databook/databook.json', 'w') as json_file:
+            json.dump(databook, json_file)
