@@ -279,11 +279,11 @@ class Generator:
             yx_board = self.get_random_consecutive_yx_board(**args)
             state = Util.yx_board_to_state(
                 yx_board=yx_board, main_color=main_color, board_size=self.board_size
-            )
+            ).tolist()
             policy_y = self.get_policy_y(policy_value=1., side_yx_list=side_yx_list)
 
-            state_list.append(list(state))
-            policy_y_list.append(list(policy_y))
+            state_list.append(state)
+            policy_y_list.append(policy_y)
             value_y_list.append([Z_VALUE])
 
             dataset = {
@@ -344,12 +344,13 @@ class Generator:
 
             state = Util.yx_board_to_state(
                 yx_board=yx_board, main_color=main_color, board_size=self.board_size
-            )
+            ).tolist()
             policy_y = self.get_policy_y(policy_value=1., side_yx_list=side_yx_list)
             
-            state_list.append(list(state))
-            policy_y_list.append(list(policy_y))
+            state_list.append(state)
+            policy_y_list.append(policy_y)
             value_y_list.append([Z_VALUE])
+
             dataset = {
                 'state': state_list,
                 'policy_y': policy_y_list,
@@ -399,11 +400,11 @@ class Generator:
             yx_board = self.get_random_consecutive_yx_board(**args)
             state = Util.yx_board_to_state(
                 yx_board=yx_board, main_color=main_color, board_size=self.board_size
-            )
+            ).tolist()
             policy_y = self.get_policy_y(policy_value=1., side_yx_list=side_yx_list)
             
-            state_list.append(list(state))
-            policy_y_list.append(list(policy_y))
+            state_list.append(state)
+            policy_y_list.append(policy_y)
             value_y_list.append([Z_VALUE])
 
             dataset = {
@@ -464,11 +465,11 @@ class Generator:
 
             state = Util.yx_board_to_state(
                 yx_board=yx_board, main_color=main_color, board_size=self.board_size
-            )
+            ).tolist()
             policy_y = self.get_policy_y(policy_value=1., side_yx_list=side_yx_list)
             
-            state_list.append(list(state))
-            policy_y_list.append(list(policy_y))
+            state_list.append(state)
+            policy_y_list.append(policy_y)
             value_y_list.append([Z_VALUE])
 
             dataset = {
@@ -531,13 +532,13 @@ class Generator:
             
             state = Util.yx_board_to_state(
                 yx_board=yx_board, main_color=main_color, board_size=self.board_size
-            )
+            ).tolist()
             policy_y = self.get_policy_y(policy_value=1., side_yx_list=(delete_seq_yx, ))
             
-            state_list.append(list(state))
-            policy_y_list.append(list(policy_y))
+            state_list.append(state)
+            policy_y_list.append(policy_y)
             value_y_list.append([Z_VALUE])
-
+            
             dataset = {
                 'state': state_list,
                 'policy_y': policy_y_list,
@@ -608,16 +609,15 @@ class Generator:
             
             state = Util.yx_board_to_state(
                 yx_board=yx_board, main_color=main_color, board_size=self.board_size
-            )
-
+            ).tolist()
             policy_y = self.get_policy_y(policy_value=0.5, side_yx_list=side_yx_list)
             center_idx = Util.yx_to_idx(yx=delete_seq_yx, board_size=self.board_size)
             policy_y[center_idx] = 0.5
             
-            state_list.append(list(state))
-            policy_y_list.append(list(policy_y))
+            state_list.append(state)
+            policy_y_list.append(policy_y)
             value_y_list.append([Z_VALUE])
-
+            
             dataset = {
                 'state': state_list,
                 'policy_y': policy_y_list,
@@ -648,7 +648,7 @@ if __name__ == '__main__':
             noise_rate = np.random.uniform(0.1, 0.8)
             noise_rate = round(noise_rate, 1)
 
-            dataset = getattr(gen, func)(noise_rate=noise_rate, size=1000)
+            dataset = getattr(gen, func)(noise_rate=noise_rate, size=10)
             databook.add_data(dataset=dataset)
         dataset_size = databook.size()
 
