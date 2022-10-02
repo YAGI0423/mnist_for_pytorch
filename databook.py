@@ -53,5 +53,6 @@ class Databook:
             'policy_y': self.policy_y,
             'value_y': self.value_y,
         }
+        
         with open('./databook/databook.json', 'w') as json_file:
             json.dump(databook, json_file)
