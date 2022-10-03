@@ -630,9 +630,6 @@ if __name__ == '__main__':
     gen = Generator(board_size=15)
     databook = Databook()
 
-    def generate():
-        pass
-
     gen_func_tup = (
         'attack_four', 'defend_four',
         'attack_three', 'defend_three',
