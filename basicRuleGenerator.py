@@ -2,8 +2,6 @@ from util import Util
 from databook import Databook
 
 import numpy as np
-import matplotlib.pyplot as plt
-
 
 class Generator:
     def __init__(self, board_size: int):
@@ -652,7 +650,7 @@ if __name__ == '__main__':
         
         if not dataset_size % (1000 * 6):
             print(f'Dataset size: {dataset_size:,}')
-    print(f'=' * 50)
+    # print(f'=' * 50)
 
     databook.print_dataset_shape()
     databook.save_databook()
