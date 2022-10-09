@@ -647,7 +647,6 @@ if __name__ == '__main__':
             databook.add_data(dataset=dataset)
         dataset_size = databook.size()
 
-        
         if not dataset_size % (1000 * 6):
             print(f'Dataset size: {dataset_size:,}')
     print(f'=' * 50)
