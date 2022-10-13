@@ -1,5 +1,5 @@
 from util import Util
-from databook import Databook
+from collector import Collector
 
 import numpy as np
 
@@ -629,7 +629,7 @@ if __name__ == '__main__':
     BOARD_SIZE = 15
 
     gen = Generator(board_size=BOARD_SIZE)
-    databook = Databook()
+    collector = Collector()
 
     gen_func_tup = (
         'attack_four', 'defend_four',
@@ -642,7 +642,7 @@ if __name__ == '__main__':
         noise_rate = round(noise_rate, 1)
 
         dataset = getattr(gen, func)(noise_rate=noise_rate, size=DATASET_SIZE_EACH_RULE)
-        databook.add_data(dataset=dataset)
+        collector.add_data(dataset=dataset)
 
-    databook.print_dataset_shape()
-    # databook.save_databook()
+    collector.print_dataset_shape()
+    collector.save_dataset()

@@ -1,7 +1,7 @@
 import json
 import numpy as np
 
-class Databook:
+class Collector:
     def __init__(self):
         self.state = list()
         self.policy_y = list()
@@ -47,14 +47,5 @@ class Databook:
             print(f'{key:>10} shape: {shape}')
         print('=' * 50, end='\n\n\n')
 
-    def save_databook(self, file_type: str='txt'):
-        if file_type == 'json':
-            databook = {
-                'state': self.state,
-                'policy_y': self.policy_y,
-                'value_y': self.value_y,
-            }
-            with open('./databook/databook.json', 'w') as json_file:
-                json.dump(databook, json_file)
-        if file_type == 'txt':
-            pass
+    def save_dataset(self):
+        pass
