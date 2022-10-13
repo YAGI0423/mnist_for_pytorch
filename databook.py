@@ -47,11 +47,14 @@ class Databook:
             print(f'{key:>10} shape: {shape}')
         print('=' * 50, end='\n\n\n')
 
-    def save_databook(self):
-        databook = {
-            'state': self.state,
-            'policy_y': self.policy_y,
-            'value_y': self.value_y,
-        }
-        with open('./databook/databook.json', 'w') as json_file:
-            json.dump(databook, json_file)
+    def save_databook(self, file_type: str='txt'):
+        if file_type == 'json':
+            databook = {
+                'state': self.state,
+                'policy_y': self.policy_y,
+                'value_y': self.value_y,
+            }
+            with open('./databook/databook.json', 'w') as json_file:
+                json.dump(databook, json_file)
+        if file_type == 'txt':
+            pass
