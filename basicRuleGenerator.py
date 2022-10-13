@@ -625,7 +625,7 @@ class Generator:
     
 
 if __name__ == '__main__':
-    DATASET_SIZE_EACH_RULE = 150
+    DATASET_SIZE_EACH_RULE = 15
     BOARD_SIZE = 15
 
     gen = Generator(board_size=BOARD_SIZE)
