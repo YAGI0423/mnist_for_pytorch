@@ -625,7 +625,10 @@ class Generator:
     
 
 if __name__ == '__main__':
-    gen = Generator(board_size=15)
+    DATASET_SIZE_EACH_RULE = 150
+    BOARD_SIZE = 15
+
+    gen = Generator(board_size=BOARD_SIZE)
     databook = Databook()
 
     gen_func_tup = (
@@ -633,23 +636,13 @@ if __name__ == '__main__':
         'attack_three', 'defend_three',
         'attack_space_three', 'defend_space_three'
     )
-
-    limit_dataset_size = 15000
     
-    dataset_size = 0
-    print(f'DATASET SIZE'.center(50, '='))
-    while dataset_size <= limit_dataset_size:    
-        for func in gen_func_tup:
-            noise_rate = np.random.uniform(0.1, 0.8)
-            noise_rate = round(noise_rate, 1)
+    for func in gen_func_tup:
+        noise_rate = np.random.uniform(0.1, 0.8)
+        noise_rate = round(noise_rate, 1)
 
-            dataset = getattr(gen, func)(noise_rate=noise_rate, size=1000)
-            databook.add_data(dataset=dataset)
-        dataset_size = databook.size()
-
-        if not dataset_size % (1000 * 6):
-            print(f'Dataset size: {dataset_size:,}')
-    print(f'=' * 50)
+        dataset = getattr(gen, func)(noise_rate=noise_rate, size=DATASET_SIZE_EACH_RULE)
+        databook.add_data(dataset=dataset)
 
     databook.print_dataset_shape()
-    databook.save_databook()
+    # databook.save_databook()
