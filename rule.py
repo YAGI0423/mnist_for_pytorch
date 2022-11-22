@@ -1,6 +1,5 @@
 from util import Util
 
-
 class Rule:
     def __init__(self, board_size, win_sequence):
         self.board_size = board_size
