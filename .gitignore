@@ -129,5 +129,4 @@ dmypy.json
 .pyre/
 
 #personal
-/previous_code/
-/dataset/
+mnist/
