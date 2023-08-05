@@ -43,7 +43,7 @@ dataset = MnistDataset(
     is_train=True,
     flatten=False,
     normalize=True,
-    root='./mnist'
+    root='./mnistForPytorch/mnist'
 )
 
 #DataLoader
