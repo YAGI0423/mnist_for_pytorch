@@ -6,7 +6,7 @@ from torch import Tensor
 
 class MnistDataset(Dataset):
     def __init__(self, is_train: bool=True,
-                 flatten: bool=False, normalize: bool=False, root: str='./mnist') -> None:
+                 flatten: bool=False, normalize: bool=False, root: str='./mnistForPytorch/mnist') -> None:
         
         self.x, self.y = self.__getMnist(root=root, is_train=is_train)
         
