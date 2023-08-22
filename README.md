@@ -30,7 +30,7 @@
 
 ## Getting Start
 
-### Get Logic Dataset
+### Get MNIST Dataset
 ```python
 from torch.utils.data import DataLoader
 from mnistForPytorch.datasets import MnistDataset
